@@ -216,7 +216,7 @@ async function loadJobs() {
   try {
     let query = db.from('jobs')
       .select(`id, job_date, status, scope, site_notes, is_fixed_price, quote_amount,
-               work_order_number, purchase_order_number,
+               work_order_number, purchase_order_number, account_id,
                assigned_tech_ids, lead_tech_id,
                accounts!jobs_account_id_fkey(account_name, address),
                sub:accounts!jobs_sub_account_id_fkey(account_name),
@@ -526,7 +526,7 @@ async function loadTechJobPhotos(jobId) {
       ${p.url
         ? `<a href="${p.url}" target="_blank"><img src="${p.url}"
             style="width:100px;height:80px;object-fit:cover;border:1px solid #ccc;display:block"
-            onerror="this.parentElement.innerHTML='<div style=&quot;width:100px;height:80px;background:#eee;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:0.75rem;padding:4px&quot;>${p.file_name||&quot;photo&quot;}</div>'"></a>`
+            onerror="this.parentElement.innerHTML='<div style=&quot;width:100px;height:80px;background:#eee;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:0.75rem;padding:4px&quot;>${p.file_name||\'photo\'}</div>'"></a>`
         : `<div style="width:100px;height:80px;background:#eee;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:0.75rem;padding:4px">${p.file_name||'photo'}</div>`
       }
       <div style="font-size:0.72rem;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px">
