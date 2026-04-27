@@ -379,6 +379,15 @@ async function openJobDetail(jobId) {
         <div style="margin-top:0.8rem">
           <button class="btn btn-secondary" style="width:100%" onclick="openAddNote('${jobId}')">Add Note</button>
         </div>
+      </div>
+      <div class="form-section">
+        <div class="section-title">Photos</div>
+        <div id="tech-job-photos-${jobId}" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem">
+          <span style="font-size:0.82rem;color:#aaa">Loading photos...</span>
+        </div>
+        <div class="form-row"><label>Add Photos</label><input type="file" id="extra-photos-${jobId}" accept="image/*" multiple></div>
+        <button class="btn btn-secondary" style="width:100%" onclick="uploadExtraPhotos('${jobId}')">Upload More Photos</button>
+        <div id="extra-photo-msg-${jobId}" style="font-size:0.82rem;color:#2a7a2a;margin-top:0.3rem"></div>
       </div>`;
   } else {
     completionSection = `
@@ -441,12 +450,56 @@ async function openJobDetail(jobId) {
   if (!submitted) {
     renderPartsTable('m');
     renderLaborTable('m');
+  } else {
+    loadTechJobPhotos(jobId);
   }
   document.getElementById('modal').style.display = '';
   window.scrollTo(0, 0);
 }
 
 function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+// ---- JOB PHOTOS (tech view) ----
+async function loadTechJobPhotos(jobId) {
+  const grid = document.getElementById(`tech-job-photos-${jobId}`);
+  if (!grid) return;
+
+  const { data: photos } = await db.from('job_photos')
+    .select('id,storage_path,file_name,uploaded_at')
+    .eq('job_id', jobId)
+    .order('uploaded_at', { ascending: false });
+
+  if (!photos?.length) {
+    grid.innerHTML = '<span style="font-size:0.82rem;color:#aaa">No photos uploaded yet.</span>';
+    return;
+  }
+
+  const signedUrls = await Promise.all(photos.map(async p => {
+    const { data } = await db.storage.from('job-photos').createSignedUrl(p.storage_path, 3600);
+    return { ...p, url: data?.signedUrl || null };
+  }));
+
+  grid.innerHTML = signedUrls.map(p => p.url
+    ? `<div style="text-align:center">
+        <a href="${p.url}" target="_blank">
+          <img src="${p.url}" style="width:90px;height:72px;object-fit:cover;border:1px solid #ccc;display:block">
+        </a>
+        <div style="font-size:0.72rem;color:#666;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.file_name||''}</div>
+       </div>`
+    : ''
+  ).join('');
+}
+
+async function uploadExtraPhotos(jobId) {
+  const input = document.getElementById(`extra-photos-${jobId}`);
+  const msgEl = document.getElementById(`extra-photo-msg-${jobId}`);
+  if (!input?.files?.length) { msgEl.textContent = 'No files selected.'; return; }
+  msgEl.textContent = 'Uploading...';
+  await uploadPhotos(input.files, jobId);
+  input.value = '';
+  msgEl.textContent = 'Uploaded.';
+  await loadTechJobPhotos(jobId);
+}
 
 // ---- PARTS SEARCH ----
 function searchParts(prefix) {
@@ -459,7 +512,7 @@ function searchParts(prefix) {
   if (!matches.length) { results.style.display = 'none'; return; }
   results.style.display = '';
   results.innerHTML = matches.map(p =>
-    `<div onclick="addPart('${prefix}','${p.id}',${JSON.stringify(p.part_name)},${JSON.stringify(p.unit||'')})">
+    `<div onmousedown="event.preventDefault();addPart('${prefix}','${p.id}',${JSON.stringify(p.part_name)},${JSON.stringify(p.unit||'')})">
       ${p.part_name}${p.unit ? ` (${p.unit})` : ''}${p.category ? ` | ${p.category}` : ''}
     </div>`).join('');
 }

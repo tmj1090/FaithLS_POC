@@ -407,7 +407,7 @@ function sortAndRender() {
 function showSection(name) {
   ['list','add','detail'].forEach(s => {
     const el = document.getElementById(`section-${s}`);
-    if (el) el.style.display = s === name ? '' : 'none';
+    if (el) el.style.display = s === name ? 'block' : 'none';
   });
   document.querySelectorAll('nav button').forEach((b, i) => {
     b.classList.toggle('active', ['list','add'][i] === name);
@@ -478,7 +478,7 @@ async function openDetail(accountId) {
   if (!a) return;
 
   showSection('detail');
-  document.getElementById('section-detail').style.display = '';
+  document.getElementById('section-detail').style.display = 'block';
 
   const stats = allJobsByAccount[accountId] || {};
   document.getElementById('detail-header').innerHTML = `

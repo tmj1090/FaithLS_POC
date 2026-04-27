@@ -766,13 +766,17 @@ function reviewCard(j) {
         <button class="btn btn-primary" style="margin-top:0.4rem" onclick="saveOverrides('${j.id}')">Save Overrides</button>
       ` : '<p class="meta">No line items.</p>'}
 
-      <!-- Admin photo upload -->
-      <div class="section-title">Admin Photos</div>
+      <!-- Admin photo upload and view -->
+      <div class="section-title">Photos</div>
       <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem">
         <input type="file" id="aphoto-${j.id}" accept="image/*" multiple style="font-size:0.85rem">
         <button class="btn btn-primary" onclick="uploadAdminPhotos('${j.id}')">Upload Photos</button>
         <span id="aphoto-msg-${j.id}" style="font-size:0.82rem;color:#2a7a2a"></span>
       </div>
+      <div id="job-photos-${j.id}" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem">
+        <span style="font-size:0.82rem;color:#aaa">Click "Load Photos" to view uploaded photos.</span>
+      </div>
+      <button class="btn btn-secondary" style="font-size:0.82rem" onclick="loadJobPhotos('${j.id}')">Load Photos</button>
 
       <div class="section-title">Admin Review Note</div>
       <div style="display:flex;gap:0.4rem;margin-top:0.3rem">
@@ -847,6 +851,36 @@ async function uploadAdminPhotos(jobId) {
   }
   msgEl.textContent = `${uploaded} photo(s) uploaded.`;
   input.value = '';
+  await loadJobPhotos(jobId);
+}
+
+async function loadJobPhotos(jobId) {
+  const grid = document.getElementById(`job-photos-${jobId}`);
+  if (!grid) return;
+  grid.innerHTML = '<span style="font-size:0.82rem;color:#aaa">Loading...</span>';
+
+  const { data: photos } = await db.from('job_photos')
+    .select('id,storage_path,file_name,uploaded_at,uploaded_by')
+    .eq('job_id', jobId)
+    .order('uploaded_at', { ascending: false });
+
+  if (!photos?.length) { grid.innerHTML = '<span style="font-size:0.82rem;color:#aaa">No photos uploaded yet.</span>'; return; }
+
+  const signedUrls = await Promise.all(photos.map(async p => {
+    const { data } = await db.storage.from('job-photos').createSignedUrl(p.storage_path, 3600);
+    return { ...p, url: data?.signedUrl || null };
+  }));
+
+  grid.innerHTML = signedUrls.map(p => p.url
+    ? `<div style="text-align:center">
+        <a href="${p.url}" target="_blank">
+          <img src="${p.url}" style="width:90px;height:72px;object-fit:cover;border:1px solid #ccc;display:block">
+        </a>
+        <div style="font-size:0.72rem;color:#666;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.file_name||''}</div>
+        <div style="font-size:0.72rem;color:#888">${new Date(p.uploaded_at).toLocaleDateString('en-US')}</div>
+       </div>`
+    : ''
+  ).join('');
 }
 
 function resizeImage(file, maxW) {
@@ -966,7 +1000,7 @@ function searchReopenParts() {
   if (!matches.length) { res.style.display = 'none'; return; }
   res.style.display = '';
   res.innerHTML = matches.map(p =>
-    `<div onclick="addReopenPart('${p.id}','${p.part_name.replace(/'/g,"\\'")}')">
+    `<div onmousedown="event.preventDefault();addReopenPart('${p.id}','${p.part_name.replace(/'/g,"\\'")}')">
       ${p.part_name} ${p.category ? '| ' + p.category : ''}</div>`
   ).join('');
 }
@@ -1338,7 +1372,7 @@ function searchAssignParts() {
   if (!matches.length) { res.style.display = 'none'; return; }
   res.style.display = '';
   res.innerHTML = matches.map(p =>
-    `<div onclick="addAssignPart('${p.id}',${JSON.stringify(p.part_name)})">
+    `<div onmousedown="event.preventDefault();addAssignPart('${p.id}',${JSON.stringify(p.part_name)})">
       ${p.part_name}${p.unit ? ' (' + p.unit + ')' : ''}${p.category ? ' | ' + p.category : ''}</div>`
   ).join('');
 }
