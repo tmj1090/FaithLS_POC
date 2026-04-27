@@ -284,59 +284,85 @@ function formatDate(str) {
 
 // ---- INIT ----
 async function init() {
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) { window.location.href = 'index.html'; return; }
-  currentUser = session.user;
-  const { data: profile } = await db.from('user_profiles').select('role').eq('id', currentUser.id).single();
-  if (!profile || profile.role !== 'admin') { window.location.href = 'index.html'; return; }
+  try {
+    const { data: { session }, error: sessErr } = await db.auth.getSession();
+    if (sessErr) throw sessErr;
+    if (!session) { window.location.href = 'index.html'; return; }
+    currentUser = session.user;
 
-  const [p, l] = await Promise.all([
-    db.from('parts').select('id,part_name').eq('active', true),
-    db.from('labor_types').select('id,labor_type_name')
-  ]);
-  allParts = p.data || [];
-  allLaborTypes = l.data || [];
+    const { data: profile, error: profErr } = await db.from('user_profiles')
+      .select('role').eq('id', currentUser.id).single();
+    if (profErr) throw profErr;
+    if (!profile || profile.role !== 'admin') { window.location.href = 'index.html'; return; }
 
-  await loadAccounts();
+    const [p, l] = await Promise.all([
+      db.from('parts').select('id,part_name').eq('active', true),
+      db.from('labor_types').select('id,labor_type_name')
+    ]);
+    allParts = p.data || [];
+    allLaborTypes = l.data || [];
+
+    await loadAccounts();
+  } catch (err) {
+    document.getElementById('accounts-tbody').innerHTML =
+      `<tr><td colspan="10" style="color:#a00;padding:1rem">
+        <strong>Load error:</strong> ${err.message || JSON.stringify(err)}<br>
+        <span style="font-size:0.82rem">Check the browser console for details. Try signing out and back in.</span>
+      </td></tr>`;
+    console.error('accounts init error:', err);
+  }
 }
 
 // ---- LOAD ACCOUNTS ----
 async function loadAccounts() {
-  const { data: accounts, error } = await db.from('accounts')
-    .select('id,account_name,parent_account_id,address,phone,billing_notes,active')
-    .order('account_name');
-  if (error) { document.getElementById('accounts-tbody').innerHTML = `<tr><td colspan="10">${error.message}</td></tr>`; return; }
-  allAccounts = accounts || [];
+  document.getElementById('accounts-tbody').innerHTML = '<tr><td colspan="9" style="color:#888;padding:0.5rem">Loading...</td></tr>';
+  try {
+    const { data: accounts, error } = await db.from('accounts')
+      .select('id,account_name,parent_account_id,address,phone,billing_notes,active')
+      .order('account_name');
+    if (error) throw error;
+    allAccounts = accounts || [];
 
-  // Load job stats per account
-  const { data: jobStats } = await db.from('jobs')
-    .select('id,account_id,job_date,status,job_line_items(unit_cost,override_cost,quantity)');
-  allJobsByAccount = {};
-  (jobStats || []).forEach(j => {
-    if (!j.account_id) return;
-    if (!allJobsByAccount[j.account_id]) allJobsByAccount[j.account_id] = { count: 0, lastDate: null, totalRevenue: 0, approvedRevenue: 0 };
-    const s = allJobsByAccount[j.account_id];
-    s.count++;
-    if (!s.lastDate || j.job_date > s.lastDate) s.lastDate = j.job_date;
-    const rev = (j.job_line_items || []).reduce((sum, i) => sum + ((i.override_cost ?? i.unit_cost) * i.quantity), 0);
-    s.totalRevenue += rev;
-    if (j.status === 'Approved') s.approvedRevenue += rev;
-  });
+    // Load job stats per account
+    const { data: jobStats, error: jobErr } = await db.from('jobs')
+      .select('id,account_id,job_date,status,job_line_items(unit_cost,override_cost,quantity)');
+    if (jobErr) console.warn('Job stats load error (non-fatal):', jobErr.message);
+    allJobsByAccount = {};
+    (jobStats || []).forEach(j => {
+      if (!j.account_id) return;
+      if (!allJobsByAccount[j.account_id]) allJobsByAccount[j.account_id] = { count: 0, lastDate: null, totalRevenue: 0, approvedRevenue: 0 };
+      const s = allJobsByAccount[j.account_id];
+      s.count++;
+      if (!s.lastDate || j.job_date > s.lastDate) s.lastDate = j.job_date;
+      const rev = (j.job_line_items || []).reduce((sum, i) => sum + (Number(i.override_cost ?? i.unit_cost) * Number(i.quantity)), 0);
+      s.totalRevenue += rev;
+      if (j.status === 'Approved') s.approvedRevenue += rev;
+    });
 
-  // Load primary contacts for all accounts (for list display)
-  const { data: contacts } = await db.from('account_contacts')
-    .select('account_id,contact_name,work_phone,cell_phone,is_primary')
-    .eq('active', true).eq('is_primary', true);
-  allPrimaryContacts = {};
-  (contacts || []).forEach(c => { allPrimaryContacts[c.account_id] = c; });
+    // Load primary contacts for all accounts (for list display)
+    const { data: contacts, error: conErr } = await db.from('account_contacts')
+      .select('account_id,contact_name,work_phone,cell_phone,is_primary')
+      .eq('active', true).eq('is_primary', true);
+    if (conErr) console.warn('Contacts load error (non-fatal):', conErr.message);
+    allPrimaryContacts = {};
+    (contacts || []).forEach(c => { allPrimaryContacts[c.account_id] = c; });
 
-  // Populate parent select in add form
-  const masters = allAccounts.filter(a => !a.parent_account_id);
-  const parentSel = document.getElementById('f-parent');
-  parentSel.innerHTML = '<option value="">-- Master Account --</option>' +
-    masters.map(a => `<option value="${a.id}">${a.account_name}</option>`).join('');
+    // Populate parent select in add form
+    const masters = allAccounts.filter(a => !a.parent_account_id);
+    const parentSel = document.getElementById('f-parent');
+    if (parentSel) {
+      parentSel.innerHTML = '<option value="">-- Master Account --</option>' +
+        masters.map(a => `<option value="${a.id}">${a.account_name}</option>`).join('');
+    }
 
-  filterAccounts();
+    filterAccounts();
+  } catch (err) {
+    document.getElementById('accounts-tbody').innerHTML =
+      `<tr><td colspan="9" style="color:#a00;padding:1rem">
+        <strong>Error loading accounts:</strong> ${err.message || JSON.stringify(err)}
+      </td></tr>`;
+    console.error('loadAccounts error:', err);
+  }
 }
 
 // ---- FILTER & RENDER ----
@@ -648,7 +674,7 @@ async function loadContactsTab() {
   const el = document.getElementById('contacts-list');
   el.innerHTML = 'Loading...';
   const { data: contacts, error } = await db.from('account_contacts')
-    .select('*').eq('account_id', currentDetailAccountId)
+    .select('*').eq('account_id', currentDetailAccountId).eq('active', true)
     .order('is_primary', { ascending: false })
     .order('is_secondary', { ascending: false })
     .order('contact_name');

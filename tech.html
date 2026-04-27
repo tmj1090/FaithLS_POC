@@ -163,10 +163,18 @@ function formatDate(str) {
 }
 
 async function init() {
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) { window.location.href = 'index.html'; return; }
-  currentUser = session.user;
-  await Promise.all([loadRefData(), loadJobs()]);
+  try {
+    const { data: { session }, error: sessErr } = await db.auth.getSession();
+    if (sessErr) throw sessErr;
+    if (!session) { window.location.href = 'index.html'; return; }
+    currentUser = session.user;
+    await Promise.all([loadRefData(), loadJobs()]);
+  } catch (err) {
+    document.getElementById('jobs-list').innerHTML =
+      `<div class="msg error"><strong>Load error:</strong> ${err.message || JSON.stringify(err)}<br>
+       <span style="font-size:0.82rem">Try signing out and back in.</span></div>`;
+    console.error('tech init error:', err);
+  }
 }
 
 async function loadRefData() {
@@ -199,25 +207,45 @@ function weekStart() {
   return d.toISOString().split('T')[0];
 }
 
+// Primary contacts cache for job cards (account_id -> contact)
+let allPrimaryContactsCache = {};
+
 async function loadJobs() {
-  let query = db.from('jobs')
-    .select(`id, job_date, status, scope, site_notes, is_fixed_price, quote_amount,
-             work_order_number, purchase_order_number,
-             assigned_tech_ids, lead_tech_id,
-             accounts!jobs_account_id_fkey(account_name, address),
-             sub:accounts!jobs_sub_account_id_fkey(account_name),
-             job_types(job_type_name),
-             job_completions(id,tech_notes,follow_up_flag,submitted_at),
-             job_line_items(id,item_type,item_id,quantity)`)
-    .not('status', 'in', '("Cancelled","Approved")');
-  if (currentFilter === 'today') query = query.eq('job_date', today());
-  else if (currentFilter === 'week') query = query.gte('job_date', weekStart());
-  const { data, error } = await query.order('job_date', { ascending: true });
   const list = document.getElementById('jobs-list');
-  if (error) { list.innerHTML = `<div class="msg error">${error.message}</div>`; return; }
-  const myJobs = data || [];
-  if (!myJobs.length) { list.innerHTML = '<p>No jobs found for this period.</p>'; return; }
-  list.innerHTML = myJobs.map(j => jobCard(j)).join('');
+  list.innerHTML = '<p style="color:#888">Loading...</p>';
+  try {
+    let query = db.from('jobs')
+      .select(`id, job_date, status, scope, site_notes, is_fixed_price, quote_amount,
+               work_order_number, purchase_order_number,
+               assigned_tech_ids, lead_tech_id,
+               accounts!jobs_account_id_fkey(account_name, address),
+               sub:accounts!jobs_sub_account_id_fkey(account_name),
+               job_types(job_type_name),
+               job_completions(id,tech_notes,follow_up_flag,submitted_at),
+               job_line_items(id,item_type,item_id,quantity)`)
+      .not('status', 'in', '("Cancelled","Approved")');
+    if (currentFilter === 'today') query = query.eq('job_date', today());
+    else if (currentFilter === 'week') query = query.gte('job_date', weekStart());
+    const { data, error } = await query.order('job_date', { ascending: true });
+    if (error) throw error;
+    const myJobs = data || [];
+    if (!myJobs.length) { list.innerHTML = '<p>No jobs found for this period.</p>'; return; }
+
+    // Fetch primary contacts for all unique account IDs in the job list
+    const accountIds = [...new Set(myJobs.map(j => j.account_id).filter(Boolean))];
+    allPrimaryContactsCache = {};
+    if (accountIds.length) {
+      const { data: contacts } = await db.from('account_contacts')
+        .select('account_id,contact_name,work_phone,cell_phone,is_primary')
+        .in('account_id', accountIds).eq('active', true).eq('is_primary', true);
+      (contacts || []).forEach(c => { allPrimaryContactsCache[c.account_id] = c; });
+    }
+
+    list.innerHTML = myJobs.map(j => jobCard(j)).join('');
+  } catch (err) {
+    list.innerHTML = `<div class="msg error"><strong>Error loading jobs:</strong> ${err.message}</div>`;
+    console.error('loadJobs error:', err);
+  }
 }
 
 function jobCard(j) {
@@ -228,6 +256,16 @@ function jobCard(j) {
 
   const fixedBanner = j.is_fixed_price
     ? `<div class="fixed-banner">FIXED PRICE | Quoted: $${Number(j.quote_amount||0).toFixed(2)} | Do not exceed scope without calling Rich.</div>` : '';
+
+  // Primary contact from cache (loaded in loadJobs)
+  const pc = allPrimaryContactsCache[j.account_id];
+  let contactHtml = '';
+  if (pc) {
+    let line = `<strong>Contact:</strong> ${pc.contact_name}`;
+    if (pc.work_phone) line += ` | Work: ${pc.work_phone}`;
+    if (pc.cell_phone) line += ` | Cell: ${pc.cell_phone}`;
+    contactHtml = `<div class="contact-info">${line}</div>`;
+  }
 
   const expParts = (j.job_line_items||[]).filter(i => i.item_type === 'Part');
   const expLabor = (j.job_line_items||[]).filter(i => i.item_type === 'Labor');
@@ -259,6 +297,7 @@ function jobCard(j) {
     <div class="meta">${formatDate(j.job_date)} | ${j.job_types?.job_type_name||''} | ${j.status}</div>
     ${wopo ? `<div class="meta">${wopo}</div>` : ''}
     ${addrHtml}
+    ${contactHtml}
     ${fixedBanner}${expHtml}
     ${j.scope ? `<div style="font-size:0.85rem;margin-bottom:0.4rem"><strong>Scope:</strong> ${j.scope}</div>` : ''}
     ${j.site_notes ? `<div style="font-size:0.85rem;margin-bottom:0.4rem"><strong>Site Notes:</strong> ${j.site_notes}</div>` : ''}

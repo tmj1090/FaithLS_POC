@@ -399,13 +399,25 @@ function formatDate(str) {
 
 // ---- INIT ----
 async function init() {
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) { window.location.href = 'index.html'; return; }
-  currentUser = session.user;
-  const { data: profile } = await db.from('user_profiles').select('role').eq('id', currentUser.id).single();
-  if (!profile || profile.role !== 'admin') { window.location.href = 'index.html'; return; }
-  await loadRefData();
-  setDateDefaults();
+  try {
+    const { data: { session }, error: sessErr } = await db.auth.getSession();
+    if (sessErr) throw sessErr;
+    if (!session) { window.location.href = 'index.html'; return; }
+    currentUser = session.user;
+    const { data: profile, error: profErr } = await db.from('user_profiles')
+      .select('role').eq('id', currentUser.id).single();
+    if (profErr) throw profErr;
+    if (!profile || profile.role !== 'admin') { window.location.href = 'index.html'; return; }
+    await loadRefData();
+    setDateDefaults();
+  } catch (err) {
+    document.querySelector('.container').innerHTML =
+      `<div style="color:#a00;background:white;border:1px solid #f99;padding:1rem;margin-top:1rem">
+        <strong>Load error:</strong> ${err.message || JSON.stringify(err)}<br>
+        <span style="font-size:0.82rem">Check the browser console. Try signing out and back in.</span>
+      </div>`;
+    console.error('admin init error:', err);
+  }
 }
 
 function setDateDefaults() {
@@ -426,6 +438,10 @@ async function loadRefData() {
     db.from('parts').select('*').eq('active', true).order('part_name'),
     db.from('labor_types').select('*').order('labor_type_name')
   ]);
+
+  if (a.error) console.error('accounts load error:', a.error.message);
+  if (p.error) console.error('parts load error:', p.error.message);
+
   allAccounts = a.data || [];
   allTechs = tc.data || [];
   allJobTypes = jt.data || [];
