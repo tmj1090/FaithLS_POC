@@ -10,7 +10,7 @@
 body { font-family: sans-serif; margin: 0; background: #f0f0f0; font-size: 0.9rem; }
 header { background: #1a1a1a; color: white; padding: 0.7rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
 header h1 { margin: 0; font-size: 1rem; }
-nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+nav { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
 nav button { background: none; border: 1px solid #aaa; color: #aaa; padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.85rem; }
 nav button.active { border-color: white; color: white; }
 button.logout { background: none; border: 1px solid #f66; color: #f66; padding: 0.3rem 0.7rem; cursor: pointer; }
@@ -67,13 +67,13 @@ select[multiple] { height: 90px; }
   <nav>
     <button class="active" onclick="showSection('assign')">Assign</button>
     <button onclick="showSection('review')">Review</button>
-    <span style="border-left:1px solid #555;margin:0 0.2rem"></span>
+    <span style="border-left:1px solid #555;margin:0 0.6rem;height:1.2rem;display:inline-block"></span>
     <button onclick="showSection('jobslist')">Jobs List</button>
     <button onclick="showSection('calendar')">Calendar</button>
-    <span style="border-left:1px solid #555;margin:0 0.2rem"></span>
+    <span style="border-left:1px solid #555;margin:0 0.6rem;height:1.2rem;display:inline-block"></span>
     <a href="accounts.html" style="text-decoration:none"><button>Accounts</button></a>
     <button onclick="showSection('reference')">Reference</button>
-    <span style="border-left:1px solid #555;margin:0 0.2rem"></span>
+    <span style="border-left:1px solid #555;margin:0 0.6rem;height:1.2rem;display:inline-block"></span>
     <button onclick="showSection('search')">Search</button>
     <button onclick="showSection('export')">Export</button>
   </nav>
@@ -904,31 +904,35 @@ async function loadJobPhotos(jobId) {
   grid.innerHTML = '<span style="font-size:0.82rem;color:#aaa">Loading...</span>';
 
   const { data: photos } = await db.from('job_photos')
-    .select('id,storage_path,file_name,uploaded_at,uploaded_by')
+    .select('id,storage_path,file_name,uploaded_at')
     .eq('job_id', jobId)
     .order('uploaded_at', { ascending: false });
 
   if (!photos?.length) { grid.innerHTML = '<span style="font-size:0.82rem;color:#aaa">No photos uploaded yet.</span>'; return; }
 
-  const signedUrls = await Promise.all(photos.map(async p => {
-    const { data } = await db.storage.from('job-photos').createSignedUrl(p.storage_path, 3600);
-    return { ...p, url: data?.signedUrl || null };
+  const withUrls = await Promise.all(photos.map(async p => {
+    // Try signed URL first (works for private buckets)
+    const { data: signed } = await db.storage.from('job-photos').createSignedUrl(p.storage_path, 7200);
+    if (signed?.signedUrl) return { ...p, url: signed.signedUrl };
+    // Fallback: public URL (works if bucket is set to public)
+    const { data: pub } = db.storage.from('job-photos').getPublicUrl(p.storage_path);
+    return { ...p, url: pub?.publicUrl || null };
   }));
 
-  grid.innerHTML = signedUrls.map(p => p.url
-    ? `<div style="text-align:center;margin-bottom:0.3rem">
-        <a href="${p.url}" target="_blank" title="Open full size">
-          <img src="${p.url}" style="width:90px;height:72px;object-fit:cover;border:1px solid #ccc;display:block"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-          <div style="display:none;width:90px;height:72px;background:#eee;border:1px solid #ccc;font-size:0.72rem;color:#666;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px">View Photo</div>
-        </a>
-        <div style="font-size:0.72rem;color:#555;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-          <a href="${p.url}" target="_blank" style="color:#1a4a8a">${p.file_name||'photo'}</a>
-        </div>
-        <div style="font-size:0.72rem;color:#888">${new Date(p.uploaded_at).toLocaleDateString('en-US')}</div>
-       </div>`
-    : `<div style="font-size:0.82rem;color:#888">${p.file_name||''} (URL unavailable)</div>`
-  ).join('');
+  grid.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem">' + withUrls.map(p =>
+    `<div style="text-align:center">
+      ${p.url
+        ? `<a href="${p.url}" target="_blank"><img src="${p.url}"
+            style="width:100px;height:80px;object-fit:cover;border:1px solid #ccc;display:block;cursor:pointer"
+            onerror="this.parentElement.innerHTML='<div style=&quot;width:100px;height:80px;background:#eee;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:0.75rem;padding:4px&quot;>${p.file_name||&quot;photo&quot;}</div>'"></a>`
+        : `<div style="width:100px;height:80px;background:#eee;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:0.75rem;padding:4px">${p.file_name||'photo'}</div>`
+      }
+      <div style="font-size:0.72rem;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px">
+        ${p.url ? `<a href="${p.url}" target="_blank" style="color:#1a4a8a">${p.file_name||'photo'}</a>` : (p.file_name||'photo')}
+      </div>
+      <div style="font-size:0.72rem;color:#888">${new Date(p.uploaded_at).toLocaleDateString('en-US')}</div>
+    </div>`
+  ).join('') + '</div>';
 }
 
 function resizeImage(file, maxW) {
@@ -1046,11 +1050,18 @@ function searchReopenParts() {
   if (q.length < 2) { res.style.display = 'none'; return; }
   const matches = allParts.filter(p => p.part_name.toLowerCase().includes(q)).slice(0, 8);
   if (!matches.length) { res.style.display = 'none'; return; }
-  res.style.display = 'block';
   res.innerHTML = matches.map(p =>
-    `<div onmousedown="event.preventDefault();addReopenPart('${p.id}','${p.part_name.replace(/'/g,"\\'")}')">
+    `<div data-id="${p.id}" data-name="${p.part_name.replace(/"/g,'&quot;')}">
       ${p.part_name} ${p.category ? '| ' + p.category : ''}</div>`
   ).join('');
+  res.style.display = 'block';
+  res.querySelectorAll('div').forEach(div => {
+    div.addEventListener('mousedown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      addReopenPart(div.dataset.id, div.dataset.name);
+    });
+  });
 }
 function addReopenPart(id, name) {
   const ex = reopenParts.find(p => p.id === id);
@@ -1418,11 +1429,18 @@ function searchAssignParts() {
   if (!q) { res.style.display = 'none'; return; }
   const matches = allParts.filter(p => p.part_name.toLowerCase().includes(q)).slice(0, 10);
   if (!matches.length) { res.style.display = 'none'; return; }
-  res.style.display = 'block';
-  res.innerHTML = matches.map(p =>
-    `<div onmousedown="event.preventDefault();addAssignPart('${p.id}',${JSON.stringify(p.part_name)})">
+  res.innerHTML = matches.map((p, i) =>
+    `<div data-idx="${i}" data-id="${p.id}" data-name="${p.part_name.replace(/"/g,'&quot;')}">
       ${p.part_name}${p.unit ? ' (' + p.unit + ')' : ''}${p.category ? ' | ' + p.category : ''}</div>`
   ).join('');
+  res.style.display = 'block';
+  res.querySelectorAll('div').forEach(div => {
+    div.addEventListener('mousedown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      addAssignPart(div.dataset.id, div.dataset.name);
+    });
+  });
 }
 
 document.addEventListener('click', e => {
