@@ -67,12 +67,15 @@ select[multiple] { height: 90px; }
   <nav>
     <button class="active" onclick="showSection('assign')">Assign</button>
     <button onclick="showSection('review')">Review</button>
+    <span style="border-left:1px solid #555;margin:0 0.2rem"></span>
+    <button onclick="showSection('jobslist')">Jobs List</button>
+    <button onclick="showSection('calendar')">Calendar</button>
+    <span style="border-left:1px solid #555;margin:0 0.2rem"></span>
+    <a href="accounts.html" style="text-decoration:none"><button>Accounts</button></a>
+    <button onclick="showSection('reference')">Reference</button>
+    <span style="border-left:1px solid #555;margin:0 0.2rem"></span>
     <button onclick="showSection('search')">Search</button>
     <button onclick="showSection('export')">Export</button>
-    <button onclick="showSection('reference')">Reference</button>
-    <button onclick="showSection('newcustomers')">New Customers</button>
-    <button onclick="showSection('calendar')">Calendar</button>
-    <a href="accounts.html" style="text-decoration:none"><button>Accounts</button></a>
   </nav>
   <button class="logout" onclick="logout()">Sign Out</button>
 </header>
@@ -184,9 +187,14 @@ select[multiple] { height: 90px; }
     <button class="btn btn-primary" onclick="assignJob()">Assign Job</button>
     <button class="btn btn-secondary" onclick="duplicateLast()">Duplicate Last Job</button>
   </div>
+</div>
 
+<!-- ============================================================ -->
+<!-- JOBS LIST SECTION (formerly Schedule Viewer) -->
+<!-- ============================================================ -->
+<div id="section-jobslist" style="display:none">
   <div class="card">
-    <h3>Schedule Viewer</h3>
+    <h3>Jobs List</h3>
     <div class="filters">
       <div><label>From</label><input type="date" id="sv-from"></div>
       <div><label>To</label><input type="date" id="sv-to"></div>
@@ -196,7 +204,12 @@ select[multiple] { height: 90px; }
         <button class="btn btn-primary" onclick="loadSchedule()">Load</button>
       </div>
     </div>
-    <div id="schedule-list">Enter a date range and click Load.</div>
+    <div id="schedule-list">Select a date range and click Load.</div>
+  </div>
+
+  <div class="card" id="stocking-panel" style="display:none">
+    <h3>Parts and Labor Totals <span style="font-weight:normal;font-size:0.82rem;color:#666">for loaded date range</span></h3>
+    <div id="stocking-content"></div>
   </div>
 </div>
 
@@ -329,17 +342,6 @@ select[multiple] { height: 90px; }
       <table><thead><tr><th>Name</th><th>Active</th><th></th></tr></thead>
       <tbody id="techs-ref-body"></tbody></table>
     </div>
-  </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- NEW CUSTOMERS SECTION -->
-<!-- ============================================================ -->
-<div id="section-newcustomers" style="display:none">
-  <div class="card">
-    <h3>Pending New Customer Submissions</h3>
-    <p class="meta">Review and migrate to Accounts table.</p>
-    <div id="newcustomers-list">Loading...</div>
   </div>
 </div>
 
@@ -629,15 +631,16 @@ async function loadSchedule() {
   const { data, error } = await db.from('jobs')
     .select(`id, job_date, status, scope, is_fixed_price, work_order_number, purchase_order_number,
              accounts!jobs_account_id_fkey(account_name),
-             job_types(job_type_name)`)
+             job_types(job_type_name),
+             job_line_items(item_type,item_id,quantity)`)
     .gte('job_date', from).lte('job_date', to)
     .not('status', 'eq', 'Cancelled')
     .order('job_date');
 
   const el = document.getElementById('schedule-list');
-  if (error || !data?.length) { el.innerHTML = '<p>No jobs found.</p>'; return; }
+  if (error || !data?.length) { el.innerHTML = '<p>No jobs found.</p>'; document.getElementById('stocking-panel').style.display='none'; return; }
 
-  el.innerHTML = `<table>
+  el.innerHTML = `<div style="overflow-x:auto"><table>
     <thead><tr><th>Date</th><th>Account</th><th>Type</th><th>WO</th><th>Status</th><th>Scope</th><th></th></tr></thead>
     <tbody>${data.map(j => `<tr>
       <td style="white-space:nowrap">${formatDate(j.job_date)}</td>
@@ -652,7 +655,48 @@ async function loadSchedule() {
           ? `<button class="btn btn-red" onclick="deleteJob('${j.id}')">Delete</button>` : ''}
       </td>
     </tr>`).join('')}</tbody>
-  </table>`;
+  </table></div>`;
+
+  // Build stocking totals
+  const partTotals = {}, laborTotals = {};
+  data.forEach(j => {
+    (j.job_line_items || []).forEach(i => {
+      if (i.item_type === 'Part') {
+        const name = allParts.find(p => p.id === i.item_id)?.part_name || i.item_id;
+        partTotals[name] = (partTotals[name] || 0) + Number(i.quantity);
+      } else if (i.item_type === 'Labor') {
+        const name = allLaborTypes.find(l => l.id === i.item_id)?.labor_type_name || i.item_id;
+        laborTotals[name] = (laborTotals[name] || 0) + Number(i.quantity);
+      }
+    });
+  });
+
+  const partEntries = Object.entries(partTotals).sort((a,b) => a[0].localeCompare(b[0]));
+  const laborEntries = Object.entries(laborTotals).sort((a,b) => a[0].localeCompare(b[0]));
+
+  const stockPanel = document.getElementById('stocking-panel');
+  const stockContent = document.getElementById('stocking-content');
+
+  if (!partEntries.length && !laborEntries.length) {
+    stockPanel.style.display = 'none';
+    return;
+  }
+
+  stockPanel.style.display = 'block';
+  stockContent.innerHTML = `
+    <p style="font-size:0.85rem;color:#555;margin-bottom:0.8rem">Based on expected parts and labor pre-loaded on scheduled and upcoming jobs. Does not include jobs with no line items assigned yet.</p>
+    <div style="display:flex;gap:2rem;flex-wrap:wrap">
+      ${partEntries.length ? `<div style="flex:1;min-width:200px">
+        <div class="section-title" style="margin-top:0">Parts Needed</div>
+        <table><thead><tr><th>Part</th><th>Total Qty</th></tr></thead>
+        <tbody>${partEntries.map(([name, qty]) => `<tr><td>${name}</td><td><strong>${qty}</strong></td></tr>`).join('')}</tbody>
+        </table></div>` : ''}
+      ${laborEntries.length ? `<div style="flex:1;min-width:200px">
+        <div class="section-title" style="margin-top:0">Labor (hrs)</div>
+        <table><thead><tr><th>Type</th><th>Total Hrs</th></tr></thead>
+        <tbody>${laborEntries.map(([name, hrs]) => `<tr><td>${name}</td><td><strong>${hrs}</strong></td></tr>`).join('')}</tbody>
+        </table></div>` : ''}
+    </div>`;
 }
 
 async function deleteJob(id) {
@@ -872,14 +916,18 @@ async function loadJobPhotos(jobId) {
   }));
 
   grid.innerHTML = signedUrls.map(p => p.url
-    ? `<div style="text-align:center">
-        <a href="${p.url}" target="_blank">
-          <img src="${p.url}" style="width:90px;height:72px;object-fit:cover;border:1px solid #ccc;display:block">
+    ? `<div style="text-align:center;margin-bottom:0.3rem">
+        <a href="${p.url}" target="_blank" title="Open full size">
+          <img src="${p.url}" style="width:90px;height:72px;object-fit:cover;border:1px solid #ccc;display:block"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <div style="display:none;width:90px;height:72px;background:#eee;border:1px solid #ccc;font-size:0.72rem;color:#666;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px">View Photo</div>
         </a>
-        <div style="font-size:0.72rem;color:#666;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.file_name||''}</div>
+        <div style="font-size:0.72rem;color:#555;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          <a href="${p.url}" target="_blank" style="color:#1a4a8a">${p.file_name||'photo'}</a>
+        </div>
         <div style="font-size:0.72rem;color:#888">${new Date(p.uploaded_at).toLocaleDateString('en-US')}</div>
        </div>`
-    : ''
+    : `<div style="font-size:0.82rem;color:#888">${p.file_name||''} (URL unavailable)</div>`
   ).join('');
 }
 
@@ -998,16 +1046,15 @@ function searchReopenParts() {
   if (q.length < 2) { res.style.display = 'none'; return; }
   const matches = allParts.filter(p => p.part_name.toLowerCase().includes(q)).slice(0, 8);
   if (!matches.length) { res.style.display = 'none'; return; }
-  res.style.display = '';
+  res.style.display = 'block';
   res.innerHTML = matches.map(p =>
     `<div onmousedown="event.preventDefault();addReopenPart('${p.id}','${p.part_name.replace(/'/g,"\\'")}')">
       ${p.part_name} ${p.category ? '| ' + p.category : ''}</div>`
   ).join('');
 }
 function addReopenPart(id, name) {
-  const qty = prompt(`Quantity for ${name}?`, '1');
-  if (!qty || isNaN(qty) || Number(qty) <= 0) return;
-  reopenParts.push({ id, name, qty: Number(qty) });
+  const ex = reopenParts.find(p => p.id === id);
+  if (ex) ex.qty += 1; else reopenParts.push({ id, name, qty: 1 });
   renderReopenParts();
   document.getElementById('ro-parts-results').style.display = 'none';
   document.getElementById('ro-partsearch').value = '';
@@ -1015,7 +1062,8 @@ function addReopenPart(id, name) {
 function removeReopenPart(idx) { reopenParts.splice(idx, 1); renderReopenParts(); }
 function renderReopenParts() {
   document.querySelector('#ro-parts-table tbody').innerHTML = reopenParts.map((p, i) =>
-    `<tr><td>${p.name}</td><td>${p.qty}</td>
+    `<tr><td>${p.name}</td>
+     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:60px;padding:0.2rem;border:1px solid #ccc" onchange="reopenParts[${i}].qty=parseFloat(this.value)||1"></td>
      <td><button onclick="removeReopenPart(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
   ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr>';
 }
@@ -1370,7 +1418,7 @@ function searchAssignParts() {
   if (!q) { res.style.display = 'none'; return; }
   const matches = allParts.filter(p => p.part_name.toLowerCase().includes(q)).slice(0, 10);
   if (!matches.length) { res.style.display = 'none'; return; }
-  res.style.display = '';
+  res.style.display = 'block';
   res.innerHTML = matches.map(p =>
     `<div onmousedown="event.preventDefault();addAssignPart('${p.id}',${JSON.stringify(p.part_name)})">
       ${p.part_name}${p.unit ? ' (' + p.unit + ')' : ''}${p.category ? ' | ' + p.category : ''}</div>`
@@ -1384,10 +1432,8 @@ document.addEventListener('click', e => {
 });
 
 function addAssignPart(id, name) {
-  const qty = prompt(`Quantity for: ${name}`, '1');
-  if (!qty || isNaN(qty) || Number(qty) <= 0) return;
   const ex = assignParts.find(p => p.id === id);
-  if (ex) ex.qty = Number(qty); else assignParts.push({ id, name, qty: Number(qty) });
+  if (ex) ex.qty += 1; else assignParts.push({ id, name, qty: 1 });
   renderAssignParts();
   document.getElementById('a-parts-results').style.display = 'none';
   document.getElementById('a-partsearch').value = '';
@@ -1395,7 +1441,8 @@ function addAssignPart(id, name) {
 function removeAssignPart(idx) { assignParts.splice(idx, 1); renderAssignParts(); }
 function renderAssignParts() {
   document.querySelector('#a-parts-table tbody').innerHTML = assignParts.map((p, i) =>
-    `<tr><td>${p.name}</td><td>${p.qty}</td>
+    `<tr><td>${p.name}</td>
+     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:60px;padding:0.2rem;border:1px solid #ccc" onchange="assignParts[${i}].qty=parseFloat(this.value)||1"></td>
      <td><button onclick="removeAssignPart(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
   ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr>';
 }
@@ -1506,15 +1553,16 @@ function renderCalendar() {
 
 // ---- SECTION NAVIGATION ----
 function showSection(name) {
-  ['assign','review','search','export','reference','newcustomers','calendar'].forEach(s => {
-    document.getElementById(`section-${s}`).style.display = s === name ? '' : 'none';
+  ['assign','review','search','export','reference','jobslist','calendar'].forEach(s => {
+    document.getElementById(`section-${s}`).style.display = s === name ? 'block' : 'none';
   });
-  document.querySelectorAll('nav button').forEach((b, i) => {
-    b.classList.toggle('active', ['assign','review','search','export','reference','newcustomers','calendar'][i] === name);
-  });
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  const navMap = { assign:0, review:1, jobslist:2, calendar:3, reference:4, search:5, export:6 };
+  const navBtns = document.querySelectorAll('nav button');
+  if (navMap[name] !== undefined && navBtns[navMap[name]]) navBtns[navMap[name]].classList.add('active');
   if (name === 'review') loadReview();
-  if (name === 'newcustomers') loadNewCustomers();
   if (name === 'calendar') loadCalendar();
+  if (name === 'jobslist') { setScheduleRange('week'); }
 }
 
 async function logout() {

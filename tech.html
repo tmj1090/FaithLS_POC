@@ -480,13 +480,16 @@ async function loadTechJobPhotos(jobId) {
   }));
 
   grid.innerHTML = signedUrls.map(p => p.url
-    ? `<div style="text-align:center">
-        <a href="${p.url}" target="_blank">
-          <img src="${p.url}" style="width:90px;height:72px;object-fit:cover;border:1px solid #ccc;display:block">
+    ? `<div style="text-align:center;margin-bottom:0.3rem">
+        <a href="${p.url}" target="_blank" title="Open full size">
+          <img src="${p.url}" style="width:90px;height:72px;object-fit:cover;border:1px solid #ccc;display:block"
+            onerror="this.style.display='none'">
         </a>
-        <div style="font-size:0.72rem;color:#666;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.file_name||''}</div>
+        <div style="font-size:0.72rem;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          <a href="${p.url}" target="_blank" style="color:#1a4a8a">${p.file_name||'photo'}</a>
+        </div>
        </div>`
-    : ''
+    : `<div style="font-size:0.82rem;color:#888">${p.file_name||''} (unavailable)</div>`
   ).join('');
 }
 
@@ -510,7 +513,7 @@ function searchParts(prefix) {
   if (!q) { results.style.display = 'none'; return; }
   const matches = allParts.filter(p => p.part_name.toLowerCase().includes(q)).slice(0, 12);
   if (!matches.length) { results.style.display = 'none'; return; }
-  results.style.display = '';
+  results.style.display = 'block';
   results.innerHTML = matches.map(p =>
     `<div onmousedown="event.preventDefault();addPart('${prefix}','${p.id}',${JSON.stringify(p.part_name)},${JSON.stringify(p.unit||'')})">
       ${p.part_name}${p.unit ? ` (${p.unit})` : ''}${p.category ? ` | ${p.category}` : ''}
@@ -523,11 +526,9 @@ document.addEventListener('click', e => {
 });
 
 function addPart(prefix, id, name, unit) {
-  const qty = prompt(`Quantity for: ${name}`, '1');
-  if (!qty || isNaN(qty) || Number(qty) <= 0) return;
   const store = prefix === 'm' ? modalParts : njParts;
   const ex = store.find(p => p.id === id);
-  if (ex) ex.qty = Number(qty); else store.push({ id, name, unit, qty: Number(qty) });
+  if (ex) ex.qty += 1; else store.push({ id, name, unit, qty: 1 });
   renderPartsTable(prefix);
   document.getElementById(`${prefix}-parts-results`).style.display = 'none';
   document.getElementById(`${prefix}-partsearch`).value = '';
@@ -539,8 +540,9 @@ function renderPartsTable(prefix) {
   const tbody = document.querySelector(`#${prefix}-parts-table tbody`);
   if (!tbody) return;
   tbody.innerHTML = store.map((p, i) =>
-    `<tr><td>${p.name}</td><td>${p.qty}</td>
-     <td><button onclick="removePart('${prefix}',${i})" style="border:none;background:none;cursor:pointer;color:red;font-size:1rem">X</button></td></tr>`
+    `<tr><td>${p.name}</td>
+     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:60px;padding:0.3rem;border:1px solid #ccc;font-size:0.9rem" onchange="${prefix==='m'?'modalParts':'njParts'}[${i}].qty=parseFloat(this.value)||1"></td>
+     <td><button onclick="removePart('${prefix}',${i})" style="border:none;background:none;cursor:pointer;color:red;font-size:1.1rem;padding:0.2rem 0.5rem">X</button></td></tr>`
   ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None added</td></tr>';
 }
 

@@ -104,7 +104,16 @@ input[type=checkbox] { width: auto; }
       <div style="align-self:flex-end">
         <button class="btn btn-primary" onclick="loadAccounts()">Refresh</button>
         <button class="btn btn-secondary" onclick="exportAccountsCSV()">Export CSV</button>
+        <button class="btn btn-yellow" onclick="toggleNewCustomers()">New Customer Submissions</button>
       </div>
+    </div>
+    <!-- New Customer Submissions inline panel -->
+    <div id="new-customers-panel" style="display:none;border:1px solid #e0c040;background:#fffbe8;padding:0.8rem;margin-bottom:0.8rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+        <strong>Pending New Customer Submissions</strong>
+        <button class="btn btn-secondary" style="font-size:0.82rem" onclick="toggleNewCustomers()">Close</button>
+      </div>
+      <div id="newcustomers-list">Loading...</div>
     </div>
     <div id="accounts-summary" style="margin-bottom:0.6rem"></div>
     <div style="overflow-x:auto">
@@ -395,8 +404,7 @@ function sortAndRender() {
       <td style="font-size:0.82rem;white-space:nowrap">${formatDate(stats.lastDate)||'--'}</td>
       <td style="text-align:center">${a.active ? 'Yes' : 'No'}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-blue" onclick="openDetail('${a.id}')">View</button>
-        <button class="btn btn-secondary" onclick="openEdit('${a.id}')">Edit</button>
+        <button class="btn btn-blue" onclick="openDetail('${a.id}')">Open</button>
         <button class="btn btn-red" onclick="toggleAccountActive('${a.id}',${a.active})">${a.active ? 'Deactivate' : 'Activate'}</button>
       </td>
     </tr>`;
@@ -469,6 +477,45 @@ async function saveAccount() {
 async function toggleAccountActive(id, current) {
   await db.from('accounts').update({ active: !current }).eq('id', id);
   await loadAccounts();
+}
+
+// ---- NEW CUSTOMERS (inline panel on accounts list) ----
+function toggleNewCustomers() {
+  const panel = document.getElementById('new-customers-panel');
+  const visible = panel.style.display === 'block';
+  panel.style.display = visible ? 'none' : 'block';
+  if (!visible) loadNewCustomers();
+}
+
+async function loadNewCustomers() {
+  const { data } = await db.from('new_customers').select('*').eq('migrated', false).order('submitted_at', { ascending: false });
+  const el = document.getElementById('newcustomers-list');
+  if (!data?.length) { el.innerHTML = '<p style="margin:0;font-size:0.85rem">No pending submissions.</p>'; return; }
+  el.innerHTML = `<div style="overflow-x:auto"><table>
+    <thead><tr><th>Submitted</th><th>Name</th><th>Address</th><th>Phone</th><th>Notes</th><th></th></tr></thead>
+    <tbody>${data.map(c => `<tr>
+      <td style="font-size:0.82rem;white-space:nowrap">${new Date(c.submitted_at).toLocaleDateString('en-US')}</td>
+      <td>${c.name}</td><td>${c.address||''}</td><td>${c.phone||''}</td>
+      <td style="font-size:0.82rem">${c.notes||''}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-green" onclick="migrateCustomer('${c.id}','${c.name.replace(/'/g,"\\'")}','${(c.address||'').replace(/'/g,"\\'")}','${c.phone||''}')">Add to Accounts</button>
+        <button class="btn btn-secondary" onclick="dismissCustomer('${c.id}')">Dismiss</button>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function migrateCustomer(id, name, address, phone) {
+  const { error } = await db.from('accounts').insert({ account_name: name, address, phone });
+  if (error) { alert(error.message); return; }
+  await db.from('new_customers').update({ migrated: true }).eq('id', id);
+  loadNewCustomers();
+  await loadAccounts();
+}
+
+async function dismissCustomer(id) {
+  await db.from('new_customers').update({ migrated: true }).eq('id', id);
+  loadNewCustomers();
 }
 
 // ---- ACCOUNT DETAIL ----
@@ -664,6 +711,26 @@ async function saveContact() {
   msg.innerHTML = '';
   if (!name) { msg.innerHTML = '<div class="msg error">Contact name is required.</div>'; return; }
 
+  const isPrimary = document.getElementById('cf-primary').checked;
+  const isSecondary = document.getElementById('cf-secondary').checked;
+  const isOnsite = document.getElementById('cf-onsite').checked;
+  const editId = document.getElementById('cf-id').value;
+
+  // Enforce uniqueness: if setting primary, clear primary on all other contacts
+  if (isPrimary) {
+    await db.from('account_contacts')
+      .update({ is_primary: false })
+      .eq('account_id', currentDetailAccountId)
+      .neq('id', editId || '00000000-0000-0000-0000-000000000000');
+  }
+  // Enforce uniqueness: if setting secondary, clear secondary on all other contacts
+  if (isSecondary) {
+    await db.from('account_contacts')
+      .update({ is_secondary: false })
+      .eq('account_id', currentDetailAccountId)
+      .neq('id', editId || '00000000-0000-0000-0000-000000000000');
+  }
+
   const payload = {
     account_id: currentDetailAccountId,
     contact_name: name,
@@ -673,14 +740,13 @@ async function saveContact() {
     email: document.getElementById('cf-email').value || null,
     company: document.getElementById('cf-company').value || null,
     notes: document.getElementById('cf-notes').value || null,
-    is_primary: document.getElementById('cf-primary').checked,
-    is_secondary: document.getElementById('cf-secondary').checked,
-    is_onsite: document.getElementById('cf-onsite').checked,
+    is_primary: isPrimary,
+    is_secondary: isSecondary,
+    is_onsite: isOnsite,
     updated_at: new Date().toISOString(),
     created_by: currentUser.id
   };
 
-  const editId = document.getElementById('cf-id').value;
   let error;
   if (editId) {
     ({ error } = await db.from('account_contacts').update(payload).eq('id', editId));
@@ -742,12 +808,18 @@ async function loadAccountPhotos() {
   el.innerHTML = `<p style="font-size:0.82rem;color:#555">${photos.length} photo(s) across all jobs for this account.</p>
     <div class="photo-grid">
       ${signedUrls.map(p => p.url
-        ? `<div style="text-align:center">
-            <img src="${p.url}" class="photo-thumb" onclick="window.open('${p.url}','_blank')" title="${p.file_name||''}">
-            <div style="font-size:0.72rem;color:#666;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.file_name||''}</div>
+        ? `<div style="text-align:center;margin-bottom:0.3rem">
+            <a href="${p.url}" target="_blank" title="Open full size">
+              <img src="${p.url}" class="photo-thumb"
+                onerror="this.style.display='none'"
+                title="${p.file_name||''}">
+            </a>
+            <div style="font-size:0.72rem;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+              <a href="${p.url}" target="_blank" style="color:#1a4a8a">${p.file_name||'photo'}</a>
+            </div>
             <div style="font-size:0.72rem;color:#888">${new Date(p.uploaded_at).toLocaleDateString('en-US')}</div>
            </div>`
-        : `<div style="font-size:0.78rem;color:#aaa">${p.file_name||'No URL'}</div>`
+        : `<div style="font-size:0.78rem;color:#aaa">${p.file_name||''} (unavailable)</div>`
       ).join('')}
     </div>`;
 }
