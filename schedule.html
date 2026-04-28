@@ -9,7 +9,7 @@
 <style>
 * { box-sizing: border-box; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f2f4f8; font-size: 0.9rem; color: #1a1a2e; }
-header { background: #1a2744; color: white; padding: 0.6rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+header { background: #1a2744; color: white; padding: 0 1rem; display: flex; align-items: center; gap: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.25); flex-wrap: wrap; min-height: 44px; }
 header h1 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
 nav { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; }
 nav a { text-decoration: none; }
@@ -79,21 +79,21 @@ tr:hover td { background: #f8f9fc; }
 </head>
 <body>
 <header>
-  <h1>Faith Lock &amp; Safe &nbsp;|&nbsp; Schedule</h1>
-  <button class="logout" onclick="logout()">Sign Out</button>
+  <h1 style="margin:0;font-size:0.9rem;font-weight:600;letter-spacing:0.02em;white-space:nowrap;padding:0.55rem 1rem 0.55rem 0;border-right:1px solid rgba(255,255,255,0.15)">Faith Lock &amp; Safe &nbsp;|&nbsp; Schedule</h1>
+  <nav style="display:flex;align-items:center;gap:0.2rem;flex-wrap:wrap;flex:1;padding:0.35rem 0.6rem">
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Assign</button></a>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Review</button></a>
+    <button class="tnav active">Schedule</button>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Calendar</button></a>
+    <a href="accounts.html" style="text-decoration:none"><button class="tnav">Accounts</button></a>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Reference</button></a>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Search</button></a>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Export</button></a>
+    <span style="width:1px;height:1rem;background:rgba(255,255,255,0.2);margin:0 0.3rem;display:inline-block"></span>
+    <button class="tnav" onclick="loadSchedule()">Refresh</button>
+  </nav>
+  <button class="logout" onclick="logout()" style="white-space:nowrap;flex-shrink:0">Sign Out</button>
 </header>
-<div style="background:#1e3260;border-bottom:1px solid #162248;padding:0.4rem 1.2rem;display:flex;justify-content:flex-end;align-items:center;gap:0.3rem;flex-wrap:wrap">
-  <a href="admin.html" style="text-decoration:none"><button class="tnav">Assign</button></a>
-  <a href="admin.html#review" style="text-decoration:none"><button class="tnav">Review</button></a>
-  <button class="tnav active">Schedule</button>
-  <a href="admin.html#calendar" style="text-decoration:none"><button class="tnav">Calendar</button></a>
-  <a href="accounts.html" style="text-decoration:none"><button class="tnav">Accounts</button></a>
-  <a href="admin.html#reference" style="text-decoration:none"><button class="tnav">Reference</button></a>
-  <a href="admin.html#search" style="text-decoration:none"><button class="tnav">Search</button></a>
-  <a href="admin.html#export" style="text-decoration:none"><button class="tnav">Export</button></a>
-  <span style="width:1px;height:1rem;background:rgba(255,255,255,0.2);margin:0 0.4rem;display:inline-block"></span>
-  <button class="tnav" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.4);color:white" onclick="loadSchedule()">Refresh</button>
-</div>
 
 <div class="container">
 

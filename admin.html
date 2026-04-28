@@ -12,7 +12,7 @@
 body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f2f4f8; font-size: 0.9rem; color: #1a1a2e; }
 
 /* ---- HEADER & NAV ---- */
-header { background: #1a2744; color: white; padding: 0.6rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+header { background: #1a2744; color: white; padding: 0 1rem; display: flex; align-items: center; gap: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.25); flex-wrap: wrap; min-height: 44px; }
 header h1 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
 nav { display: flex; gap: 0.3rem; flex-wrap: wrap; align-items: center; }
 nav button { background: transparent; border: 1px solid rgba(255,255,255,0.35); color: rgba(255,255,255,0.75); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; transition: all 0.15s; }
@@ -132,22 +132,20 @@ tr:hover td { background: #f8f9fc; }
 </head>
 <body>
 <header>
-  <h1>Faith Lock &amp; Safe &nbsp;|&nbsp; Admin</h1>
-  <button class="logout" onclick="logout()">Sign Out</button>
+  <h1 style="margin:0;font-size:0.9rem;font-weight:600;letter-spacing:0.02em;white-space:nowrap;padding:0.55rem 1rem 0.55rem 0;border-right:1px solid rgba(255,255,255,0.15)">Faith Lock &amp; Safe &nbsp;|&nbsp; Admin</h1>
+  <nav id="admin-toolbar" style="display:flex;align-items:center;gap:0.2rem;flex-wrap:wrap;flex:1;padding:0.35rem 0.6rem">
+    <button class="tnav active" onclick="showSection('assign')">Assign</button>
+    <button class="tnav" onclick="showSection('review')">Review</button>
+    <a href="schedule.html" style="text-decoration:none"><button class="tnav">Schedule</button></a>
+    <button class="tnav" onclick="showSection('calendar')">Calendar</button>
+    <a href="accounts.html" style="text-decoration:none"><button class="tnav">Accounts</button></a>
+    <button class="tnav" onclick="showSection('reference')">Reference</button>
+    <button class="tnav" onclick="showSection('search')">Search</button>
+    <button class="tnav" onclick="showSection('export')">Export</button>
+    <span id="toolbar-extras"></span>
+  </nav>
+  <button class="logout" onclick="logout()" style="white-space:nowrap;flex-shrink:0">Sign Out</button>
 </header>
-<!-- Unified nav toolbar always visible -->
-<div id="admin-toolbar" style="background:#1e3260;border-bottom:1px solid #162248;padding:0.4rem 1.2rem;display:flex;justify-content:flex-end;align-items:center;gap:0.3rem;flex-wrap:wrap">
-  <button class="tnav active" onclick="showSection('assign')">Assign</button>
-  <button class="tnav" onclick="showSection('review')">Review</button>
-  <a href="schedule.html" style="text-decoration:none"><button class="tnav">Schedule</button></a>
-  <button class="tnav" onclick="showSection('calendar')">Calendar</button>
-  <a href="accounts.html" style="text-decoration:none"><button class="tnav">Accounts</button></a>
-  <button class="tnav" onclick="showSection('reference')">Reference</button>
-  <button class="tnav" onclick="showSection('search')">Search</button>
-  <button class="tnav" onclick="showSection('export')">Export</button>
-  <!-- Section-specific extras injected here by showSection() -->
-  <span id="toolbar-extras"></span>
-</div>
 
 <div class="container">
 

@@ -9,12 +9,15 @@
 <style>
 * { box-sizing: border-box; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f2f4f8; font-size: 0.9rem; color: #1a1a2e; }
-header { background: #1a2744; color: white; padding: 0.6rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+header { background: #1a2744; color: white; padding: 0 1rem; display: flex; align-items: center; gap: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.25); flex-wrap: wrap; min-height: 44px; }
 header h1 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
 nav button { background: transparent; border: 1px solid rgba(255,255,255,0.35); color: rgba(255,255,255,0.75); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; margin-left: 0.3rem; }
 nav button:hover, nav button.active { border-color: white; color: white; }
 nav button.active { background: #6b6fa8; border-color: #6b6fa8; }
 button.logout { background: transparent; border: 1px solid rgba(255,100,100,0.6); color: rgba(255,150,150,0.9); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; }
+.tnav { background: transparent; border: 1px solid rgba(255,255,255,0.28); color: rgba(255,255,255,0.75); padding: 0.28rem 0.65rem; cursor: pointer; font-size: 0.81rem; border-radius: 3px; font-family: inherit; transition: all 0.15s; }
+.tnav:hover { border-color: white; color: white; }
+.tnav.active { background: #6b6fa8; border-color: #6b6fa8; color: white; }
 .container { max-width: 100%; margin: 1.2rem auto; padding: 0 1.5rem; }
 .card { background: white; border: 1px solid #dde1ea; border-radius: 6px; margin-bottom: 1rem; padding: 1.2rem; box-shadow: 0 1px 4px rgba(26,39,68,0.06); }
 .card h3 { margin: 0 0 0.6rem; font-size: 1rem; color: #1a2744; font-weight: 600; }
@@ -70,13 +73,21 @@ input[type=checkbox] { width: auto; accent-color: #1a2744; }
 </head>
 <body>
 <header>
-  <h1>Faith Lock &amp; Safe &nbsp;|&nbsp; Accounts</h1>
-  <nav>
-    <button class="active" onclick="showSection('list')">Account List</button>
-    <button onclick="showSection('add')">+ Add Account</button>
-    <a href="admin.html" style="text-decoration:none"><button>Admin</button></a>
+  <h1 style="margin:0;font-size:0.9rem;font-weight:600;letter-spacing:0.02em;white-space:nowrap;padding:0.55rem 1rem 0.55rem 0;border-right:1px solid rgba(255,255,255,0.15)">Faith Lock &amp; Safe &nbsp;|&nbsp; Accounts</h1>
+  <nav style="display:flex;align-items:center;gap:0.2rem;flex-wrap:wrap;flex:1;padding:0.35rem 0.6rem">
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Assign</button></a>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Review</button></a>
+    <a href="schedule.html" style="text-decoration:none"><button class="tnav">Schedule</button></a>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Calendar</button></a>
+    <button class="tnav active">Accounts</button>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Reference</button></a>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Search</button></a>
+    <a href="admin.html" style="text-decoration:none"><button class="tnav">Export</button></a>
+    <span style="width:1px;height:1rem;background:rgba(255,255,255,0.2);margin:0 0.3rem;display:inline-block"></span>
+    <button class="tnav" onclick="showSection('list')">Account List</button>
+    <button class="tnav" onclick="showSection('add')">+ Add Account</button>
   </nav>
-  <button class="logout" onclick="logout()">Sign Out</button>
+  <button class="logout" onclick="logout()" style="white-space:nowrap;flex-shrink:0">Sign Out</button>
 </header>
 
 <div class="container">
