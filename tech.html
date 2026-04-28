@@ -197,9 +197,6 @@ let allJobTypes   = [];
 // Cache of primary contacts keyed by account_id.
 let allPrimaryContactsCache = {};
 
-// Open job_visits rows for this tech keyed by job_id.
-let openVisitsByJob = {};
-
 
 // ---- INIT ----
 // Entry point: verify auth, then load reference data and jobs in parallel.
@@ -297,11 +294,6 @@ async function loadJobs() {
       (contacts || []).forEach(c => { allPrimaryContactsCache[c.account_id] = c; });
     }
 
-    const { data: openVisits } = await db.from('job_visits')
-      .select('id,job_id').eq('clocked_in_by', currentUser.id).is('clocked_out_at', null);
-    openVisitsByJob = {};
-    (openVisits || []).forEach(v => { openVisitsByJob[v.job_id] = v; });
-
     list.innerHTML = myJobs.map(j => jobCard(j)).join('');
   } catch (err) {
     list.innerHTML = `<div class="msg error"><strong>Error loading jobs:</strong> ${err.message}</div>`;
@@ -380,15 +372,7 @@ function jobCard(j) {
     ${j.scope      ? `<div style="font-size:0.85rem;margin-bottom:0.4rem"><strong>Scope:</strong> ${j.scope}</div>` : ''}
     ${j.site_notes ? `<div style="font-size:0.85rem;margin-bottom:0.4rem"><strong>Site Notes:</strong> ${j.site_notes}</div>` : ''}
     <div style="margin-top:0.4rem">
-      ${!submitted ? `
-        <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem">
-          ${openVisitsByJob[j.id]
-            ? `<button class="btn btn-warn" onclick="clockOut('${j.id}','${openVisitsByJob[j.id].id}')" style="flex:1">Clock Out</button>`
-            : `<button class="btn btn-green" onclick="clockIn('${j.id}')" style="flex:1">Clock In</button>`}
-          <button class="btn btn-primary" onclick="openJobDetail('${j.id}')" style="flex:2">Job Details</button>
-        </div>
-        <div id="card-clock-msg-${j.id}" style="font-size:0.82rem;color:#a00;display:none"></div>
-      ` : `<button class="btn btn-primary" onclick="openJobDetail('${j.id}')" style="width:100%">Job Details</button>`}
+      <button class="btn btn-primary" onclick="openJobDetail('${j.id}')" style="width:100%">Job Details</button>
       ${submitted && j.status === 'Pending Review'
         ? `<button class="btn btn-warn" onclick="unsubmit('${j.id}','${comp.id}')" style="width:100%;margin-top:0.4rem">Unsubmit</button>`
         : ''}
@@ -414,31 +398,6 @@ async function unsubmit(jobId, compId) {
   loadJobs();
 }
 
-async function clockIn(jobId) {
-  const msgEl = document.getElementById(`card-clock-msg-${jobId}`);
-  if (msgEl) { msgEl.style.display = 'none'; msgEl.textContent = ''; }
-
-  const { data: open } = await db.from('job_visits')
-    .select('id,job_id').eq('clocked_in_by', currentUser.id).is('clocked_out_at', null);
-  if (open?.length) {
-    if (msgEl) { msgEl.textContent = 'You are already clocked in to another job. Clock out first.'; msgEl.style.display = ''; }
-    return;
-  }
-
-  const { count } = await db.from('job_visits').select('id', { count: 'exact', head: true }).eq('job_id', jobId);
-  await db.from('job_visits').insert({
-    job_id: jobId, visit_number: (count || 0) + 1,
-    visit_date: today(), clocked_in_at: new Date().toISOString(), clocked_in_by: currentUser.id
-  });
-  await db.from('jobs').update({ status: 'In Progress', updated_at: new Date().toISOString() }).eq('id', jobId);
-  loadJobs();
-}
-
-async function clockOut(jobId, visitId) {
-  await db.from('job_visits').update({ clocked_out_at: new Date().toISOString() }).eq('id', visitId);
-  await db.from('jobs').update({ status: 'Scheduled', updated_at: new Date().toISOString() }).eq('id', jobId);
-  loadJobs();
-}
 
 function showTab(name) {
   ['jobs','newjob','newcustomer'].forEach(t => {
@@ -559,8 +518,18 @@ async function openJobDetail(jobId) {
     completionSection = `
       <div class="form-section">
         <div class="section-title">Complete This Job</div>
-        <div class="form-row"><label>Time In</label><input type="datetime-local" id="m-timein"></div>
-        <div class="form-row"><label>Time Out</label><input type="datetime-local" id="m-timeout"></div>
+        <div class="form-row"><label>Time In</label>
+          <div style="display:flex;gap:0.4rem">
+            <input type="datetime-local" id="m-timein" style="flex:1">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('m-timein').value=nowLocal()" style="white-space:nowrap">Now</button>
+          </div>
+        </div>
+        <div class="form-row"><label>Time Out</label>
+          <div style="display:flex;gap:0.4rem">
+            <input type="datetime-local" id="m-timeout" style="flex:1">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('m-timeout').value=nowLocal()" style="white-space:nowrap">Now</button>
+          </div>
+        </div>
       </div>
       <div class="form-section">
         <div class="section-title">Parts Used</div>
