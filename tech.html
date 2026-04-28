@@ -419,39 +419,42 @@ async function openJobDetail(jobId) {
   modalLabor = [];
 
   const { data: job } = await db.from('jobs')
-    .select(`*, accounts!jobs_account_id_fkey(account_name, address),
+    .select(`*, accounts!jobs_account_id_fkey(account_name, address, phone, instructions),
              sub:accounts!jobs_sub_account_id_fkey(account_name),
              job_types(job_type_name),
              job_completions(id,time_in,time_out,payment_type,payment_detail,follow_up_flag,tech_notes,submitted_at),
              job_line_items(id,item_type,item_id,quantity)`)
     .eq('id', jobId).single();
 
-  // Fetch all contacts for this account to show primary + secondary in the modal.
-  // The card list only shows the primary contact; the modal shows both for complete info.
+  // Build contact HTML: prefer named contacts from account_contacts, fall back to account phone.
   let contactHtml = '';
   if (job.account_id) {
     const { data: contacts } = await db.from('account_contacts')
       .select('*').eq('account_id', job.account_id).eq('active', true)
       .order('is_primary', { ascending: false });
+
     if (contacts?.length) {
       const primary   = contacts.find(c => c.is_primary) || contacts[0];
-      const secondary = contacts.find(c => c.is_secondary && !c.is_primary);
+      const secondary = contacts.find(c => !c.is_primary);
       let ch = `<div class="contact-info"><strong>Contact:</strong> ${primary.contact_name}`;
-      if (primary.title)    ch += ` | ${primary.title}`;
-      if (primary.company)  ch += ` | ${primary.company}`;
+      if (primary.title)      ch += ` | ${primary.title}`;
+      if (primary.company)    ch += ` | ${primary.company}`;
       ch += '<br>';
       if (primary.work_phone) ch += `Work: ${primary.work_phone} &nbsp;`;
       if (primary.cell_phone) ch += `Cell: ${primary.cell_phone} &nbsp;`;
       if (primary.email)      ch += primary.email;
       if (primary.notes)      ch += `<br><em style="font-size:0.82rem">${primary.notes}</em>`;
       if (secondary) {
-        ch += `<br><span style="font-size:0.82rem">Secondary: ${secondary.contact_name}`;
-        if (secondary.work_phone) ch += ` | ${secondary.work_phone}`;
-        if (secondary.cell_phone) ch += ` / ${secondary.cell_phone}`;
+        ch += `<br><span style="font-size:0.82rem"><strong>Secondary:</strong> ${secondary.contact_name}`;
+        if (secondary.work_phone) ch += ` | Work: ${secondary.work_phone}`;
+        if (secondary.cell_phone) ch += ` | Cell: ${secondary.cell_phone}`;
         ch += '</span>';
       }
       ch += '</div>';
       contactHtml = ch;
+    } else if (job.accounts?.phone) {
+      // No named contacts on file — show the account-level phone number
+      contactHtml = `<div class="contact-info"><strong>Phone:</strong> ${job.accounts.phone}</div>`;
     }
   }
 
