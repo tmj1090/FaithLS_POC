@@ -7,63 +7,100 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="shared.js"></script>
 <style>
+/* ---- RESET & BASE ---- */
 * { box-sizing: border-box; }
-body { font-family: sans-serif; margin: 0; background: #f0f0f0; font-size: 0.9rem; }
-header { background: #1a1a1a; color: white; padding: 0.7rem 1rem; display: flex; justify-content: space-between; align-items: center; }
-header h1 { margin: 0; font-size: 1rem; }
-button.logout { background: none; border: 1px solid #aaa; color: #aaa; padding: 0.3rem 0.7rem; cursor: pointer; }
-.container { max-width: 700px; margin: 1rem auto; padding: 0 1rem; }
-.tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.tab { padding: 0.4rem 1rem; border: 1px solid #ccc; background: white; cursor: pointer; font-size: 0.9rem; }
-.tab.active { background: #1a1a1a; color: white; border-color: #1a1a1a; }
-.filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.filter-btn { padding: 0.4rem 1rem; border: 1px solid #ccc; background: white; cursor: pointer; font-size: 0.85rem; }
-.filter-btn.active { background: #444; color: white; border-color: #444; }
-.card { background: white; border: 1px solid #ccc; margin-bottom: 0.8rem; padding: 1rem; }
-.card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
-.card .meta { color: #555; font-size: 0.82rem; margin-bottom: 0.5rem; }
-.fixed-banner { background: #ffe0e0; border: 1px solid #f99; color: #900; padding: 0.4rem 0.7rem; margin-bottom: 0.6rem; font-weight: bold; font-size: 0.85rem; }
-.expected-banner { background: #e8f0ff; border: 1px solid #99c; color: #224; padding: 0.4rem 0.7rem; margin-bottom: 0.6rem; font-size: 0.85rem; }
-.contact-info { background: #e8f4ff; border: 1px solid #9bc; color: #135; padding: 0.4rem 0.7rem; margin-bottom: 0.6rem; font-size: 0.85rem; }
-.address-info { background: #f4f4f4; border: 1px solid #ccc; padding: 0.4rem 0.7rem; margin-bottom: 0.6rem; font-size: 0.85rem; }
-.btn { padding: 0.5rem 1rem; border: none; cursor: pointer; font-size: 0.9rem; margin-right: 0.4rem; margin-bottom: 0.3rem; border-radius: 2px; }
-.btn-primary { background: #1a1a1a; color: white; }
-.btn-secondary { background: #ddd; color: #333; }
-.btn-warn { background: #b8860b; color: white; }
-.btn-green { background: #2a7a2a; color: white; }
-.form-section { margin-top: 0.8rem; border-top: 1px solid #eee; padding-top: 0.8rem; }
-.form-row { margin-bottom: 0.6rem; }
-.form-row label { display: block; font-weight: bold; font-size: 0.82rem; margin-bottom: 0.2rem; }
-.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 0.5rem; border: 1px solid #ccc; font-size: 0.9rem; }
-.form-row textarea { height: 70px; resize: vertical; }
-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.4rem; }
-th { background: #eee; text-align: left; padding: 0.3rem 0.5rem; }
-td { padding: 0.3rem 0.5rem; border-bottom: 1px solid #eee; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f2f4f8; font-size: 0.92rem; color: #1a1a2e; }
+
+/* ---- HEADER ---- */
+header { background: #1a2744; color: white; padding: 0.7rem 1.2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+header h1 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+button.logout { background: transparent; border: 1px solid rgba(255,100,100,0.6); color: rgba(255,150,150,0.9); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; }
+
+/* ---- LAYOUT ---- */
+.container { max-width: 680px; margin: 1rem auto; padding: 0 1rem; }
+
+/* ---- TABS ---- */
+.tabs { display: flex; gap: 0; margin-bottom: 1rem; border-radius: 5px; overflow: hidden; border: 1px solid #c8cdd8; }
+.tab { flex: 1; padding: 0.55rem 0.5rem; border: none; background: white; cursor: pointer; font-size: 0.88rem; font-family: inherit; color: #5a6075; font-weight: 500; transition: background 0.15s; text-align: center; }
+.tab + .tab { border-left: 1px solid #c8cdd8; }
+.tab.active { background: #1a2744; color: white; font-weight: 600; }
+
+/* ---- FILTER BUTTONS ---- */
+.filters { display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.filter-btn { padding: 0.4rem 1rem; border: 1px solid #c8cdd8; background: white; cursor: pointer; font-size: 0.85rem; font-family: inherit; border-radius: 20px; color: #5a6075; transition: all 0.15s; }
+.filter-btn.active { background: #1a2744; color: white; border-color: #1a2744; }
+
+/* ---- CARDS ---- */
+.card { background: white; border: 1px solid #dde1ea; border-radius: 6px; margin-bottom: 0.9rem; padding: 1.1rem; box-shadow: 0 1px 4px rgba(26,39,68,0.07); }
+.card h3 { margin: 0 0 0.25rem; font-size: 1rem; color: #1a2744; font-weight: 600; }
+.card .meta { color: #5a6075; font-size: 0.83rem; margin-bottom: 0.3rem; }
+
+/* ---- BANNERS ---- */
+.fixed-banner    { background: #ffe8e8; border: 1px solid #f4aaaa; color: #800; padding: 0.45rem 0.7rem; margin-bottom: 0.6rem; font-weight: 600; font-size: 0.85rem; border-radius: 4px; }
+.expected-banner { background: #eaf2ff; border: 1px solid #aacaf8; color: #1a3070; padding: 0.45rem 0.7rem; margin-bottom: 0.6rem; font-size: 0.85rem; border-radius: 4px; }
+.contact-info    { background: #e8f0ff; border: 1px solid #b0c4f8; color: #1a3070; padding: 0.45rem 0.7rem; margin-bottom: 0.6rem; font-size: 0.85rem; border-radius: 4px; line-height: 1.55; }
+.address-info    { background: #f4f6fb; border: 1px solid #dde1ea; padding: 0.4rem 0.7rem; margin-bottom: 0.6rem; font-size: 0.85rem; border-radius: 4px; }
+
+/* ---- BUTTONS ---- */
+.btn { padding: 0.48rem 1rem; border: none; cursor: pointer; font-size: 0.9rem; font-family: inherit; font-weight: 500; border-radius: 4px; margin-right: 0.4rem; margin-bottom: 0.3rem; transition: opacity 0.15s; }
+.btn:active { opacity: 0.8; }
+.btn-primary   { background: #1a2744; color: white; }
+.btn-secondary { background: #eaecf4; color: #333; }
+.btn-green     { background: #2a7a4a; color: white; }
+.btn-warn      { background: #b86c00; color: white; }
+
+/* ---- FORM ELEMENTS ---- */
+.form-section { margin-top: 1rem; border-top: 1px solid #eef0f6; padding-top: 0.9rem; }
+.form-row { margin-bottom: 0.65rem; }
+.form-row label { display: block; font-weight: 600; font-size: 0.82rem; color: #4a5070; margin-bottom: 0.25rem; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 0.5rem 0.6rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.9rem; font-family: inherit; transition: border-color 0.15s; }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: #6b6fa8; box-shadow: 0 0 0 2px rgba(107,111,168,0.12); }
+.form-row textarea { height: 72px; resize: vertical; }
+input[type=checkbox] { width: auto; accent-color: #1a2744; }
+
+/* ---- PARTS AUTOCOMPLETE ---- */
 .parts-wrap { position: relative; margin-bottom: 0.5rem; }
-.parts-wrap input { width: 100%; padding: 0.5rem; border: 1px solid #ccc; font-size: 0.9rem; }
-.parts-results { border: 1px solid #ccc; background: white; max-height: 200px; overflow-y: auto; position: absolute; z-index: 50; width: 100%; top: 100%; left: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
-.parts-results div { padding: 0.6rem 0.5rem; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-.parts-results div:hover, .parts-results div:active { background: #e8f0ff; }
-.msg { padding: 0.5rem; margin-bottom: 0.5rem; font-size: 0.85rem; }
-.msg.success { background: #e0ffe0; border: 1px solid #9d9; }
-.msg.error { background: #ffe0e0; border: 1px solid #f99; }
-input[type=checkbox] { width: auto; }
-.section-title { font-weight: bold; margin: 0.8rem 0 0.4rem; font-size: 0.88rem; border-bottom: 1px solid #eee; padding-bottom: 0.2rem; }
-.status-badge { display: inline-block; padding: 0.15rem 0.5rem; font-size: 0.78rem; font-weight: bold; }
-.status-Scheduled { background: #e0e8ff; color: #224; }
-.status-In-Progress { background: #e0ffe0; color: #060; }
-.status-Pending-Review { background: #ffd; color: #660; }
-.status-Approved { background: #e0ffe0; color: #060; }
-.status-Quoted { background: #fff0cc; color: #640; }
-.status-Awaiting-Parts { background: #ffe8cc; color: #640; }
-.status-Flagged { background: #ffe0e0; color: #900; }
+.parts-wrap input { width: 100%; padding: 0.5rem 0.6rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.9rem; font-family: inherit; }
+.parts-results { border: 1px solid #c8cdd8; background: white; max-height: 200px; overflow-y: auto; position: absolute; z-index: 50; width: 100%; top: 100%; left: 0; box-shadow: 0 4px 14px rgba(26,39,68,0.14); border-radius: 0 0 4px 4px; }
+.parts-results div { padding: 0.55rem 0.6rem; cursor: pointer; border-bottom: 1px solid #eef0f6; font-size: 0.9rem; }
+.parts-results div:hover, .parts-results div:active { background: #e8eaf8; }
+
+/* ---- TABLES ---- */
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin-top: 0.4rem; }
+th { background: #f2f4f8; text-align: left; padding: 0.4rem 0.5rem; font-weight: 600; color: #4a5070; font-size: 0.8rem; border-bottom: 2px solid #dde1ea; }
+td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #eef0f6; }
+
+/* ---- MESSAGES ---- */
+.msg { padding: 0.5rem 0.7rem; margin-bottom: 0.5rem; font-size: 0.87rem; border-radius: 4px; }
+.msg.success { background: #d6f2e0; border: 1px solid #8cd8aa; color: #1a5c30; }
+.msg.error   { background: #ffe0e0; border: 1px solid #f4aaaa; color: #800; }
+
+/* ---- SECTION TITLE ---- */
+.section-title { font-weight: 600; font-size: 0.82rem; color: #6b6fa8; text-transform: uppercase; letter-spacing: 0.05em; margin: 0.9rem 0 0.45rem; border-bottom: 1px solid #eef0f6; padding-bottom: 0.3rem; }
+
+/* ---- STATUS BADGES ---- */
+.status-badge { display: inline-block; padding: 0.18rem 0.55rem; font-size: 0.76rem; font-weight: 600; border-radius: 20px; }
+.status-Scheduled      { background: #e4eaf8; color: #1a2744; }
+.status-In-Progress    { background: #d6f2e0; color: #1a5c30; }
+.status-Pending-Review { background: #fff8c0; color: #6b5a00; }
+.status-Approved       { background: #d6f2e0; color: #1a5c30; }
+.status-Quoted         { background: #fff3d6; color: #7a4800; }
+.status-Awaiting-Parts { background: #ffe8cc; color: #7a3800; }
+.status-Flagged        { background: #ffe0e0; color: #900; }
+
+/* ---- CONFIRM PANEL ---- */
+.confirm-panel { background: #f8f9fc; border: 1px solid #dde1ea; border-radius: 5px; padding: 1rem; margin-top: 0.8rem; }
+.confirm-panel .confirm-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.6rem; color: #1a2744; }
+.confirm-row { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 0.2rem 0; border-bottom: 1px solid #eef0f6; }
+.confirm-row:last-of-type { border-bottom: none; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Faith Lock &amp; Safe | Field View</h1>
+  <h1>Faith Lock &amp; Safe &nbsp;|&nbsp; Field View</h1>
   <button class="logout" onclick="logout()">Sign Out</button>
 </header>
+
 <div class="container">
   <div class="tabs">
     <div class="tab active" onclick="showTab('jobs')">My Jobs</div>
@@ -78,7 +115,7 @@ input[type=checkbox] { width: auto; }
       <button class="filter-btn" onclick="setFilter('week',this)">This Week</button>
       <button class="filter-btn active" onclick="setFilter('open',this)">All Open</button>
     </div>
-    <div id="jobs-list">Loading...</div>
+    <div id="jobs-list"><p style="color:#888">Loading...</p></div>
   </div>
 
   <!-- ---- NEW JOB TAB ---- -->
@@ -98,8 +135,18 @@ input[type=checkbox] { width: auto; }
       <div class="form-row"><label>Scope</label><textarea id="nj-scope"></textarea></div>
       <div class="form-section">
         <div class="section-title">Completion Details</div>
-        <div class="form-row"><label>Time In</label><input type="datetime-local" id="nj-timein"></div>
-        <div class="form-row"><label>Time Out</label><input type="datetime-local" id="nj-timeout"></div>
+        <div class="form-row"><label>Time In</label>
+          <div style="display:flex;gap:0.4rem">
+            <input type="datetime-local" id="nj-timein" style="flex:1">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('nj-timein').value=nowLocal()" style="white-space:nowrap;padding:0.4rem 0.7rem">Now</button>
+          </div>
+        </div>
+        <div class="form-row"><label>Time Out</label>
+          <div style="display:flex;gap:0.4rem">
+            <input type="datetime-local" id="nj-timeout" style="flex:1">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('nj-timeout').value=nowLocal()" style="white-space:nowrap;padding:0.4rem 0.7rem">Now</button>
+          </div>
+        </div>
         <div class="form-row"><label>Payment Type</label>
           <select id="nj-paytype">
             <option value="">Select...</option>
@@ -107,8 +154,7 @@ input[type=checkbox] { width: auto; }
           </select>
         </div>
         <div class="form-row"><label>Payment Detail</label><input type="text" id="nj-paydetail"></div>
-        <div class="form-row">
-          <label>Parts Used</label>
+        <div class="form-row"><label>Parts Used</label>
           <div class="parts-wrap">
             <input type="text" id="nj-partsearch" placeholder="Type to search parts..." oninput="searchParts('nj')" autocomplete="off">
             <div class="parts-results" id="nj-parts-results" style="display:none"></div>
@@ -117,20 +163,21 @@ input[type=checkbox] { width: auto; }
         </div>
         <div class="form-row"><label>Labor</label>
           <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem;flex-wrap:wrap">
-            <select id="nj-labortype" style="flex:2;padding:0.5rem;border:1px solid #ccc"><option value="">Select type...</option></select>
-            <input type="number" id="nj-laborhours" placeholder="Hrs" style="width:70px;padding:0.5rem;border:1px solid #ccc">
+            <select id="nj-labortype" style="flex:2;padding:0.5rem;border:1px solid #c8cdd8;border-radius:4px"><option value="">Select type...</option></select>
+            <input type="number" id="nj-laborhours" placeholder="Hrs" style="width:70px;padding:0.5rem;border:1px solid #c8cdd8;border-radius:4px">
             <button class="btn btn-secondary" onclick="addLabor('nj')">Add</button>
           </div>
           <table id="nj-labor-table"><thead><tr><th>Type</th><th>Hours</th><th></th></tr></thead><tbody></tbody></table>
         </div>
         <div class="form-row"><label>Tech Notes</label><textarea id="nj-notes"></textarea></div>
         <div class="form-row"><label><input type="checkbox" id="nj-followup"> Flag for Follow-up</label></div>
-        <div class="form-row"><label>Photos</label><input type="file" id="nj-photos" accept="image/*" multiple onchange="showPhotoPreview('nj-photos','nj-photo-preview')">
-          <div id="nj-photo-preview" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem"></div>
+        <div class="form-row"><label>Photos</label>
+          <input type="file" id="nj-photos" accept="image/*" multiple onchange="showPhotoPreview('nj-photos','nj-photo-preview')">
+          <div id="nj-photo-preview" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem"></div>
         </div>
       </div>
-      <div id="nj-msg"></div>
-      <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="submitNewJob()">Submit Job</button>
+      <div id="nj-msg" style="margin-top:0.6rem"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:0.5rem;padding:0.7rem;font-size:0.95rem" onclick="submitNewJob()">Submit Job</button>
     </div>
   </div>
 
@@ -138,24 +185,21 @@ input[type=checkbox] { width: auto; }
   <div id="tab-newcustomer" style="display:none">
     <div class="card">
       <h3>Submit New Customer</h3>
-      <p style="font-size:0.82rem;color:#555">Admin will add this to the permanent account list.</p>
+      <p style="font-size:0.85rem;color:#5a6075;margin-bottom:0.8rem">Admin will add this to the permanent account list.</p>
       <div class="form-row"><label>Customer Name</label><input type="text" id="nc-name"></div>
       <div class="form-row"><label>Address</label><input type="text" id="nc-address"></div>
       <div class="form-row"><label>Phone</label><input type="text" id="nc-phone"></div>
       <div class="form-row"><label>Notes</label><textarea id="nc-notes"></textarea></div>
-      <div id="nc-msg"></div>
-      <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="submitNewCustomer()">Submit</button>
+      <div id="nc-msg" style="margin-top:0.5rem"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:0.4rem;padding:0.7rem;font-size:0.95rem" onclick="submitNewCustomer()">Submit</button>
     </div>
   </div>
 </div>
 
-<!-- ---- JOB DETAIL MODAL ----
-     A full-screen overlay that shows all job info + a completion form (if not yet submitted).
-     Using a modal instead of an inline expand keeps the jobs list visible behind it and makes
-     the form layout much easier to scroll on mobile. -->
+<!-- ---- JOB DETAIL MODAL ---- -->
 <div id="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;overflow-y:auto">
-  <div style="background:white;max-width:640px;margin:0 auto;padding:1.5rem;position:relative;min-height:100vh">
-    <button onclick="closeModal()" style="position:absolute;top:0.5rem;right:0.5rem;background:#ddd;border:none;font-size:1rem;cursor:pointer;padding:0.3rem 0.6rem">Close</button>
+  <div style="background:white;max-width:640px;margin:0 auto;padding:1.4rem 1.2rem;position:relative;min-height:100vh">
+    <button onclick="closeModal()" style="position:absolute;top:0.75rem;right:0.75rem;background:#eaecf4;border:none;font-size:0.9rem;cursor:pointer;border-radius:3px;padding:0.3rem 0.7rem;color:#333">Close</button>
     <div id="modal-content"></div>
   </div>
 </div>
@@ -163,51 +207,30 @@ input[type=checkbox] { width: auto; }
 <script>
 // ============================================================
 // tech.html — Faith Lock & Safe Field View
-//
-// This page is used by field technicians on their phones or tablets.
-// It is intentionally simpler than admin.html — no billing details,
-// no account management. Techs log their work, submit completions,
-// and upload photos. Admin reviews everything in admin.html.
-//
-// Globals from shared.js (loaded above):
-//   db, formatDate(), today(), weekStart(), nowLocal(),
-//   populateSelect(), populateMultiSelect(), resizeImage(),
-//   fetchPhotoUrls(), renderPhotoGrid(), mapsLink(), logout()
 // ============================================================
 
+let currentUser  = null;
+let currentFilter = 'open';
+let modalJobId   = null;
 
-// ---- STATE ----
-// These are the top-level variables the page uses. Everything else is local to its function.
-
-let currentUser  = null;     // Supabase auth user object (set on init)
-let currentFilter = 'open';  // Active date filter: 'today' | 'week' | 'open'
-let modalJobId   = null;     // ID of the job currently open in the modal
-
-// Parts and labor lists for the completion modal ('m') and the new-job form ('nj').
-// Kept separate so both forms can be open (conceptually) without cross-contamination.
 let modalParts = [], modalLabor = [];
 let njParts    = [], njLabor    = [];
 
-// Reference data — loaded once on init and reused everywhere.
 let allParts      = [];
 let allLaborTypes = [];
 let allAccounts   = [];
 let allJobTypes   = [];
 
-// Cache of primary contacts keyed by account_id.
 let allPrimaryContactsCache = {};
 
 
 // ---- INIT ----
-// Entry point: verify auth, then load reference data and jobs in parallel.
 async function init() {
   try {
     const { data: { session }, error: sessErr } = await db.auth.getSession();
     if (sessErr) throw sessErr;
     if (!session) { window.location.href = 'index.html'; return; }
     currentUser = session.user;
-
-    // Load both in parallel — neither depends on the other.
     await Promise.all([loadRefData(), loadJobs()]);
   } catch (err) {
     document.getElementById('jobs-list').innerHTML =
@@ -219,8 +242,6 @@ async function init() {
 
 
 // ---- REFERENCE DATA ----
-// Loads the lookup tables (parts, labor types, accounts, job types) used to
-// populate dropdowns. Runs once on init; results are cached in the globals above.
 async function loadRefData() {
   const [p, l, a, jt] = await Promise.all([
     db.from('parts').select('id,part_name,category,unit').eq('active', true).order('part_name'),
@@ -233,7 +254,6 @@ async function loadRefData() {
   allAccounts   = a.data  || [];
   allJobTypes   = jt.data || [];
 
-  // Only show top-level (parent) accounts in the account picker; sub-accounts load separately.
   populateSelect('nj-account',   allAccounts.filter(a => !a.parent_account_id), 'id', 'account_name', 'Select account...');
   populateSelect('nj-jobtype',   allJobTypes,   'id', 'job_type_name',   'Select type...');
   populateSelect('nj-labortype', allLaborTypes, 'id', 'labor_type_name', 'Select type...');
@@ -242,18 +262,10 @@ async function loadRefData() {
 
 
 // ---- JOB LIST ----
-
-// loadJobs: fetches jobs assigned to the current tech for the active date filter.
-// Uses .contains('assigned_tech_ids', [currentUser.id]) so each tech sees ONLY
-// their own jobs. The array-contains operator matches rows where assigned_tech_ids
-// includes (at minimum) the given value — other IDs in the array don't matter.
 async function loadJobs() {
   const list = document.getElementById('jobs-list');
   list.innerHTML = '<p style="color:#888">Loading...</p>';
   try {
-    // Resolve auth user → techs row. The jobs table stores techs.id in assigned_tech_ids,
-    // not the Supabase auth user ID. Look up this user's techs row first.
-    // If no mapping exists yet, techRowId stays null and we show all open jobs (POC fallback).
     const { data: techRow } = await db.from('techs').select('id').eq('user_id', currentUser.id).maybeSingle();
     const techRowId = techRow?.id || null;
 
@@ -269,7 +281,6 @@ async function loadJobs() {
                job_visits(id,visit_number,visit_date)`)
       .not('status', 'in', '("Cancelled","Approved")');
 
-    // Filter to this tech's jobs only when a techs row mapping exists
     if (techRowId) query = query.contains('assigned_tech_ids', [techRowId]);
 
     if (currentFilter === 'today') query = query.eq('job_date', today());
@@ -279,12 +290,9 @@ async function loadJobs() {
     if (error) throw error;
 
     const myJobs = data || [];
-    if (!myJobs.length) { list.innerHTML = '<p>No jobs found for this period.</p>'; return; }
+    if (!myJobs.length) { list.innerHTML = '<p style="color:#888">No jobs found for this period.</p>'; return; }
 
-    // Pre-fetch primary contacts for all accounts in the result set in a SINGLE query.
-    // Without this, each jobCard() would trigger its own DB call — an N+1 query problem.
-    // Instead we collect all unique account IDs first, fetch contacts once, then store
-    // them in allPrimaryContactsCache for jobCard() to read synchronously.
+    // Pre-fetch primary contacts in a single batch query to avoid N+1 problem
     const accountIds = [...new Set(myJobs.map(j => j.account_id).filter(Boolean))];
     allPrimaryContactsCache = {};
     if (accountIds.length) {
@@ -301,95 +309,68 @@ async function loadJobs() {
   }
 }
 
-// jobCard: builds the HTML for a single job card in the list.
-// Each card shows the account, date, status, fixed-price warning, expected
-// parts/labor, contact info, address, scope, and a "Job Details" button.
 function jobCard(j) {
   const account   = j.accounts?.account_name || 'Unknown Account';
   const sub       = j.sub?.account_name ? ` / ${j.sub.account_name}` : '';
   const comp      = j.job_completions?.[0];
   const submitted = !!comp;
+  const visits    = j.job_visits || [];
 
-  // Bright red banner for fixed-price jobs — tells the tech not to over-scope.
+  const statusBadge = `<span class="status-badge status-${j.status.replace(/ /g,'-')}">${j.status}</span>`;
+  const visitLine   = visits.length > 1
+    ? `<div class="meta">Visit ${visits.length} of ${visits.length}</div>` : '';
+
   const fixedBanner = j.is_fixed_price
-    ? `<div class="fixed-banner">FIXED PRICE | Quoted: $${Number(j.quote_amount||0).toFixed(2)} | Do not exceed scope without calling Rich.</div>`
-    : '';
+    ? `<div class="fixed-banner">FIXED PRICE | Quoted: $${Number(j.quote_amount||0).toFixed(2)} | Do not exceed scope without calling Rich.</div>` : '';
 
-  // Primary contact from the pre-fetched cache (avoids a DB call per card).
   const pc = allPrimaryContactsCache[j.account_id];
-  let contactHtml = '';
-  if (pc) {
-    let line = `<strong>Contact:</strong> ${pc.contact_name}`;
-    if (pc.work_phone) line += ` | Work: ${pc.work_phone}`;
-    if (pc.cell_phone) line += ` | Cell: ${pc.cell_phone}`;
-    contactHtml = `<div class="contact-info">${line}</div>`;
-  }
+  const contactLine = pc
+    ? `<div style="font-size:0.83rem;color:#1a3070;margin-bottom:0.3rem">
+         Contact: <strong>${pc.contact_name}</strong>
+         ${pc.work_phone ? ` | Work: ${pc.work_phone}` : ''}
+         ${pc.cell_phone ? ` | Cell: ${pc.cell_phone}` : ''}
+       </div>` : '';
 
-  // Expected parts/labor (pre-loaded by admin) shown as a blue banner.
-  // Only shown on un-submitted jobs so the tech knows what to bring/expect.
-  const expParts = (j.job_line_items||[]).filter(i => i.item_type === 'Part');
-  const expLabor = (j.job_line_items||[]).filter(i => i.item_type === 'Labor');
-  let expHtml = '';
-  if (!submitted && (expParts.length || expLabor.length)) {
-    const pNames = expParts.map(i => {
-      const p = allParts.find(x => x.id === i.item_id);
-      return p ? `${p.part_name} x${i.quantity}` : '';
-    }).filter(Boolean).join(', ');
-    const lNames = expLabor.map(i => {
-      const l = allLaborTypes.find(x => x.id === i.item_id);
-      return l ? `${l.labor_type_name} ${i.quantity}hr` : '';
-    }).filter(Boolean).join(', ');
-    expHtml = `<div class="expected-banner">${pNames ? `<div><strong>Expected parts:</strong> ${pNames}</div>` : ''}${lNames ? `<div><strong>Expected labor:</strong> ${lNames}</div>` : ''}</div>`;
-  }
+  const addrLine = j.accounts?.address
+    ? `<div style="font-size:0.83rem;margin-bottom:0.3rem">${mapsLink(j.accounts.address)}</div>` : '';
 
-  // Address wrapped in a Google Maps link so techs can tap for turn-by-turn directions.
-  const addr    = j.accounts?.address;
-  const addrHtml = addr ? `<div class="address-info"><strong>Address:</strong> ${mapsLink(addr)}</div>` : '';
+  const expectedParts  = (j.job_line_items||[]).filter(i => i.item_type === 'Part');
+  const expectedLabor  = (j.job_line_items||[]).filter(i => i.item_type === 'Labor');
+  const expectedBanner = (expectedParts.length || expectedLabor.length) && !submitted
+    ? `<div class="expected-banner">Expected: ${expectedParts.length} part type(s), ${expectedLabor.length} labor entry(ies) pre-loaded in the form.</div>` : '';
 
-  const wopo = [
-    j.work_order_number    ? `WO: ${j.work_order_number}`    : '',
-    j.purchase_order_number ? `PO: ${j.purchase_order_number}` : ''
-  ].filter(Boolean).join(' | ');
+  const wopo = [j.work_order_number ? `WO: ${j.work_order_number}` : '', j.purchase_order_number ? `PO: ${j.purchase_order_number}` : ''].filter(Boolean).join(' | ');
 
-  const visits     = j.job_visits || [];
-  const visitCount = visits.length;
-  const visitLine  = visitCount > 1
-    ? `<div style="font-size:0.78rem;color:#888;margin-bottom:0.2rem">Visit ${visitCount} of ${visitCount}</div>`
-    : '';
+  const actionBtn = submitted
+    ? `<button class="btn btn-secondary" onclick="openJobDetail('${j.id}')">View / Add Photos</button>
+       <button class="btn btn-warn" onclick="unsubmit('${j.id}','${comp.id}')">Unsubmit</button>`
+    : `<button class="btn btn-primary" style="padding:0.55rem 1.2rem" onclick="openJobDetail('${j.id}')">Job Details</button>`;
 
-  const statusSlug = (j.status || '').replace(/ /g, '-');
   return `<div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start">
-      <h3 style="margin:0 0 0.3rem">${account}${sub}</h3>
-      <span class="status-badge status-${statusSlug}">${j.status}</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem">
+      <h3>${account}${sub}</h3>
+      ${statusBadge}
     </div>
-    <div class="meta">${formatDate(j.job_date)} | ${j.job_types?.job_type_name||''}</div>
+    <div class="meta">${formatDate(j.job_date)} | ${j.job_types?.job_type_name || ''}</div>
     ${visitLine}
     ${wopo ? `<div class="meta">${wopo}</div>` : ''}
-    ${addrHtml}
-    ${contactHtml}
-    ${fixedBanner}${expHtml}
-    ${j.scope      ? `<div style="font-size:0.85rem;margin-bottom:0.4rem"><strong>Scope:</strong> ${j.scope}</div>` : ''}
-    ${j.site_notes ? `<div style="font-size:0.85rem;margin-bottom:0.4rem"><strong>Site Notes:</strong> ${j.site_notes}</div>` : ''}
-    <div style="margin-top:0.4rem">
-      <button class="btn btn-primary" onclick="openJobDetail('${j.id}')" style="width:100%">Job Details</button>
-      ${submitted && j.status === 'Pending Review'
-        ? `<button class="btn btn-warn" onclick="unsubmit('${j.id}','${comp.id}')" style="width:100%;margin-top:0.4rem">Unsubmit</button>`
-        : ''}
-    </div>
+    ${addrLine}
+    ${contactLine}
+    ${fixedBanner}
+    ${expectedBanner}
+    ${j.scope ? `<p style="font-size:0.85rem;margin:0.4rem 0;color:#333"><strong>Scope:</strong> ${j.scope}</p>` : ''}
+    ${submitted ? '<p style="font-size:0.83rem;color:#2a7a4a;font-weight:600;margin:0.3rem 0">Submitted -- awaiting review.</p>' : ''}
+    <div style="margin-top:0.7rem">${actionBtn}</div>
   </div>`;
 }
 
-function setFilter(f, btn) {
-  currentFilter = f;
+function setFilter(filter, btn) {
+  currentFilter = filter;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   loadJobs();
 }
 
-// unsubmit: removes a submitted completion so the tech can re-submit with corrections.
-// Deletes job_line_items too because submitCompletion() re-inserts them fresh, avoiding
-// duplicates. The job status returns to Scheduled so admin knows it's not ready to review.
 async function unsubmit(jobId, compId) {
   if (!confirm('Remove your submission? The job will return to Scheduled. Only do this if Rich has not yet reviewed it.')) return;
   await db.from('job_completions').delete().eq('id', compId);
@@ -398,21 +379,15 @@ async function unsubmit(jobId, compId) {
   loadJobs();
 }
 
-
 function showTab(name) {
-  ['jobs','newjob','newcustomer'].forEach(t => {
-    document.getElementById(`tab-${t}`).style.display = t === name ? '' : 'none';
-  });
+  ['jobs','newjob','newcustomer'].forEach(t =>
+    document.getElementById(`tab-${t}`).style.display = t === name ? '' : 'none');
   document.querySelectorAll('.tab').forEach((t, i) =>
     t.classList.toggle('active', ['jobs','newjob','newcustomer'][i] === name));
 }
 
 
 // ---- JOB DETAIL MODAL ----
-
-// openJobDetail: loads full job data and builds the modal for a single job.
-// If the job is already submitted, shows read-only details + photo panel.
-// If not yet submitted, shows the completion form with pre-loaded parts/labor.
 async function openJobDetail(jobId) {
   modalJobId = jobId;
   modalParts = [];
@@ -426,7 +401,6 @@ async function openJobDetail(jobId) {
              job_line_items(id,item_type,item_id,quantity)`)
     .eq('id', jobId).single();
 
-  // Build contact HTML: prefer named contacts from account_contacts, fall back to account phone.
   let contactHtml = '';
   if (job.account_id) {
     const { data: contacts } = await db.from('account_contacts')
@@ -445,7 +419,7 @@ async function openJobDetail(jobId) {
       if (primary.email)      ch += primary.email;
       if (primary.notes)      ch += `<br><em style="font-size:0.82rem">${primary.notes}</em>`;
       if (secondary) {
-        ch += `<br><span style="font-size:0.82rem"><strong>Secondary:</strong> ${secondary.contact_name}`;
+        ch += `<br><span style="font-size:0.83rem"><strong>Secondary:</strong> ${secondary.contact_name}`;
         if (secondary.work_phone) ch += ` | Work: ${secondary.work_phone}`;
         if (secondary.cell_phone) ch += ` | Cell: ${secondary.cell_phone}`;
         ch += '</span>';
@@ -453,7 +427,6 @@ async function openJobDetail(jobId) {
       ch += '</div>';
       contactHtml = ch;
     } else if (job.accounts?.phone) {
-      // No named contacts on file — show the account-level phone number
       contactHtml = `<div class="contact-info"><strong>Phone:</strong> ${job.accounts.phone}</div>`;
     }
   }
@@ -461,8 +434,6 @@ async function openJobDetail(jobId) {
   const comp      = job.job_completions?.[0];
   const submitted = !!comp;
 
-  // Pre-load any expected parts/labor (set by admin when scheduling) so the tech
-  // can confirm or adjust quantities rather than entering everything from scratch.
   (job.job_line_items || []).forEach(i => {
     if (i.item_type === 'Part') {
       const p = allParts.find(x => x.id === i.item_id);
@@ -476,27 +447,20 @@ async function openJobDetail(jobId) {
   const laborOpts = allLaborTypes.map(l => `<option value="${l.id}">${l.labor_type_name}</option>`).join('');
 
   const fixedBanner = job.is_fixed_price
-    ? `<div class="fixed-banner">FIXED PRICE | Quoted: $${Number(job.quote_amount||0).toFixed(2)} | Do not exceed scope without calling Rich.</div>`
-    : '';
+    ? `<div class="fixed-banner">FIXED PRICE | Quoted: $${Number(job.quote_amount||0).toFixed(2)} | Do not exceed scope without calling Rich.</div>` : '';
 
-  const wopo = [
-    job.work_order_number    ? `WO: ${job.work_order_number}`    : '',
-    job.purchase_order_number ? `PO: ${job.purchase_order_number}` : ''
-  ].filter(Boolean).join(' | ');
+  const wopo = [job.work_order_number ? `WO: ${job.work_order_number}` : '', job.purchase_order_number ? `PO: ${job.purchase_order_number}` : ''].filter(Boolean).join(' | ');
 
-  // Address as a Google Maps link so the tech can tap for navigation.
   const addrHtml = job.accounts?.address
-    ? `<div class="address-info"><strong>Address:</strong> ${mapsLink(job.accounts.address)}</div>`
-    : '';
+    ? `<div class="address-info"><strong>Address:</strong> ${mapsLink(job.accounts.address)}</div>` : '';
 
   const hasExpected = (job.job_line_items||[]).some(i => i.item_type === 'Part' || i.item_type === 'Labor');
   const preNote = hasExpected
-    ? `<p style="font-size:0.82rem;color:#446;margin:0 0 0.5rem">Expected parts and labor are pre-loaded. Adjust quantities or add/remove as needed.</p>`
+    ? `<p style="font-size:0.83rem;color:#1a3070;margin:0 0 0.5rem;background:#eaf2ff;border-radius:3px;padding:0.4rem 0.6rem">Expected parts and labor are pre-loaded. Adjust quantities or add/remove as needed.</p>`
     : '';
 
   let completionSection = '';
   if (submitted) {
-    // Read-only view for completed jobs — shows what was submitted.
     completionSection = `
       <div class="form-section">
         <div class="section-title">Submitted Details</div>
@@ -504,18 +468,18 @@ async function openJobDetail(jobId) {
         <div class="meta">Time Out: ${comp.time_out ? new Date(comp.time_out).toLocaleString() : '--'}</div>
         <div class="meta">Payment: ${comp.payment_type || '--'} ${comp.payment_detail || ''}</div>
         ${comp.tech_notes ? `<div class="meta">Notes: ${comp.tech_notes}</div>` : ''}
-        <div style="margin-top:0.8rem">
-          <button class="btn btn-secondary" style="width:100%" onclick="openAddNote('${jobId}')">Add Note</button>
-        </div>
+        <button class="btn btn-secondary" style="width:100%;margin-top:0.8rem" onclick="openAddNote('${jobId}')">Add Note</button>
       </div>
       <div class="form-section">
         <div class="section-title">Photos</div>
-        <div id="tech-job-photos-${jobId}" style="margin-bottom:0.5rem">
-          <span style="font-size:0.82rem;color:#aaa">Loading photos...</span>
+        <div id="tech-job-photos-${jobId}" style="margin-bottom:0.6rem">
+          <span style="font-size:0.83rem;color:#aaa">Loading photos...</span>
         </div>
-        <div class="form-row"><label>Add Photos</label><input type="file" id="extra-photos-${jobId}" accept="image/*" multiple></div>
+        <div class="form-row"><label>Add Photos</label>
+          <input type="file" id="extra-photos-${jobId}" accept="image/*" multiple>
+        </div>
         <button class="btn btn-secondary" style="width:100%" onclick="uploadExtraPhotos('${jobId}')">Upload More Photos</button>
-        <div id="extra-photo-msg-${jobId}" style="font-size:0.82rem;color:#2a7a2a;margin-top:0.3rem"></div>
+        <div id="extra-photo-msg-${jobId}" style="font-size:0.83rem;color:#2a7a4a;margin-top:0.3rem"></div>
       </div>`;
   } else {
     completionSection = `
@@ -524,13 +488,13 @@ async function openJobDetail(jobId) {
         <div class="form-row"><label>Time In</label>
           <div style="display:flex;gap:0.4rem">
             <input type="datetime-local" id="m-timein" style="flex:1">
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('m-timein').value=nowLocal()" style="white-space:nowrap">Now</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('m-timein').value=nowLocal()" style="white-space:nowrap;padding:0.4rem 0.7rem">Now</button>
           </div>
         </div>
         <div class="form-row"><label>Time Out</label>
           <div style="display:flex;gap:0.4rem">
             <input type="datetime-local" id="m-timeout" style="flex:1">
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('m-timeout').value=nowLocal()" style="white-space:nowrap">Now</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('m-timeout').value=nowLocal()" style="white-space:nowrap;padding:0.4rem 0.7rem">Now</button>
           </div>
         </div>
       </div>
@@ -546,8 +510,8 @@ async function openJobDetail(jobId) {
       <div class="form-section">
         <div class="section-title">Labor</div>
         <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem;flex-wrap:wrap">
-          <select id="m-labortype" style="flex:2;padding:0.5rem;border:1px solid #ccc;min-width:150px"><option value="">Select type...</option>${laborOpts}</select>
-          <input type="number" id="m-laborhours" placeholder="Hrs" style="width:70px;padding:0.5rem;border:1px solid #ccc">
+          <select id="m-labortype" style="flex:2;padding:0.5rem;border:1px solid #c8cdd8;border-radius:4px;min-width:150px"><option value="">Select type...</option>${laborOpts}</select>
+          <input type="number" id="m-laborhours" placeholder="Hrs" style="width:70px;padding:0.5rem;border:1px solid #c8cdd8;border-radius:4px">
           <button class="btn btn-secondary" onclick="addLabor('m')">Add</button>
         </div>
         <table id="m-labor-table"><thead><tr><th>Type</th><th>Hours</th><th></th></tr></thead><tbody></tbody></table>
@@ -561,34 +525,35 @@ async function openJobDetail(jobId) {
       <div class="form-section">
         <div class="form-row"><label>Tech Notes</label><textarea id="m-notes"></textarea></div>
         <div class="form-row"><label><input type="checkbox" id="m-followup"> Flag for Follow-up</label></div>
-        <div class="form-row"><label>Photos</label><input type="file" id="m-photos" accept="image/*" multiple onchange="showPhotoPreview('m-photos','m-photo-preview')">
-          <div id="m-photo-preview" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem"></div>
+        <div class="form-row"><label>Photos</label>
+          <input type="file" id="m-photos" accept="image/*" multiple onchange="showPhotoPreview('m-photos','m-photo-preview')">
+          <div id="m-photo-preview" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem"></div>
         </div>
       </div>
       <div class="form-section">
-        <div class="section-title">Quote Form (leave blank if not a quote job)</div>
+        <div class="section-title">Quote Form <span style="font-weight:400;text-transform:none;font-size:0.78rem;color:#888">(leave blank if not a quote job)</span></div>
         <div class="form-row"><label>Scope Observed</label><textarea id="m-quote-scope"></textarea></div>
         <div class="form-row"><label>Materials / Notes for Rich</label><textarea id="m-quote-materials"></textarea></div>
       </div>
-      <div id="m-msg" style="margin-top:0.5rem"></div>
-      <div id="m-confirm-panel" style="display:none;background:#f9f9f9;border:1px solid #ccc;padding:1rem;margin-top:0.8rem">
-        <div style="font-weight:bold;margin-bottom:0.5rem;font-size:0.95rem">Review before submitting</div>
-        <div id="m-confirm-body" style="font-size:0.88rem;margin-bottom:0.8rem"></div>
+      <div id="m-msg" style="margin-top:0.6rem"></div>
+      <div id="m-confirm-panel" style="display:none" class="confirm-panel">
+        <div class="confirm-title">Review before submitting</div>
+        <div id="m-confirm-body" style="margin-bottom:0.8rem"></div>
         <button class="btn btn-green" style="width:100%;padding:0.7rem;font-size:0.95rem" onclick="submitCompletion()">Confirm and Submit</button>
         <button class="btn btn-secondary" style="width:100%;margin-top:0.4rem" onclick="closeSubmitConfirm()">Go Back</button>
       </div>
-      <button id="m-submit-btn" class="btn btn-green" style="width:100%;margin-top:0.8rem;padding:0.8rem;font-size:1rem" onclick="showSubmitConfirm()">Submit Completion</button>`;
+      <button id="m-submit-btn" class="btn btn-green" style="width:100%;margin-top:0.9rem;padding:0.85rem;font-size:1rem" onclick="showSubmitConfirm()">Submit Completion</button>`;
   }
 
   document.getElementById('modal-content').innerHTML = `
-    <h3 style="margin-top:0.5rem">${job.accounts?.account_name||''}${job.sub?.account_name ? ' / '+job.sub.account_name : ''}</h3>
+    <h3 style="margin:0.3rem 0 0.2rem;color:#1a2744">${job.accounts?.account_name||''}${job.sub?.account_name ? ' / '+job.sub.account_name : ''}</h3>
     <div class="meta">${formatDate(job.job_date)} | ${job.job_types?.job_type_name||''}</div>
     ${wopo ? `<div class="meta">${wopo}</div>` : ''}
     ${addrHtml}
     ${contactHtml}
     ${fixedBanner}
-    ${job.scope      ? `<p style="font-size:0.85rem;margin:0.3rem 0"><strong>Scope:</strong> ${job.scope}</p>` : ''}
-    ${job.site_notes ? `<p style="font-size:0.85rem;margin:0.3rem 0"><strong>Site Notes:</strong> ${job.site_notes}</p>` : ''}
+    ${job.scope      ? `<p style="font-size:0.87rem;margin:0.4rem 0"><strong>Scope:</strong> ${job.scope}</p>` : ''}
+    ${job.site_notes ? `<p style="font-size:0.87rem;margin:0.4rem 0"><strong>Site Notes:</strong> ${job.site_notes}</p>` : ''}
     ${submitted ? '<div class="msg success">Job submitted. Awaiting admin review.</div>' : ''}
     ${completionSection}
   `;
@@ -596,9 +561,6 @@ async function openJobDetail(jobId) {
   if (!submitted) {
     renderPartsTable('m');
     renderLaborTable('m');
-    // Pre-fill Time In with current local time so the tech doesn't have to type it.
-    // nowLocal() (from shared.js) returns YYYY-MM-DDTHH:MM in local timezone —
-    // the exact format required by <input type="datetime-local">.
     document.getElementById('m-timein').value = nowLocal();
   } else {
     loadTechJobPhotos(jobId);
@@ -613,24 +575,16 @@ function closeModal() {
 }
 
 
-// ---- JOB PHOTOS (tech view) ----
-
-// loadTechJobPhotos: fetches and displays photos for a completed job.
-// Uses shared fetchPhotoUrls() and renderPhotoGrid() to avoid duplicating
-// the signed-URL and thumbnail logic that also lives in admin.html.
-// showDate is false here — the tech view is compact and doesn't need upload dates.
+// ---- PHOTOS ----
 async function loadTechJobPhotos(jobId) {
   const grid = document.getElementById(`tech-job-photos-${jobId}`);
   if (!grid) return;
-  grid.innerHTML = '<span style="font-size:0.82rem;color:#aaa">Loading...</span>';
-
+  grid.innerHTML = '<span style="font-size:0.83rem;color:#aaa">Loading...</span>';
   const { data: photos } = await db.from('job_photos')
-    .select('id,storage_path,file_name,uploaded_at')
-    .eq('job_id', jobId)
+    .select('id,storage_path,file_name,uploaded_at').eq('job_id', jobId)
     .order('uploaded_at', { ascending: false });
-
   const withUrls = await fetchPhotoUrls(photos || []);
-  renderPhotoGrid(grid, withUrls, false); // false = don't show upload date
+  renderPhotoGrid(grid, withUrls, false);
 }
 
 async function uploadExtraPhotos(jobId) {
@@ -646,10 +600,6 @@ async function uploadExtraPhotos(jobId) {
 
 
 // ---- PARTS SEARCH ----
-// Inline autocomplete for the parts search field.
-// Uses mousedown + preventDefault so the click registers before the input loses focus.
-// Without preventDefault, the blur event on the input fires first and hides the results
-// dropdown before the click on a result row can register.
 function searchParts(prefix) {
   const input   = document.getElementById(`${prefix}-partsearch`);
   const results = document.getElementById(`${prefix}-parts-results`);
@@ -667,14 +617,12 @@ function searchParts(prefix) {
   results.style.display = 'block';
   results.querySelectorAll('div').forEach(div => {
     div.addEventListener('mousedown', e => {
-      e.preventDefault(); // prevent blur on the input before click registers
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       addPart(prefix, div.dataset.id, div.dataset.name, div.dataset.unit);
     });
   });
 }
 
-// Close parts dropdown when clicking anywhere outside the parts search widget.
 document.addEventListener('click', e => {
   if (!e.target.closest('.parts-wrap'))
     document.querySelectorAll('.parts-results').forEach(el => el.style.display = 'none');
@@ -702,17 +650,16 @@ function renderPartsTable(prefix) {
     `<tr>
        <td>${p.name}</td>
        <td><input type="number" min="0.1" step="0.1" value="${p.qty}"
-             style="width:60px;padding:0.3rem;border:1px solid #ccc;font-size:0.9rem"
+             style="width:65px;padding:0.3rem;border:1px solid #c8cdd8;border-radius:3px;font-size:0.9rem"
              onchange="${prefix === 'm' ? 'modalParts' : 'njParts'}[${i}].qty=parseFloat(this.value)||1"></td>
        <td><button onclick="removePart('${prefix}',${i})"
-             style="border:none;background:none;cursor:pointer;color:red;font-size:1.1rem;padding:0.2rem 0.5rem">X</button></td>
+             style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold;font-size:1rem;padding:0.2rem 0.4rem">X</button></td>
      </tr>`
-  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None added</td></tr>';
+  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None added</td></tr>';
 }
 
 
 // ---- LABOR ----
-
 function addLabor(prefix) {
   const typeId = document.getElementById(`${prefix}-labortype`).value;
   const hours  = parseFloat(document.getElementById(`${prefix}-laborhours`).value);
@@ -739,32 +686,31 @@ function renderLaborTable(prefix) {
        <td>${l.name}</td>
        <td>${l.hours} hr</td>
        <td><button onclick="removeLabor('${prefix}',${i})"
-             style="border:none;background:none;cursor:pointer;color:red;font-size:1rem">X</button></td>
+             style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold;font-size:1rem;padding:0.2rem 0.4rem">X</button></td>
      </tr>`
-  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None added</td></tr>';
+  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None added</td></tr>';
 }
 
 
-// ---- SUBMIT CONFIRMATION ----
-
+// ---- SUBMIT CONFIRM ----
 function showSubmitConfirm() {
   const timeIn  = document.getElementById('m-timein')?.value;
   const timeOut = document.getElementById('m-timeout')?.value;
   const payType = document.getElementById('m-paytype')?.value;
 
   const warn = (!timeIn || !timeOut)
-    ? '<div style="background:#fff3cd;border:1px solid #e0c040;padding:0.4rem 0.6rem;margin-bottom:0.5rem;font-size:0.85rem">Time in/out not entered -- are you sure?</div>'
+    ? '<div style="background:#fff3d6;border:1px solid #e0c060;padding:0.4rem 0.6rem;margin-bottom:0.6rem;font-size:0.85rem;border-radius:4px;color:#7a4800">Time in/out not entered -- are you sure?</div>'
     : '';
 
   const fmtTime = v => v ? new Date(v).toLocaleString() : '--';
 
   document.getElementById('m-confirm-body').innerHTML = `
     ${warn}
-    <div><strong>Time In:</strong> ${fmtTime(timeIn)}</div>
-    <div><strong>Time Out:</strong> ${fmtTime(timeOut)}</div>
-    <div><strong>Parts:</strong> ${modalParts.length} item(s)</div>
-    <div><strong>Labor:</strong> ${modalLabor.length} entr${modalLabor.length === 1 ? 'y' : 'ies'}</div>
-    <div><strong>Payment:</strong> ${payType || '--'}</div>`;
+    <div class="confirm-row"><span>Time In</span><span>${fmtTime(timeIn)}</span></div>
+    <div class="confirm-row"><span>Time Out</span><span>${fmtTime(timeOut)}</span></div>
+    <div class="confirm-row"><span>Parts</span><span>${modalParts.length} item(s)</span></div>
+    <div class="confirm-row"><span>Labor</span><span>${modalLabor.length} entr${modalLabor.length === 1 ? 'y' : 'ies'}</span></div>
+    <div class="confirm-row"><span>Payment</span><span>${payType || '--'}</span></div>`;
 
   document.getElementById('m-confirm-panel').style.display = '';
   document.getElementById('m-submit-btn').style.display    = 'none';
@@ -775,20 +721,12 @@ function closeSubmitConfirm() {
   document.getElementById('m-submit-btn').style.display    = '';
 }
 
+
 // ---- SUBMIT COMPLETION ----
-// Saves the tech's completion data for a scheduled job.
-// Step 1: Delete any existing line items for this job (they were pre-set by admin;
-//         the tech's actual usage replaces them — avoids duplicates on re-submission).
-// Step 2: Insert the job_completions record.
-// Step 3: Insert the final job_line_items (parts + labor the tech actually used).
-// Step 4: Update job status to 'Pending Review' so admin sees it in the review queue.
-// Step 5: Upload any photos attached to the form.
-// Step 6: If a quote form was filled in, insert a quote_forms record.
 async function submitCompletion() {
   const msg = document.getElementById('m-msg');
   msg.innerHTML = '';
 
-  // Delete pre-loaded line items so we can insert the tech's actual usage fresh.
   await db.from('job_line_items').delete().eq('job_id', modalJobId);
 
   const { error: ce } = await db.from('job_completions').insert({
@@ -812,16 +750,15 @@ async function submitCompletion() {
   await db.from('jobs').update({ status: 'Pending Review', updated_at: new Date().toISOString() }).eq('id', modalJobId);
   await uploadPhotos(document.getElementById('m-photos').files, modalJobId);
 
-  // Only insert a quote form if the tech actually filled something in.
   const qScope = document.getElementById('m-quote-scope').value;
   const qMat   = document.getElementById('m-quote-materials').value;
   if (qScope || qMat) {
     await db.from('quote_forms').insert({
-      job_id:          modalJobId,
-      scope_observed:  qScope || null,
-      materials_json:  qMat ? [{ notes: qMat }] : null,
-      locked_at:       new Date().toISOString(),
-      created_by:      currentUser.id
+      job_id:         modalJobId,
+      scope_observed: qScope || null,
+      materials_json: qMat ? [{ notes: qMat }] : null,
+      locked_at:      new Date().toISOString(),
+      created_by:     currentUser.id
     });
   }
 
@@ -831,21 +768,20 @@ async function submitCompletion() {
 
 
 // ---- PHOTO PREVIEW ----
-
 function showPhotoPreview(inputId, previewId) {
   const input   = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
   if (!input || !preview) return;
   preview.innerHTML = '';
   Array.from(input.files).forEach((file, idx) => {
-    const reader  = new FileReader();
-    const wrap    = document.createElement('div');
+    const reader = new FileReader();
+    const wrap   = document.createElement('div');
     wrap.style.cssText = 'position:relative;display:inline-block';
     reader.onload = e => {
       wrap.innerHTML =
-        `<img src="${e.target.result}" style="width:80px;height:70px;object-fit:cover;border:1px solid #ccc;display:block">` +
-        `<button onclick="removePhotoFile('${inputId}','${previewId}',${idx})" ` +
-        `style="position:absolute;top:1px;right:1px;background:rgba(0,0,0,0.6);color:white;border:none;cursor:pointer;font-size:0.75rem;padding:0 4px;line-height:1.5">X</button>`;
+        `<img src="${e.target.result}" style="width:80px;height:68px;object-fit:cover;border:1px solid #c8cdd8;border-radius:3px;display:block">` +
+        `<button onclick="removePhotoFile('${inputId}','${previewId}',${idx})"
+          style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:white;border:none;cursor:pointer;font-size:0.75rem;padding:0 5px;line-height:1.6;border-radius:2px">X</button>`;
     };
     reader.readAsDataURL(file);
     preview.appendChild(wrap);
@@ -860,9 +796,6 @@ function removePhotoFile(inputId, previewId, idx) {
   showPhotoPreview(inputId, previewId);
 }
 
-// ---- PHOTO UPLOAD ----
-// Resizes each selected image to 1200px wide (via shared resizeImage()) before uploading
-// to keep storage costs low. Stores a record in job_photos for display in the grid.
 async function uploadPhotos(files, jobId) {
   if (!files || !files.length) return;
   const { data: job } = await db.from('jobs').select('account_id').eq('id', jobId).single();
@@ -883,8 +816,6 @@ async function uploadPhotos(files, jobId) {
 
 
 // ---- ADD NOTE ----
-// Appends a timestamped note to an already-submitted job's tech_notes field.
-// Uses prompt() for simplicity — this is a rare edge-case action, not a primary flow.
 async function openAddNote(jobId) {
   const note = prompt('Add a note to this job:');
   if (!note) return;
@@ -903,8 +834,6 @@ async function openAddNote(jobId) {
 
 
 // ---- SUB-ACCOUNTS ----
-// Loads sub-accounts for the selected parent in the New Job form.
-// Shared populateSelect() is used here just as in admin.html.
 function loadSubAccounts(prefix) {
   const parentId = document.getElementById(`${prefix}-account`).value;
   const subs     = allAccounts.filter(a => a.parent_account_id === parentId);
@@ -913,9 +842,6 @@ function loadSubAccounts(prefix) {
 
 
 // ---- NEW JOB ----
-// Allows a tech to log a job that was not pre-scheduled by admin.
-// Creates the job AND its completion record in one go (since the tech is already on site).
-// Redirects to My Jobs tab after a short success message.
 async function submitNewJob() {
   const accountId = document.getElementById('nj-account').value;
   const date      = document.getElementById('nj-date').value;
@@ -964,8 +890,6 @@ async function submitNewJob() {
 
 
 // ---- NEW CUSTOMER ----
-// Submits a new customer request to the new_customers table.
-// Admin reviews these in accounts.html and can migrate them to the main accounts table.
 async function submitNewCustomer() {
   const name = document.getElementById('nc-name').value.trim();
   const msg  = document.getElementById('nc-msg');

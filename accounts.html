@@ -8,67 +8,69 @@
 <script src="shared.js"></script>
 <style>
 * { box-sizing: border-box; }
-body { font-family: sans-serif; margin: 0; background: #f0f0f0; font-size: 0.9rem; }
-header { background: #1a1a1a; color: white; padding: 0.7rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
-header h1 { margin: 0; font-size: 1rem; }
-nav button { background: none; border: 1px solid #aaa; color: #aaa; padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.85rem; margin-left: 0.3rem; }
-nav button.active { border-color: white; color: white; }
-button.logout { background: none; border: 1px solid #f66; color: #f66; padding: 0.3rem 0.7rem; cursor: pointer; }
-.container { max-width: 100%; margin: 1rem auto; padding: 0 1.5rem; }
-.card { background: white; border: 1px solid #ccc; margin-bottom: 0.8rem; padding: 1rem; }
-.card h3 { margin: 0 0 0.4rem; font-size: 1rem; }
-.meta { color: #555; font-size: 0.82rem; margin-bottom: 0.4rem; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f2f4f8; font-size: 0.9rem; color: #1a1a2e; }
+header { background: #1a2744; color: white; padding: 0.6rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+header h1 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+nav button { background: transparent; border: 1px solid rgba(255,255,255,0.35); color: rgba(255,255,255,0.75); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; margin-left: 0.3rem; }
+nav button:hover, nav button.active { border-color: white; color: white; }
+nav button.active { background: #6b6fa8; border-color: #6b6fa8; }
+button.logout { background: transparent; border: 1px solid rgba(255,100,100,0.6); color: rgba(255,150,150,0.9); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; }
+.container { max-width: 100%; margin: 1.2rem auto; padding: 0 1.5rem; }
+.card { background: white; border: 1px solid #dde1ea; border-radius: 6px; margin-bottom: 1rem; padding: 1.2rem; box-shadow: 0 1px 4px rgba(26,39,68,0.06); }
+.card h3 { margin: 0 0 0.6rem; font-size: 1rem; color: #1a2744; font-weight: 600; }
+.meta { color: #5a6075; font-size: 0.83rem; margin-bottom: 0.35rem; }
 .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: flex-end; }
-.filters label { font-size: 0.82rem; font-weight: bold; display: block; margin-bottom: 0.2rem; }
-.filters input, .filters select { padding: 0.35rem; border: 1px solid #ccc; font-size: 0.85rem; }
-.btn { padding: 0.35rem 0.8rem; border: none; cursor: pointer; font-size: 0.85rem; margin-right: 0.3rem; margin-top: 0.2rem; }
-.btn-primary { background: #1a1a1a; color: white; }
-.btn-green { background: #2a7a2a; color: white; }
-.btn-red { background: #a00; color: white; }
-.btn-secondary { background: #ddd; color: #333; }
-.btn-blue { background: #1a4a8a; color: white; }
-.btn-yellow { background: #b8860b; color: white; }
+.filters label { font-size: 0.8rem; font-weight: 600; color: #4a5070; display: block; margin-bottom: 0.25rem; }
+.filters input, .filters select { padding: 0.4rem 0.55rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.85rem; font-family: inherit; }
+.btn { padding: 0.38rem 0.9rem; border: none; cursor: pointer; font-size: 0.84rem; border-radius: 4px; font-family: inherit; font-weight: 500; margin-right: 0.3rem; margin-top: 0.2rem; transition: opacity 0.15s; }
+.btn-primary   { background: #1a2744; color: white; }
+.btn-green     { background: #2a7a4a; color: white; }
+.btn-red       { background: #a02020; color: white; }
+.btn-secondary { background: #eaecf4; color: #333; }
+.btn-blue      { background: #1a4a8a; color: white; }
+.btn-yellow    { background: #b86c00; color: white; }
 table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-th { background: #eee; text-align: left; padding: 0.4rem 0.5rem; white-space: nowrap; cursor: pointer; user-select: none; }
-th:hover { background: #e0e0e0; }
+th { background: #f2f4f8; text-align: left; padding: 0.5rem 0.6rem; white-space: nowrap; cursor: pointer; user-select: none; font-weight: 600; color: #4a5070; font-size: 0.8rem; border-bottom: 2px solid #dde1ea; }
+th:hover { background: #e8eaf2; }
 th.sorted-asc::after { content: ' ^'; }
 th.sorted-desc::after { content: ' v'; }
-td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #eee; vertical-align: top; }
-tr:hover td { background: #fafafa; }
-.form-row { margin-bottom: 0.5rem; }
-.form-row label { display: block; font-weight: bold; font-size: 0.82rem; margin-bottom: 0.2rem; }
-.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 0.4rem; border: 1px solid #ccc; font-size: 0.9rem; }
-.form-row textarea { height: 60px; resize: vertical; }
-.msg { padding: 0.4rem 0.6rem; margin: 0.4rem 0; font-size: 0.85rem; }
-.msg.success { background: #e0ffe0; border: 1px solid #9d9; }
-.msg.error { background: #ffe0e0; border: 1px solid #f99; }
-.section-title { font-weight: bold; margin: 0.8rem 0 0.4rem; font-size: 0.9rem; border-bottom: 1px solid #eee; padding-bottom: 0.2rem; }
-.status-badge { display: inline-block; padding: 0.15rem 0.5rem; font-size: 0.78rem; font-weight: bold; }
-.status-Approved { background: #e0ffe0; color: #060; }
-.status-Pending-Review { background: #ffd; color: #660; }
-.status-Flagged { background: #ffe0e0; color: #900; }
-.status-Scheduled { background: #e0e8ff; color: #224; }
-.status-Quoted { background: #fff0cc; color: #640; }
-.status-Awaiting-Parts { background: #ffe8cc; color: #640; }
-.status-Cancelled { background: #eee; color: #666; }
-.inactive-row td { color: #aaa; }
+td { padding: 0.45rem 0.6rem; border-bottom: 1px solid #eef0f6; vertical-align: top; }
+tr:hover td { background: #f8f9fc; }
+.form-row { margin-bottom: 0.6rem; }
+.form-row label { display: block; font-weight: 600; font-size: 0.8rem; color: #4a5070; margin-bottom: 0.25rem; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 0.45rem 0.6rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.9rem; font-family: inherit; }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: #6b6fa8; box-shadow: 0 0 0 2px rgba(107,111,168,0.12); }
+.form-row textarea { height: 64px; resize: vertical; }
+input[type=checkbox] { width: auto; accent-color: #1a2744; }
+.msg { padding: 0.5rem 0.7rem; margin: 0.4rem 0; font-size: 0.85rem; border-radius: 4px; }
+.msg.success { background: #d6f2e0; border: 1px solid #8cd8aa; color: #1a5c30; }
+.msg.error   { background: #ffe0e0; border: 1px solid #f4aaaa; color: #800; }
+.section-title { font-weight: 600; font-size: 0.82rem; color: #6b6fa8; text-transform: uppercase; letter-spacing: 0.05em; margin: 1rem 0 0.5rem; border-bottom: 1px solid #eef0f6; padding-bottom: 0.3rem; }
+.status-badge { display: inline-block; padding: 0.18rem 0.55rem; font-size: 0.76rem; font-weight: 600; border-radius: 20px; }
+.status-Approved       { background: #d6f2e0; color: #1a5c30; }
+.status-Pending-Review { background: #fff8c0; color: #6b5a00; }
+.status-Flagged        { background: #ffe0e0; color: #900; }
+.status-Scheduled      { background: #e4eaf8; color: #1a2744; }
+.status-Quoted         { background: #fff3d6; color: #7a4800; }
+.status-Awaiting-Parts { background: #ffe8cc; color: #7a3800; }
+.status-Cancelled      { background: #eee; color: #666; }
+.inactive-row td { color: #b0b8c8; }
 .detail-panel { display: none; }
-.stat-box { display: inline-block; background: #f5f5f5; border: 1px solid #ddd; padding: 0.4rem 0.8rem; margin-right: 0.5rem; margin-bottom: 0.5rem; text-align: center; min-width: 90px; }
-.stat-box .val { font-size: 1.3rem; font-weight: bold; }
-.stat-box .lbl { font-size: 0.78rem; color: #555; }
-input[type=checkbox] { width: auto; }
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.stat-box { display: inline-block; background: #f2f4f8; border: 1px solid #dde1ea; border-radius: 5px; padding: 0.5rem 0.9rem; margin-right: 0.5rem; margin-bottom: 0.5rem; text-align: center; min-width: 100px; }
+.stat-box .val { font-size: 1.3rem; font-weight: 700; color: #1a2744; }
+.stat-box .lbl { font-size: 0.75rem; color: #5a6075; margin-top: 0.1rem; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
 @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
-.contact-card { border: 1px solid #ccc; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; background: white; }
-.contact-card .flags { font-size: 0.78rem; margin-bottom: 0.3rem; }
-.contact-card .flags span { background: #1a4a8a; color: white; padding: 0.1rem 0.4rem; margin-right: 0.3rem; border-radius: 2px; }
-.contact-card .flags span.secondary { background: #555; }
-.contact-card .flags span.onsite { background: #2a7a2a; }
+.contact-card { border: 1px solid #dde1ea; border-radius: 5px; padding: 0.7rem 0.9rem; margin-bottom: 0.6rem; background: white; }
+.contact-card .flags { font-size: 0.78rem; margin-bottom: 0.35rem; }
+.contact-card .flags span { background: #1a2744; color: white; padding: 0.1rem 0.45rem; margin-right: 0.3rem; border-radius: 20px; font-size: 0.76rem; }
+.contact-card .flags span.secondary { background: #6b6fa8; }
+.contact-card .flags span.onsite { background: #2a7a4a; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Faith Lock &amp; Safe | Accounts</h1>
+  <h1>Faith Lock &amp; Safe &nbsp;|&nbsp; Accounts</h1>
   <nav>
     <button class="active" onclick="showSection('list')">Account List</button>
     <button onclick="showSection('add')">+ Add Account</button>
@@ -79,9 +81,7 @@ input[type=checkbox] { width: auto; }
 
 <div class="container">
 
-<!-- ============================================================ -->
-<!-- ACCOUNT LIST SECTION -->
-<!-- ============================================================ -->
+<!-- ACCOUNT LIST -->
 <div id="section-list">
   <div class="card">
     <div class="filters">
@@ -103,20 +103,19 @@ input[type=checkbox] { width: auto; }
       <div style="align-self:flex-end">
         <button class="btn btn-primary" onclick="loadAccounts()">Refresh</button>
         <button class="btn btn-secondary" onclick="exportAccountsCSV()">Export CSV</button>
-        <button class="btn btn-yellow" onclick="toggleNewCustomers()">New Customer Submissions</button>
+        <button class="btn btn-yellow" onclick="toggleNewCustomers()">New Customers</button>
       </div>
     </div>
 
-    <!-- New Customer Submissions inline panel (toggled by button above) -->
-    <div id="new-customers-panel" style="display:none;border:1px solid #e0c040;background:#fffbe8;padding:0.8rem;margin-bottom:0.8rem">
+    <div id="new-customers-panel" style="display:none;border:1px solid #e0cc60;background:#fffbe8;border-radius:5px;padding:0.9rem;margin-bottom:0.9rem">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
-        <strong>Pending New Customer Submissions</strong>
+        <strong style="color:#6b4800">Pending New Customer Submissions</strong>
         <button class="btn btn-secondary" style="font-size:0.82rem" onclick="toggleNewCustomers()">Close</button>
       </div>
       <div id="newcustomers-list">Loading...</div>
     </div>
 
-    <div id="accounts-summary" style="margin-bottom:0.6rem"></div>
+    <div id="accounts-summary" style="margin-bottom:0.6rem;font-size:0.83rem;color:#5a6075"></div>
     <div style="overflow-x:auto">
     <table id="accounts-table">
       <thead>
@@ -132,16 +131,14 @@ input[type=checkbox] { width: auto; }
         </tr>
       </thead>
       <tbody id="accounts-tbody">
-        <tr><td colspan="8">Loading...</td></tr>
+        <tr><td colspan="8" style="color:#888;padding:0.8rem">Loading...</td></tr>
       </tbody>
     </table>
     </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!-- ADD / EDIT ACCOUNT FORM SECTION -->
-<!-- ============================================================ -->
+<!-- ADD / EDIT ACCOUNT -->
 <div id="section-add" style="display:none">
   <div class="card">
     <h3 id="form-title">Add Account</h3>
@@ -156,34 +153,33 @@ input[type=checkbox] { width: auto; }
     </div>
     <div class="form-row"><label><input type="checkbox" id="f-active" checked> Active</label></div>
     <div id="form-msg"></div>
-    <button class="btn btn-primary" onclick="saveAccount()">Save</button>
-    <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+    <div style="margin-top:0.5rem">
+      <button class="btn btn-primary" onclick="saveAccount()">Save</button>
+      <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!-- ACCOUNT DETAIL SECTION -->
-<!-- ============================================================ -->
+<!-- ACCOUNT DETAIL -->
 <div id="section-detail" class="detail-panel">
   <div class="card">
-    <button class="btn btn-secondary" onclick="showSection('list')" style="margin-bottom:0.8rem">Back to List</button>
+    <button class="btn btn-secondary" onclick="showSection('list')" style="margin-bottom:0.9rem">Back to List</button>
     <div id="detail-header"></div>
     <div id="detail-stats" style="margin:0.8rem 0"></div>
     <div id="detail-subs"></div>
 
-    <!-- Detail Tabs -->
-    <div style="display:flex;gap:0.4rem;margin:0.8rem 0;flex-wrap:wrap">
+    <div style="display:flex;gap:0.4rem;margin:0.9rem 0;flex-wrap:wrap;border-bottom:1px solid #eef0f6;padding-bottom:0.8rem">
       <button class="btn btn-primary"   id="dtab-history"      onclick="switchDetailTab('history')">Job History</button>
       <button class="btn btn-secondary" id="dtab-contacts"     onclick="switchDetailTab('contacts')">Contacts</button>
       <button class="btn btn-secondary" id="dtab-quotes"       onclick="switchDetailTab('quotes')">Quote Forms</button>
       <button class="btn btn-secondary" id="dtab-photos"       onclick="switchDetailTab('photos')">Photos</button>
       <button class="btn btn-secondary" id="dtab-instructions" onclick="switchDetailTab('instructions')">Instructions</button>
-      <button class="btn btn-secondary" onclick="exportAccountDetailCSV()" style="margin-left:auto">Export Account CSV</button>
+      <button class="btn btn-secondary" onclick="exportAccountDetailCSV()" style="margin-left:auto">Export CSV</button>
     </div>
 
     <!-- Job History Tab -->
     <div id="dtab-history-panel">
-      <div class="filters" style="margin-top:0.4rem">
+      <div class="filters" style="margin-top:0.3rem">
         <div><label>Status</label>
           <select id="dj-status" onchange="loadAccountJobs()">
             <option value="">All</option>
@@ -192,7 +188,7 @@ input[type=checkbox] { width: auto; }
           </select>
         </div>
         <div><label>From</label><input type="date" id="dj-from" onchange="loadAccountJobs()"></div>
-        <div><label>To</label>  <input type="date" id="dj-to"   onchange="loadAccountJobs()"></div>
+        <div><label>To</label><input type="date" id="dj-to" onchange="loadAccountJobs()"></div>
         <div style="align-self:flex-end"><button class="btn btn-primary" onclick="loadAccountJobs()">Filter</button></div>
       </div>
       <div id="detail-jobs">Loading jobs...</div>
@@ -204,10 +200,8 @@ input[type=checkbox] { width: auto; }
         <div class="section-title" style="margin:0;border:none">Contacts</div>
         <button class="btn btn-green" onclick="openAddContact()">+ Add Contact</button>
       </div>
-
-      <!-- Add / Edit contact form — hidden until triggered -->
-      <div id="contact-form-wrap" style="display:none;background:#f9f9f9;border:1px solid #ccc;padding:1rem;margin-bottom:1rem">
-        <h4 id="contact-form-title" style="margin:0 0 0.6rem">Add Contact</h4>
+      <div id="contact-form-wrap" style="display:none;background:#f8f9fc;border:1px solid #dde1ea;border-radius:5px;padding:1rem;margin-bottom:1rem">
+        <h4 id="contact-form-title" style="margin:0 0 0.7rem;color:#1a2744">Add Contact</h4>
         <input type="hidden" id="cf-id">
         <div class="two-col">
           <div class="form-row"><label>Name *</label><input type="text" id="cf-name"></div>
@@ -218,16 +212,15 @@ input[type=checkbox] { width: auto; }
           <div class="form-row"><label>Company</label><input type="text" id="cf-company"></div>
         </div>
         <div class="form-row"><label>Notes</label><textarea id="cf-notes" style="height:50px"></textarea></div>
-        <div style="display:flex;gap:1rem;margin-bottom:0.5rem;flex-wrap:wrap">
-          <label><input type="checkbox" id="cf-primary">   Primary Contact</label>
-          <label><input type="checkbox" id="cf-secondary"> Secondary Contact</label>
-          <label><input type="checkbox" id="cf-onsite">    On-Site Contact</label>
+        <div style="display:flex;gap:1.2rem;margin-bottom:0.6rem;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:0.4rem"><input type="checkbox" id="cf-primary">   Primary Contact</label>
+          <label style="display:flex;align-items:center;gap:0.4rem"><input type="checkbox" id="cf-secondary"> Secondary Contact</label>
+          <label style="display:flex;align-items:center;gap:0.4rem"><input type="checkbox" id="cf-onsite">    On-Site Contact</label>
         </div>
         <div id="cf-msg"></div>
         <button class="btn btn-primary"   onclick="saveContact()">Save</button>
         <button class="btn btn-secondary" onclick="closeContactForm()">Cancel</button>
       </div>
-
       <div id="contacts-list">Loading contacts...</div>
     </div>
 
@@ -246,14 +239,13 @@ input[type=checkbox] { width: auto; }
     <!-- Instructions Tab -->
     <div id="dtab-instructions-panel" style="display:none">
       <div class="section-title">Account Instructions</div>
-      <p style="font-size:0.82rem;color:#555;margin-bottom:0.5rem">Gate codes, key locations, access restrictions, billing quirks. Visible to admin only.</p>
-      <textarea id="instructions-text" style="width:100%;height:200px;padding:0.5rem;border:1px solid #ccc;font-size:0.9rem;resize:vertical"></textarea>
-      <div style="margin-top:0.4rem">
+      <p style="font-size:0.83rem;color:#5a6075;margin-bottom:0.5rem">Gate codes, key locations, access restrictions, billing quirks. Visible to admin only.</p>
+      <textarea id="instructions-text" style="width:100%;height:200px;padding:0.5rem 0.6rem;border:1px solid #c8cdd8;border-radius:4px;font-size:0.9rem;font-family:inherit;resize:vertical"></textarea>
+      <div style="margin-top:0.5rem">
         <button class="btn btn-primary" onclick="saveInstructions()">Save Instructions</button>
-        <span id="instructions-msg" style="font-size:0.85rem;margin-left:0.5rem;color:#2a7a2a"></span>
+        <span id="instructions-msg" style="font-size:0.85rem;margin-left:0.5rem;color:#2a7a4a"></span>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -262,33 +254,21 @@ input[type=checkbox] { width: auto; }
 <script>
 // ============================================================
 // accounts.html — Faith Lock & Safe Account Management
-//
-// Admin-only page for managing account records, contacts, job history,
-// quote forms, photos, and account instructions.
-//
-// Globals from shared.js:
-//   db, formatDate(), downloadCSV(), fetchPhotoUrls(), renderPhotoGrid(),
-//   mapsLink(), logout()
 // ============================================================
 
-
-// ---- STATE ----
-
 let currentUser            = null;
-let allAccounts            = [];       // Full account list (never filtered — needed for parent lookups)
-let filteredAccounts       = [];       // What's currently shown in the table after search/filter
-let allJobsByAccount       = {};       // account_id → { count, lastDate, totalRevenue, approvedRevenue }
-let allPrimaryContacts     = {};       // account_id → primary contact object
+let allAccounts            = [];
+let filteredAccounts       = [];
+let allJobsByAccount       = {};
+let allPrimaryContacts     = {};
 let sortKey                = 'account_name';
-let sortDir                = 1;        // 1 = ascending, -1 = descending
-let currentDetailAccountId = null;     // ID of the account currently open in the detail panel
+let sortDir                = 1;
+let currentDetailAccountId = null;
 let allParts               = [];
 let allLaborTypes          = [];
 
 
 // ---- INIT ----
-// Verifies the session and that the user is an admin, then loads accounts.
-// Non-admin users (techs) are redirected to the login page.
 async function init() {
   try {
     const { data: { session }, error: sessErr } = await db.auth.getSession();
@@ -311,9 +291,8 @@ async function init() {
     await loadAccounts();
   } catch (err) {
     document.getElementById('accounts-tbody').innerHTML =
-      `<tr><td colspan="8" style="color:#a00;padding:1rem">
-        <strong>Load error:</strong> ${err.message || JSON.stringify(err)}<br>
-        <span style="font-size:0.82rem">Try signing out and back in.</span>
+      `<tr><td colspan="8" style="color:#a02020;padding:1rem">
+        <strong>Load error:</strong> ${err.message || JSON.stringify(err)}
       </td></tr>`;
     console.error('accounts init error:', err);
   }
@@ -321,12 +300,9 @@ async function init() {
 
 
 // ---- LOAD ACCOUNTS ----
-// Fetches all accounts plus job stats and primary contacts in parallel.
-// Includes the instructions column so loadInstructions() can read from the cache
-// without a second DB round-trip when the Instructions tab is opened.
 async function loadAccounts() {
   document.getElementById('accounts-tbody').innerHTML =
-    '<tr><td colspan="8" style="color:#888;padding:0.5rem">Loading...</td></tr>';
+    '<tr><td colspan="8" style="color:#888;padding:0.6rem">Loading...</td></tr>';
   try {
     const { data: accounts, error } = await db.from('accounts')
       .select('id,account_name,parent_account_id,address,phone,billing_notes,active,instructions')
@@ -334,10 +310,8 @@ async function loadAccounts() {
     if (error) throw error;
     allAccounts = accounts || [];
 
-    // Aggregate job stats per account (count, last date, revenue).
-    const { data: jobStats, error: jobErr } = await db.from('jobs')
+    const { data: jobStats } = await db.from('jobs')
       .select('id,account_id,job_date,status,job_line_items(unit_cost,override_cost,quantity)');
-    if (jobErr) console.warn('Job stats load error (non-fatal):', jobErr.message);
     allJobsByAccount = {};
     (jobStats || []).forEach(j => {
       if (!j.account_id) return;
@@ -346,23 +320,19 @@ async function loadAccounts() {
       const s = allJobsByAccount[j.account_id];
       s.count++;
       if (!s.lastDate || j.job_date > s.lastDate) s.lastDate = j.job_date;
-      const rev = (j.job_line_items || []).reduce(
-        (sum, i) => sum + (Number(i.override_cost ?? i.unit_cost) * Number(i.quantity)), 0);
+      const rev = (j.job_line_items||[]).reduce((sum, i) => sum + (Number(i.override_cost ?? i.unit_cost) * Number(i.quantity)), 0);
       s.totalRevenue += rev;
       if (j.status === 'Approved') s.approvedRevenue += rev;
     });
 
-    // Pre-fetch primary contacts for all accounts (used in the list table).
-    const { data: contacts, error: conErr } = await db.from('account_contacts')
+    const { data: contacts } = await db.from('account_contacts')
       .select('account_id,contact_name,work_phone,cell_phone,is_primary')
       .eq('active', true).eq('is_primary', true);
-    if (conErr) console.warn('Contacts load error (non-fatal):', conErr.message);
     allPrimaryContacts = {};
     (contacts || []).forEach(c => { allPrimaryContacts[c.account_id] = c; });
 
-    // Populate the parent picker in the add/edit form with only master accounts.
-    const masters    = allAccounts.filter(a => !a.parent_account_id);
-    const parentSel  = document.getElementById('f-parent');
+    const masters   = allAccounts.filter(a => !a.parent_account_id);
+    const parentSel = document.getElementById('f-parent');
     if (parentSel) {
       parentSel.innerHTML = '<option value="">-- Master Account --</option>' +
         masters.map(a => `<option value="${a.id}">${a.account_name}</option>`).join('');
@@ -371,20 +341,13 @@ async function loadAccounts() {
     filterAccounts();
   } catch (err) {
     document.getElementById('accounts-tbody').innerHTML =
-      `<tr><td colspan="8" style="color:#a00;padding:1rem">
-        <strong>Error loading accounts:</strong> ${err.message || JSON.stringify(err)}
-      </td></tr>`;
+      `<tr><td colspan="8" style="color:#a02020;padding:1rem"><strong>Error:</strong> ${err.message}</td></tr>`;
     console.error('loadAccounts error:', err);
   }
 }
 
 
 // ---- FILTER & RENDER ----
-
-// filterAccounts: applies search text + type/status dropdowns to allAccounts,
-// then calls sortAndRender() to display the result.
-// filteredAccounts is kept separate from allAccounts because filter changes what's
-// visible, but allAccounts is still needed for things like parent-account name lookups.
 function filterAccounts() {
   const q         = document.getElementById('f-search').value.toLowerCase();
   const type      = document.getElementById('f-type').value;
@@ -408,44 +371,32 @@ function sortTable(key) {
   sortAndRender();
 }
 
-// sortAndRender: renders the accounts table, grouping sub-accounts immediately after
-// their parent master account so the hierarchy is visually clear.
-// The sort is applied to master accounts only; sub-accounts are always alphabetical
-// under their parent regardless of sort column.
-// Sub-accounts whose parent is not in the filtered view are appended at the end.
 function sortAndRender() {
   const masters = filteredAccounts.filter(a => !a.parent_account_id).sort((a, b) => {
     let av, bv;
     if      (sortKey === 'account_name') { av = a.account_name; bv = b.account_name; }
-    else if (sortKey === 'job_count')    { av = allJobsByAccount[a.id]?.count   || 0; bv = allJobsByAccount[b.id]?.count   || 0; }
-    else if (sortKey === 'last_service') { av = allJobsByAccount[a.id]?.lastDate|| ''; bv = allJobsByAccount[b.id]?.lastDate|| ''; }
+    else if (sortKey === 'job_count')    { av = allJobsByAccount[a.id]?.count    || 0;  bv = allJobsByAccount[b.id]?.count    || 0; }
+    else if (sortKey === 'last_service') { av = allJobsByAccount[a.id]?.lastDate || ''; bv = allJobsByAccount[b.id]?.lastDate || ''; }
     else                                 { av = a[sortKey] || ''; bv = b[sortKey] || ''; }
-    if (av < bv) return -1 * sortDir;
-    if (av > bv) return  1 * sortDir;
-    return 0;
+    return av < bv ? -1 * sortDir : av > bv ? 1 * sortDir : 0;
   });
 
-  // Build the final display order: each master followed by its subs.
   const ordered = [];
   masters.forEach(m => {
     ordered.push(m);
-    filteredAccounts
-      .filter(a => a.parent_account_id === m.id)
-      .sort((a, b) => a.account_name.localeCompare(b.account_name))
+    filteredAccounts.filter(a => a.parent_account_id === m.id)
+      .sort((a,b) => a.account_name.localeCompare(b.account_name))
       .forEach(s => ordered.push(s));
   });
-  // Any subs whose parent is outside the filtered view still need to appear.
-  filteredAccounts
-    .filter(a => a.parent_account_id && !ordered.includes(a))
-    .forEach(a => ordered.push(a));
+  filteredAccounts.filter(a => a.parent_account_id && !ordered.includes(a)).forEach(a => ordered.push(a));
 
   const totalActive = allAccounts.filter(a => a.active).length;
   const totalMaster = allAccounts.filter(a => !a.parent_account_id && a.active).length;
   document.getElementById('accounts-summary').innerHTML =
-    `<span style="font-size:0.85rem;color:#555">${filteredAccounts.length} of ${allAccounts.length} accounts shown | ${totalMaster} master accounts | ${totalActive} active</span>`;
+    `${filteredAccounts.length} of ${allAccounts.length} accounts shown | ${totalMaster} master accounts | ${totalActive} active`;
 
   const tbody = document.getElementById('accounts-tbody');
-  if (!ordered.length) { tbody.innerHTML = '<tr><td colspan="8">No accounts found.</td></tr>'; return; }
+  if (!ordered.length) { tbody.innerHTML = '<tr><td colspan="8" style="color:#888;padding:0.6rem">No accounts found.</td></tr>'; return; }
 
   tbody.innerHTML = ordered.map(a => {
     const stats  = allJobsByAccount[a.id] || {};
@@ -453,27 +404,27 @@ function sortAndRender() {
     const pc     = allPrimaryContacts[a.id];
     const contactDisplay = pc
       ? `${pc.contact_name}${pc.work_phone
-          ? '<br><span style="font-size:0.78rem;color:#555">'+pc.work_phone+'</span>'
+          ? '<br><span style="font-size:0.78rem;color:#5a6075">'+pc.work_phone+'</span>'
           : pc.cell_phone
-            ? '<br><span style="font-size:0.78rem;color:#555">'+pc.cell_phone+'</span>'
+            ? '<br><span style="font-size:0.78rem;color:#5a6075">'+pc.cell_phone+'</span>'
             : ''}`
-      : '<span style="color:#aaa;font-size:0.8rem">None</span>';
-    const rowBg  = isSub ? 'background:#f7f7f7;' : '';
+      : '<span style="color:#bbb;font-size:0.8rem">None</span>';
+    const rowBg   = isSub ? 'background:#f8f9fc;' : '';
     const nameCell = isSub
-      ? `<span style="padding-left:1rem;color:#555;font-size:0.9rem">&#8627; ${a.account_name}</span>`
-      : `<strong>${a.account_name}</strong>`;
+      ? `<span style="padding-left:1.1rem;color:#5a6075;font-size:0.9rem">&#8627; ${a.account_name}</span>`
+      : `<strong style="color:#1a2744">${a.account_name}</strong>`;
 
     return `<tr class="${a.active ? '' : 'inactive-row'}" style="${rowBg}">
       <td>${nameCell}</td>
-      <td style="font-size:0.82rem">${a.address || ''}</td>
-      <td style="font-size:0.82rem">${a.phone   || ''}</td>
-      <td style="font-size:0.82rem">${contactDisplay}</td>
-      <td style="text-align:center">${stats.count    || 0}</td>
-      <td style="font-size:0.82rem;white-space:nowrap">${formatDate(stats.lastDate) || '--'}</td>
-      <td style="text-align:center">${a.active ? 'Yes' : 'No'}</td>
+      <td style="font-size:0.83rem">${a.address || ''}</td>
+      <td style="font-size:0.83rem">${a.phone   || ''}</td>
+      <td style="font-size:0.83rem">${contactDisplay}</td>
+      <td style="text-align:center">${stats.count || 0}</td>
+      <td style="font-size:0.83rem;white-space:nowrap">${formatDate(stats.lastDate) || '--'}</td>
+      <td style="text-align:center">${a.active ? 'Yes' : '<span style="color:#bbb">No</span>'}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-blue" onclick="openDetail('${a.id}')">Open</button>
-        <button class="btn btn-red"  onclick="toggleAccountActive('${a.id}',${a.active})">${a.active ? 'Deactivate' : 'Activate'}</button>
+        <button class="btn btn-blue"  onclick="openDetail('${a.id}')" style="padding:0.25rem 0.65rem;font-size:0.82rem">Open</button>
+        <button class="btn btn-red"   onclick="toggleAccountActive('${a.id}',${a.active})" style="padding:0.25rem 0.65rem;font-size:0.82rem">${a.active ? 'Deactivate' : 'Activate'}</button>
       </td>
     </tr>`;
   }).join('');
@@ -481,20 +432,17 @@ function sortAndRender() {
 
 
 // ---- SECTION NAVIGATION ----
-// Shows one of the three top-level sections (list | add | detail) and hides the others.
 function showSection(name) {
   ['list','add','detail'].forEach(s => {
     const el = document.getElementById(`section-${s}`);
     if (el) el.style.display = s === name ? 'block' : 'none';
   });
-  document.querySelectorAll('nav button').forEach((b, i) => {
-    b.classList.toggle('active', ['list','add'][i] === name);
-  });
+  document.querySelectorAll('nav button').forEach((b, i) =>
+    b.classList.toggle('active', ['list','add'][i] === name));
 }
 
 
 // ---- ADD / EDIT ACCOUNT ----
-
 function openEdit(id) {
   const a = allAccounts.find(x => x.id === id);
   if (!a) return;
@@ -502,8 +450,8 @@ function openEdit(id) {
   document.getElementById('edit-id').value        = a.id;
   document.getElementById('f-name').value         = a.account_name;
   document.getElementById('f-parent').value       = a.parent_account_id || '';
-  document.getElementById('f-address').value      = a.address           || '';
-  document.getElementById('f-phone').value        = a.phone             || '';
+  document.getElementById('f-address').value      = a.address || '';
+  document.getElementById('f-phone').value        = a.phone   || '';
   document.getElementById('f-active').checked     = a.active;
   showSection('add');
 }
@@ -512,8 +460,8 @@ function cancelEdit() {
   document.getElementById('edit-id').value = '';
   document.getElementById('form-title').textContent = 'Add Account';
   ['f-name','f-address','f-phone'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-parent').value    = '';
-  document.getElementById('f-active').checked  = true;
+  document.getElementById('f-parent').value   = '';
+  document.getElementById('f-active').checked = true;
   showSection('list');
 }
 
@@ -548,11 +496,7 @@ async function toggleAccountActive(id, current) {
 }
 
 
-// ---- NEW CUSTOMERS (inline panel) ----
-// Field techs can submit a new customer via tech.html. Those submissions land in the
-// new_customers table and appear here for admin to review and either migrate (add to
-// the main accounts table) or dismiss (mark as migrated without creating an account).
-
+// ---- NEW CUSTOMERS ----
 function toggleNewCustomers() {
   const panel   = document.getElementById('new-customers-panel');
   const visible = panel.style.display === 'block';
@@ -564,18 +508,18 @@ async function loadNewCustomers() {
   const { data } = await db.from('new_customers').select('*').eq('migrated', false)
     .order('submitted_at', { ascending: false });
   const el = document.getElementById('newcustomers-list');
-  if (!data?.length) { el.innerHTML = '<p style="margin:0;font-size:0.85rem">No pending submissions.</p>'; return; }
+  if (!data?.length) { el.innerHTML = '<p style="margin:0;font-size:0.85rem;color:#888">No pending submissions.</p>'; return; }
   el.innerHTML = `<div style="overflow-x:auto"><table>
     <thead><tr><th>Submitted</th><th>Name</th><th>Address</th><th>Phone</th><th>Notes</th><th></th></tr></thead>
     <tbody>${data.map(c => `<tr>
-      <td style="font-size:0.82rem;white-space:nowrap">${new Date(c.submitted_at).toLocaleDateString('en-US')}</td>
-      <td>${c.name}</td>
+      <td style="font-size:0.83rem;white-space:nowrap">${new Date(c.submitted_at).toLocaleDateString('en-US')}</td>
+      <td><strong>${c.name}</strong></td>
       <td>${c.address||''}</td>
       <td>${c.phone||''}</td>
-      <td style="font-size:0.82rem">${c.notes||''}</td>
+      <td style="font-size:0.83rem">${c.notes||''}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-green" onclick="migrateCustomer('${c.id}','${c.name.replace(/'/g,"\\'")}','${(c.address||'').replace(/'/g,"\\'")}','${c.phone||''}')">Add to Accounts</button>
-        <button class="btn btn-secondary" onclick="dismissCustomer('${c.id}')">Dismiss</button>
+        <button class="btn btn-green" style="font-size:0.82rem;padding:0.25rem 0.6rem" onclick="migrateCustomer('${c.id}','${c.name.replace(/'/g,"\\'")}','${(c.address||'').replace(/'/g,"\\'")}','${c.phone||''}')">Add to Accounts</button>
+        <button class="btn btn-secondary" style="font-size:0.82rem;padding:0.25rem 0.6rem" onclick="dismissCustomer('${c.id}')">Dismiss</button>
       </td>
     </tr>`).join('')}
     </tbody>
@@ -597,8 +541,6 @@ async function dismissCustomer(id) {
 
 
 // ---- ACCOUNT DETAIL ----
-// Opens the detail panel for a single account. Populates the header, stat boxes,
-// sub-accounts list, and then loads the Job History tab by default.
 async function openDetail(accountId) {
   currentDetailAccountId = accountId;
   const a = allAccounts.find(x => x.id === accountId);
@@ -609,26 +551,23 @@ async function openDetail(accountId) {
 
   const stats = allJobsByAccount[accountId] || {};
 
-  // Address wrapped in a Maps link so admin can navigate to the site.
   document.getElementById('detail-header').innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem">
       <div>
-        <h3 style="margin:0 0 0.2rem">${a.account_name}</h3>
-        <div class="meta">${a.parent_account_id ? 'Sub-Account' : 'Master Account'} | ${a.active ? 'Active' : 'Inactive'}</div>
+        <h3 style="margin:0 0 0.2rem;color:#1a2744">${a.account_name}</h3>
+        <div class="meta">${a.parent_account_id ? 'Sub-Account' : 'Master Account'} | ${a.active ? 'Active' : '<span style="color:#a02020">Inactive</span>'}</div>
         ${a.address ? `<div class="meta">Address: ${mapsLink(a.address)}</div>` : ''}
         ${a.phone   ? `<div class="meta">Phone: ${a.phone}</div>` : ''}
-        ${a.billing_notes ? `<div style="margin-top:0.4rem;padding:0.4rem;background:#fff8e0;border:1px solid #e0c060;font-size:0.82rem"><strong>Billing Note:</strong> ${a.billing_notes}</div>` : ''}
+        ${a.billing_notes ? `<div style="margin-top:0.4rem;padding:0.4rem 0.6rem;background:#fffbe8;border:1px solid #e0cc60;border-radius:4px;font-size:0.83rem"><strong>Billing Note:</strong> ${a.billing_notes}</div>` : ''}
       </div>
-      <div>
-        <button class="btn btn-secondary" onclick="openEdit('${accountId}')">Edit Account</button>
-      </div>
+      <button class="btn btn-secondary" onclick="openEdit('${accountId}')">Edit Account</button>
     </div>`;
 
   document.getElementById('detail-stats').innerHTML = `
-    <div class="stat-box"><div class="val">${stats.count||0}</div>                           <div class="lbl">Total Jobs</div></div>
-    <div class="stat-box"><div class="val">$${(stats.totalRevenue||0).toFixed(0)}</div>      <div class="lbl">Total Revenue</div></div>
-    <div class="stat-box"><div class="val">$${(stats.approvedRevenue||0).toFixed(0)}</div>   <div class="lbl">Approved Revenue</div></div>
-    <div class="stat-box"><div class="val">${formatDate(stats.lastDate)||'--'}</div>          <div class="lbl">Last Service</div></div>`;
+    <div class="stat-box"><div class="val">${stats.count||0}</div><div class="lbl">Total Jobs</div></div>
+    <div class="stat-box"><div class="val">$${(stats.totalRevenue||0).toFixed(0)}</div><div class="lbl">Total Revenue</div></div>
+    <div class="stat-box"><div class="val">$${(stats.approvedRevenue||0).toFixed(0)}</div><div class="lbl">Approved Revenue</div></div>
+    <div class="stat-box"><div class="val">${formatDate(stats.lastDate)||'--'}</div><div class="lbl">Last Service</div></div>`;
 
   const subs = allAccounts.filter(x => x.parent_account_id === accountId);
   if (subs.length) {
@@ -639,11 +578,11 @@ async function openDetail(accountId) {
         <tbody>${subs.map(s => {
           const ss = allJobsByAccount[s.id] || {};
           return `<tr>
-            <td>${s.account_name}</td>
-            <td style="font-size:0.82rem">${s.address ? mapsLink(s.address) : ''}</td>
-            <td style="font-size:0.82rem">${s.phone||''}</td>
+            <td><strong>${s.account_name}</strong></td>
+            <td style="font-size:0.83rem">${s.address ? mapsLink(s.address) : ''}</td>
+            <td style="font-size:0.83rem">${s.phone||''}</td>
             <td>${ss.count||0}</td>
-            <td><button class="btn btn-blue" onclick="openDetail('${s.id}')">View</button></td>
+            <td><button class="btn btn-blue" onclick="openDetail('${s.id}')" style="padding:0.25rem 0.6rem;font-size:0.82rem">View</button></td>
           </tr>`;
         }).join('')}
         </tbody>
@@ -652,7 +591,6 @@ async function openDetail(accountId) {
     document.getElementById('detail-subs').innerHTML = '';
   }
 
-  // Default date range: last 12 months.
   const now       = new Date();
   const oneYearAgo = new Date(now); oneYearAgo.setFullYear(now.getFullYear() - 1);
   document.getElementById('dj-from').value   = oneYearAgo.toISOString().split('T')[0];
@@ -664,7 +602,7 @@ async function openDetail(accountId) {
 }
 
 
-// ---- ACCOUNT JOB HISTORY ----
+// ---- JOB HISTORY ----
 async function loadAccountJobs() {
   const status = document.getElementById('dj-status').value;
   const from   = document.getElementById('dj-from').value;
@@ -694,7 +632,7 @@ async function loadAccountJobs() {
     sum + (j.job_line_items||[]).reduce((s, i) => s + ((i.override_cost??i.unit_cost)*i.quantity), 0), 0);
 
   el.innerHTML = `
-    <div style="font-size:0.85rem;color:#555;margin-bottom:0.5rem">${data.length} jobs | Total: $${totalRev.toFixed(2)}</div>
+    <div style="font-size:0.83rem;color:#5a6075;margin-bottom:0.5rem">${data.length} jobs | Total: <strong>$${totalRev.toFixed(2)}</strong></div>
     <div style="overflow-x:auto"><table>
       <thead><tr>
         <th>Date</th><th>Sub-Account</th><th>Type</th><th>WO/PO</th>
@@ -702,22 +640,22 @@ async function loadAccountJobs() {
       </tr></thead>
       <tbody>
       ${data.map(j => {
-        const comp   = j.job_completions?.[0] || {};
-        const total  = (j.job_line_items||[]).reduce((s, i) => s + ((i.override_cost??i.unit_cost)*i.quantity), 0);
-        const fixed  = j.is_fixed_price ? ` <span style="color:#900;font-size:0.78rem">[Fixed $${Number(j.quote_amount||0).toFixed(2)}]</span>` : '';
-        const wopo   = [j.work_order_number||'', j.purchase_order_number||''].filter(Boolean).join(' / ');
+        const comp  = j.job_completions?.[0] || {};
+        const total = (j.job_line_items||[]).reduce((s, i) => s + ((i.override_cost??i.unit_cost)*i.quantity), 0);
+        const fixed = j.is_fixed_price ? ` <span style="color:#a02020;font-size:0.78rem">[Fixed $${Number(j.quote_amount||0).toFixed(2)}]</span>` : '';
+        const wopo  = [j.work_order_number||'', j.purchase_order_number||''].filter(Boolean).join(' / ');
         return `<tr>
           <td style="white-space:nowrap">${formatDate(j.job_date)}</td>
-          <td style="font-size:0.82rem">${j.sub?.account_name||''}</td>
-          <td style="font-size:0.82rem">${j.job_types?.job_type_name||''}${fixed}</td>
-          <td style="font-size:0.82rem">${wopo}</td>
+          <td style="font-size:0.83rem">${j.sub?.account_name||''}</td>
+          <td style="font-size:0.83rem">${j.job_types?.job_type_name||''}${fixed}</td>
+          <td style="font-size:0.83rem">${wopo}</td>
           <td><span class="status-badge status-${(j.status||'').replace(/ /g,'-')}">${j.status}</span></td>
-          <td style="font-size:0.82rem">${comp.payment_type||'--'}</td>
-          <td>$${total.toFixed(2)}</td>
-          <td style="text-align:center">${comp.follow_up_flag ? 'YES' : ''}</td>
-          <td style="font-size:0.82rem;max-width:180px">${comp.tech_notes||''}</td>
+          <td style="font-size:0.83rem">${comp.payment_type||'--'}</td>
+          <td style="font-weight:600">$${total.toFixed(2)}</td>
+          <td style="text-align:center">${comp.follow_up_flag ? '<span style="color:#a02020;font-weight:600">YES</span>' : ''}</td>
+          <td style="font-size:0.83rem;max-width:180px">${comp.tech_notes||''}</td>
         </tr>
-        ${j.scope ? `<tr><td colspan="8" style="font-size:0.8rem;color:#555;padding-left:1rem">Scope: ${j.scope}</td></tr>` : ''}`;
+        ${j.scope ? `<tr><td colspan="9" style="font-size:0.8rem;color:#5a6075;padding-left:1rem;border-bottom:none">Scope: ${j.scope}</td></tr>` : ''}`;
       }).join('')}
       </tbody>
     </table></div>`;
@@ -725,7 +663,6 @@ async function loadAccountJobs() {
 
 
 // ---- CONTACTS ----
-
 async function loadContactsTab() {
   const el = document.getElementById('contacts-list');
   el.innerHTML = 'Loading...';
@@ -746,20 +683,20 @@ async function loadContactsTab() {
     ].filter(Boolean).join('');
 
     return `<div class="contact-card">
-      <div class="flags">${flags || '<span style="background:#999">Contact</span>'}</div>
-      <strong style="font-size:0.95rem">${c.contact_name}</strong>
-      ${c.title   ? `<span style="color:#555;font-size:0.85rem"> | ${c.title}</span>`   : ''}
-      ${c.company ? `<span style="color:#555;font-size:0.85rem"> | ${c.company}</span>` : ''}
-      <div style="margin-top:0.3rem;font-size:0.85rem">
-        ${c.work_phone ? `<span style="margin-right:1rem">Work: ${c.work_phone}</span>` : ''}
-        ${c.cell_phone ? `<span style="margin-right:1rem">Cell: ${c.cell_phone}</span>` : ''}
-        ${c.email      ? `<span>${c.email}</span>`                                      : ''}
+      <div class="flags">${flags || '<span style="background:#6b6fa8">Contact</span>'}</div>
+      <strong style="font-size:0.95rem;color:#1a2744">${c.contact_name}</strong>
+      ${c.title   ? `<span style="color:#5a6075;font-size:0.85rem"> | ${c.title}</span>`   : ''}
+      ${c.company ? `<span style="color:#5a6075;font-size:0.85rem"> | ${c.company}</span>` : ''}
+      <div style="margin-top:0.35rem;font-size:0.85rem">
+        ${c.work_phone ? `<span style="margin-right:1rem">Work: <strong>${c.work_phone}</strong></span>` : ''}
+        ${c.cell_phone ? `<span style="margin-right:1rem">Cell: <strong>${c.cell_phone}</strong></span>` : ''}
+        ${c.email      ? `<span>${c.email}</span>`                                                       : ''}
       </div>
-      ${c.notes ? `<div style="margin-top:0.3rem;font-size:0.82rem;color:#444;font-style:italic">${c.notes}</div>` : ''}
-      <div style="margin-top:0.4rem;font-size:0.78rem;color:#888">Added: ${new Date(c.date_added).toLocaleDateString('en-US')}</div>
-      <div style="margin-top:0.4rem">
-        <button class="btn btn-secondary" onclick="openEditContact(${JSON.stringify(c).replace(/"/g,'&quot;')})">Edit</button>
-        <button class="btn btn-red" onclick="deactivateContact('${c.id}')">${c.active ? 'Remove' : 'Removed'}</button>
+      ${c.notes ? `<div style="margin-top:0.35rem;font-size:0.83rem;color:#5a6075;font-style:italic">${c.notes}</div>` : ''}
+      <div style="margin-top:0.35rem;font-size:0.78rem;color:#aaa">Added: ${new Date(c.date_added).toLocaleDateString('en-US')}</div>
+      <div style="margin-top:0.5rem">
+        <button class="btn btn-secondary" style="padding:0.25rem 0.65rem;font-size:0.82rem" onclick="openEditContact(${JSON.stringify(c).replace(/"/g,'&quot;')})">Edit</button>
+        <button class="btn btn-red"       style="padding:0.25rem 0.65rem;font-size:0.82rem" onclick="deactivateContact('${c.id}')">Remove</button>
       </div>
     </div>`;
   }).join('');
@@ -797,13 +734,6 @@ function closeContactForm() {
   document.getElementById('contact-form-wrap').style.display = 'none';
 }
 
-// saveContact: inserts or updates a contact for the current account.
-// Primary/secondary uniqueness is enforced by clearing the flag on all OTHER contacts
-// before setting it on this one. The `.neq('id', sentinel)` pattern handles both
-// the add case (no id yet — sentinel is a valid UUID that won't match any real row)
-// and the edit case (exclude the row being edited from the clear).
-// The all-zeros UUID '00000000-...' is used as the sentinel because Supabase requires
-// a valid UUID type in the .neq() call — it will never match a real auto-generated ID.
 async function saveContact() {
   const name = document.getElementById('cf-name').value.trim();
   const msg  = document.getElementById('cf-msg');
@@ -861,9 +791,6 @@ async function deactivateContact(id) {
 // ---- QUOTE FORMS TAB ----
 async function loadAccountQuotes() {
   const el = document.getElementById('detail-quotes');
-
-  // Quote forms are linked to jobs, not directly to accounts, so we first get the
-  // job IDs for this account, then query quote_forms by those IDs.
   const { data: jobs } = await db.from('jobs').select('id').eq('account_id', currentDetailAccountId);
   if (!jobs?.length) { el.innerHTML = '<p class="meta">No quote forms.</p>'; return; }
 
@@ -876,12 +803,12 @@ async function loadAccountQuotes() {
   el.innerHTML = `<div style="overflow-x:auto"><table>
     <thead><tr><th>Job ID</th><th>Created</th><th>Scope Observed</th><th>Materials</th><th>Locked</th><th>Admin Notes</th></tr></thead>
     <tbody>${quotes.map(q => `<tr>
-      <td style="font-size:0.78rem">${q.job_id.slice(0,8)}...</td>
-      <td style="font-size:0.82rem;white-space:nowrap">${new Date(q.created_at).toLocaleDateString('en-US')}</td>
-      <td style="font-size:0.82rem;max-width:200px">${q.scope_observed||''}</td>
-      <td style="font-size:0.82rem">${q.materials_json ? JSON.stringify(q.materials_json) : '--'}</td>
-      <td style="font-size:0.82rem">${q.locked_at ? 'Yes — '+new Date(q.locked_at).toLocaleDateString('en-US') : 'No'}</td>
-      <td style="font-size:0.82rem">${q.admin_notes||''}</td>
+      <td style="font-size:0.78rem;color:#5a6075">${q.job_id.slice(0,8)}...</td>
+      <td style="font-size:0.83rem;white-space:nowrap">${new Date(q.created_at).toLocaleDateString('en-US')}</td>
+      <td style="font-size:0.83rem;max-width:200px">${q.scope_observed||''}</td>
+      <td style="font-size:0.83rem">${q.materials_json ? JSON.stringify(q.materials_json) : '--'}</td>
+      <td style="font-size:0.83rem">${q.locked_at ? 'Yes' : 'No'}</td>
+      <td style="font-size:0.83rem">${q.admin_notes||''}</td>
     </tr>`).join('')}
     </tbody>
   </table></div>`;
@@ -889,8 +816,6 @@ async function loadAccountQuotes() {
 
 
 // ---- PHOTOS TAB ----
-// Uses shared fetchPhotoUrls() + renderPhotoGrid() to avoid duplicating the signed-URL
-// and thumbnail logic that also lives in admin.html and tech.html.
 async function loadAccountPhotos() {
   const el = document.getElementById('detail-photos');
   const { data: photos, error } = await db.from('job_photos')
@@ -901,17 +826,14 @@ async function loadAccountPhotos() {
   if (error || !photos?.length) { el.innerHTML = '<p class="meta">No photos on file.</p>'; return; }
 
   const withUrls = await fetchPhotoUrls(photos);
-  // Prepend a photo count line before the grid.
-  el.innerHTML = `<p style="font-size:0.82rem;color:#555">${photos.length} photo(s) across all jobs for this account.</p>`;
+  el.innerHTML = `<p style="font-size:0.83rem;color:#5a6075;margin-bottom:0.6rem">${photos.length} photo(s) across all jobs for this account.</p>`;
   const gridEl = document.createElement('div');
   el.appendChild(gridEl);
-  renderPhotoGrid(gridEl, withUrls, true); // true = show upload date
+  renderPhotoGrid(gridEl, withUrls, true);
 }
 
 
 // ---- DETAIL TABS ----
-// Switches which tab panel is visible and highlights the active tab button.
-// Loads tab data on first open (lazy — avoids unnecessary queries).
 function switchDetailTab(tab) {
   ['history','contacts','quotes','photos','instructions'].forEach(t => {
     document.getElementById(`dtab-${t}-panel`).style.display = t === tab ? '' : 'none';
@@ -926,11 +848,6 @@ function switchDetailTab(tab) {
 
 
 // ---- INSTRUCTIONS ----
-// Reads and writes the instructions field directly from the allAccounts cache
-// (which was loaded with the instructions column by loadAccounts()).
-// Saving writes back to Supabase so the value is available on any device —
-// unlike the previous localStorage approach which was per-browser only.
-
 function loadInstructions() {
   const a = allAccounts.find(x => x.id === currentDetailAccountId);
   document.getElementById('instructions-text').value = a?.instructions || '';
@@ -938,31 +855,22 @@ function loadInstructions() {
 
 async function saveInstructions() {
   const text = document.getElementById('instructions-text').value;
-  const { error } = await db.from('accounts')
-    .update({ instructions: text || null })
-    .eq('id', currentDetailAccountId);
+  const { error } = await db.from('accounts').update({ instructions: text || null }).eq('id', currentDetailAccountId);
+  const msg = document.getElementById('instructions-msg');
   if (error) {
-    const msg = document.getElementById('instructions-msg');
-    msg.style.color = '#a00';
+    msg.style.color = '#a02020';
     msg.textContent = 'Save failed: ' + error.message;
     return;
   }
-  // Update the local cache so switching tabs and back doesn't show stale data.
   const a = allAccounts.find(x => x.id === currentDetailAccountId);
   if (a) a.instructions = text;
-
-  const msg = document.getElementById('instructions-msg');
-  msg.style.color = '#2a7a2a';
+  msg.style.color = '#2a7a4a';
   msg.textContent = 'Saved.';
   setTimeout(() => msg.textContent = '', 2000);
 }
 
 
 // ---- EXPORT CSV ----
-// Both export functions use shared downloadCSV() (from shared.js) instead of
-// building the blob manually. The data rows are still built here since they
-// require local state (allJobsByAccount, allPrimaryContacts, etc.).
-
 function exportAccountsCSV() {
   if (!filteredAccounts.length) { alert('No accounts to export.'); return; }
   const rows = [['Name','Type','Parent Account','Address','Phone','Primary Contact','Jobs','Last Service','Active']];
@@ -971,15 +879,10 @@ function exportAccountsCSV() {
     const parent = a.parent_account_id ? allAccounts.find(x => x.id === a.parent_account_id)?.account_name||'' : '';
     const pc     = allPrimaryContacts[a.id];
     rows.push([
-      a.account_name,
-      a.parent_account_id ? 'Sub' : 'Master',
-      parent,
-      a.address        || '',
-      a.phone          || '',
+      a.account_name, a.parent_account_id ? 'Sub' : 'Master', parent,
+      a.address||'', a.phone||'',
       pc ? `${pc.contact_name}${pc.work_phone ? ' | '+pc.work_phone : ''}` : '',
-      stats.count      || 0,
-      formatDate(stats.lastDate) || '',
-      a.active ? 'Yes' : 'No'
+      stats.count||0, formatDate(stats.lastDate)||'', a.active ? 'Yes' : 'No'
     ]);
   });
   downloadCSV(rows, 'faithlock_accounts');
@@ -1005,21 +908,11 @@ async function exportAccountDetailCSV() {
     const comp  = j.job_completions?.[0] || {};
     const total = (j.job_line_items||[]).reduce((s,i) => s+((i.override_cost??i.unit_cost)*i.quantity), 0);
     rows.push([
-      a.account_name,
-      formatDate(j.job_date),
-      j.sub?.account_name          || '',
-      j.job_types?.job_type_name   || '',
-      j.work_order_number          || '',
-      j.purchase_order_number      || '',
-      j.status,
-      j.is_fixed_price ? 'Yes' : 'No',
-      j.quote_amount               || '',
-      comp.payment_type            || '',
-      comp.payment_detail          || '',
-      total.toFixed(2),
-      comp.follow_up_flag ? 'Yes' : 'No',
-      comp.tech_notes              || '',
-      j.scope                      || ''
+      a.account_name, formatDate(j.job_date), j.sub?.account_name||'',
+      j.job_types?.job_type_name||'', j.work_order_number||'', j.purchase_order_number||'',
+      j.status, j.is_fixed_price ? 'Yes' : 'No', j.quote_amount||'',
+      comp.payment_type||'', comp.payment_detail||'', total.toFixed(2),
+      comp.follow_up_flag ? 'Yes' : 'No', comp.tech_notes||'', j.scope||''
     ]);
   });
   downloadCSV(rows, `faithlock_account_${a.account_name.replace(/[^a-z0-9]/gi,'_')}`);

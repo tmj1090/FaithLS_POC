@@ -8,59 +8,75 @@
 <script src="shared.js"></script>
 <style>
 * { box-sizing: border-box; }
-body { font-family: sans-serif; margin: 0; background: #f0f0f0; font-size: 0.9rem; }
-header { background: #1a1a1a; color: white; padding: 0.7rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
-header h1 { margin: 0; font-size: 1rem; }
-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f2f4f8; font-size: 0.9rem; color: #1a1a2e; }
+header { background: #1a2744; color: white; padding: 0.6rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+header h1 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+nav { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; }
 nav a { text-decoration: none; }
-nav button { background: none; border: 1px solid #aaa; color: #aaa; padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.85rem; }
-nav button.active { border-color: white; color: white; }
-button.logout { background: none; border: 1px solid #f66; color: #f66; padding: 0.3rem 0.7rem; cursor: pointer; }
-.container { max-width: 960px; margin: 1rem auto; padding: 0 1rem; }
-.card { background: white; border: 1px solid #ccc; margin-bottom: 0.8rem; padding: 1rem; }
-.card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
-.meta { color: #555; font-size: 0.82rem; margin-bottom: 0.4rem; }
+nav button { background: transparent; border: 1px solid rgba(255,255,255,0.35); color: rgba(255,255,255,0.75); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; font-family: inherit; transition: all 0.15s; }
+nav button:hover { border-color: white; color: white; }
+button.logout { background: transparent; border: 1px solid rgba(255,100,100,0.6); color: rgba(255,150,150,0.9); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; font-family: inherit; }
+button.logout:hover { border-color: #f88; color: #f88; }
+.container { max-width: 980px; margin: 1.2rem auto; padding: 0 1rem; }
+.card { background: white; border: 1px solid #dde1ea; border-radius: 6px; margin-bottom: 1rem; padding: 1.2rem; box-shadow: 0 1px 4px rgba(26,39,68,0.06); }
+.card h3 { margin: 0 0 0.6rem; font-size: 1rem; color: #1a2744; font-weight: 600; }
+.section-title { font-weight: 600; font-size: 0.82rem; color: #6b6fa8; text-transform: uppercase; letter-spacing: 0.05em; margin: 1rem 0 0.5rem; border-bottom: 1px solid #eef0f6; padding-bottom: 0.3rem; }
+.meta { color: #5a6075; font-size: 0.83rem; margin-bottom: 0.35rem; }
 .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: flex-end; }
-.filters label { font-size: 0.82rem; font-weight: bold; display: block; margin-bottom: 0.2rem; }
-.filters input, .filters select { padding: 0.35rem; border: 1px solid #ccc; font-size: 0.85rem; }
-.btn { padding: 0.35rem 0.8rem; border: none; cursor: pointer; font-size: 0.85rem; margin-right: 0.3rem; margin-top: 0.2rem; }
-.btn-primary { background: #1a1a1a; color: white; }
-.btn-green { background: #2a7a2a; color: white; }
-.btn-red { background: #a00; color: white; }
-.btn-secondary { background: #ddd; color: #333; }
-.btn-blue { background: #1a4a8a; color: white; }
-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-th { background: #eee; text-align: left; padding: 0.4rem 0.5rem; white-space: nowrap; }
-td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #eee; vertical-align: top; }
-tr:hover td { background: #fafafa; }
-.status-badge { display: inline-block; padding: 0.15rem 0.5rem; font-size: 0.78rem; font-weight: bold; }
-.status-Scheduled { background: #e0e8ff; color: #224; }
-.status-Quoted { background: #fff0cc; color: #640; }
-.status-Awaiting-Parts { background: #ffe8cc; color: #640; }
-.status-Pending-Review { background: #ffd; color: #660; }
-.status-Flagged { background: #ffe0e0; color: #900; }
-.status-Approved { background: #e0ffe0; color: #060; }
-.status-In-Progress { background: #e0ffe0; color: #060; }
-.form-row { margin-bottom: 0.5rem; }
-.form-row label { display: block; font-weight: bold; font-size: 0.82rem; margin-bottom: 0.2rem; }
-.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 0.4rem; border: 1px solid #ccc; font-size: 0.9rem; }
-.form-row textarea { height: 60px; resize: vertical; }
-.msg { padding: 0.4rem 0.6rem; margin: 0.4rem 0; font-size: 0.85rem; }
-.msg.success { background: #e0ffe0; border: 1px solid #9d9; }
-.msg.error { background: #ffe0e0; border: 1px solid #f99; }
-.section-title { font-weight: bold; margin: 0.8rem 0 0.4rem; font-size: 0.9rem; border-bottom: 1px solid #eee; padding-bottom: 0.2rem; }
-input[type=checkbox] { width: auto; }
-.parts-search-wrap { position: relative; }
-.parts-results { border: 1px solid #ccc; background: white; max-height: 150px; overflow-y: auto; display: none; position: absolute; z-index: 10; width: 100%; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-.parts-results div { padding: 0.35rem 0.5rem; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.85rem; }
-.parts-results div:hover { background: #f0f0f0; }
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.filters label { font-size: 0.8rem; font-weight: 600; color: #4a5070; display: block; margin-bottom: 0.25rem; }
+.filters input, .filters select { padding: 0.4rem 0.55rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.85rem; font-family: inherit; }
+.filters input:focus, .filters select:focus { outline: none; border-color: #6b6fa8; }
+.form-row { margin-bottom: 0.6rem; }
+.form-row label { display: block; font-weight: 600; font-size: 0.8rem; color: #4a5070; margin-bottom: 0.25rem; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 0.45rem 0.6rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.88rem; font-family: inherit; transition: border-color 0.15s; }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: #6b6fa8; box-shadow: 0 0 0 2px rgba(107,111,168,0.12); }
+.form-row textarea { height: 64px; resize: vertical; }
+input[type=checkbox] { width: auto; accent-color: #1a2744; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
 @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+.btn { padding: 0.38rem 0.9rem; border: none; cursor: pointer; font-size: 0.84rem; border-radius: 4px; font-family: inherit; font-weight: 500; margin-right: 0.3rem; margin-top: 0.2rem; transition: opacity 0.15s; }
+.btn:active { opacity: 0.8; }
+.btn-primary   { background: #1a2744; color: white; }
+.btn-primary:hover   { background: #243560; }
+.btn-green     { background: #2a7a4a; color: white; }
+.btn-green:hover     { background: #236040; }
+.btn-red       { background: #a02020; color: white; }
+.btn-red:hover       { background: #8a1a1a; }
+.btn-secondary { background: #eaecf4; color: #333; }
+.btn-secondary:hover { background: #d8dcea; }
+.btn-blue      { background: #1a4a8a; color: white; }
+.btn-blue:hover      { background: #153d75; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { background: #f2f4f8; text-align: left; padding: 0.5rem 0.6rem; white-space: nowrap; font-weight: 600; color: #4a5070; font-size: 0.8rem; border-bottom: 2px solid #dde1ea; }
+td { padding: 0.45rem 0.6rem; border-bottom: 1px solid #eef0f6; vertical-align: top; }
+tr:hover td { background: #f8f9fc; }
+.add-day-row > td { background: #f8f9fc !important; border-bottom: 2px solid #dde1ea; padding: 0.8rem 0.6rem; }
+.status-badge { display: inline-block; padding: 0.18rem 0.55rem; font-size: 0.76rem; font-weight: 600; border-radius: 20px; white-space: nowrap; }
+.status-Scheduled      { background: #e4eaf8; color: #1a2744; }
+.status-Quoted         { background: #fff3d6; color: #7a4800; }
+.status-Awaiting-Parts { background: #ffe8cc; color: #7a3800; }
+.status-Pending-Review { background: #fff8c0; color: #6b5a00; }
+.status-Flagged        { background: #ffe0e0; color: #900; }
+.status-Approved       { background: #d6f2e0; color: #1a5c30; }
+.status-In-Progress    { background: #d6f2e0; color: #1a5c30; }
+.status-Cancelled      { background: #eee; color: #666; }
+.msg { padding: 0.5rem 0.7rem; margin: 0.4rem 0; font-size: 0.85rem; border-radius: 4px; }
+.msg.success { background: #d6f2e0; border: 1px solid #8cd8aa; color: #1a5c30; }
+.msg.error   { background: #ffe0e0; border: 1px solid #f4aaaa; color: #800; }
+.parts-search-wrap { position: relative; margin-bottom: 0.5rem; }
+.parts-search-wrap input { width: 100%; padding: 0.45rem 0.6rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.88rem; font-family: inherit; }
+.parts-search-wrap input:focus { outline: none; border-color: #6b6fa8; }
+.parts-results { border: 1px solid #c8cdd8; background: white; max-height: 160px; overflow-y: auto; display: none; position: absolute; z-index: 20; width: 100%; box-shadow: 0 4px 12px rgba(26,39,68,0.14); border-radius: 0 0 4px 4px; }
+.parts-results div { padding: 0.4rem 0.6rem; cursor: pointer; border-bottom: 1px solid #eef0f6; font-size: 0.85rem; }
+.parts-results div:hover { background: #e8eaf8; }
+#reopen-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); z-index: 100; overflow-y: auto; }
+#reopen-modal > div { background: white; max-width: 700px; margin: 1.5rem auto; padding: 1.5rem; position: relative; border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+#reopen-modal .close-btn { position: absolute; top: 0.75rem; right: 0.75rem; background: #eaecf4; border: none; font-size: 0.9rem; cursor: pointer; border-radius: 3px; padding: 0.25rem 0.55rem; color: #333; font-family: inherit; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Faith Lock &amp; Safe | Schedule</h1>
+  <h1>Faith Lock &amp; Safe &nbsp;|&nbsp; Schedule</h1>
   <nav>
     <a href="admin.html"><button>Admin</button></a>
     <a href="accounts.html"><button>Accounts</button></a>
@@ -69,89 +85,67 @@ input[type=checkbox] { width: auto; }
 </header>
 
 <div class="container">
+
   <div class="card">
-    <h3>Jobs Schedule</h3>
+    <h3>Schedule View</h3>
     <div class="filters">
       <div><label>From</label><input type="date" id="sv-from"></div>
       <div><label>To</label><input type="date" id="sv-to"></div>
       <div>
         <label>Tech</label>
-        <select id="sv-tech" style="padding:0.35rem;border:1px solid #ccc">
-          <option value="">All Techs</option>
-        </select>
+        <select id="sv-tech"><option value="">All Techs</option></select>
       </div>
       <div style="align-self:flex-end">
         <button class="btn btn-secondary" onclick="setScheduleRange('today')">Today</button>
         <button class="btn btn-secondary" onclick="setScheduleRange('week')">This Week</button>
-        <button class="btn btn-primary" onclick="loadSchedule()">Load</button>
+        <button class="btn btn-primary"   onclick="loadSchedule()">Load</button>
       </div>
     </div>
-    <div id="schedule-list">Select a date range and click Load.</div>
+    <div id="schedule-list"><p class="meta">Select a date range and click Load.</p></div>
   </div>
 
   <div class="card" id="stocking-panel" style="display:none">
-    <h3>Parts and Labor Totals <span style="font-weight:normal;font-size:0.82rem;color:#666">for loaded date range</span></h3>
+    <h3>Parts and Labor Totals <span style="font-weight:400;font-size:0.83rem;color:#5a6075">for loaded date range</span></h3>
     <div id="stocking-content"></div>
   </div>
+
 </div>
 
-<!-- ============================================================ -->
-<!-- REOPEN/EDIT MODAL -->
-<!-- ============================================================ -->
-<div id="reopen-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;overflow-y:auto">
-  <div style="background:white;max-width:700px;margin:1.5rem auto;padding:1.5rem;position:relative">
-    <button onclick="closeReopenModal()" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;font-size:1.2rem;cursor:pointer">X</button>
+<div id="reopen-modal">
+  <div>
+    <button class="close-btn" onclick="closeReopenModal()">X</button>
     <div id="reopen-content"></div>
   </div>
 </div>
 
 <script>
-// ============================================================
-// schedule.html — Faith Lock & Safe Schedule View
-//
-// Standalone schedule page: date-range job list with tech filter,
-// Add a Day inline form, Edit modal, and parts/labor stocking totals.
-//
-// Shared utilities from shared.js:
-//   db, formatDate(), today(), tomorrow(), weekStart(),
-//   populateSelect(), populateMultiSelect(), mapsLink(), logout()
-// ============================================================
-
 let currentUser   = null;
 let allParts      = [];
 let allLaborTypes = [];
 let allTechs      = [];
 let allJobTypes   = [];
-
 let reopenParts   = [];
 let reopenLabor   = [];
 let reopenCharges = [];
 let reopenVisits  = [];
 
-
-// ---- INIT ----
 async function init() {
   try {
     const { data: { session }, error: sessErr } = await db.auth.getSession();
     if (sessErr) throw sessErr;
     if (!session) { window.location.href = 'index.html'; return; }
     currentUser = session.user;
-
     const { data: profile } = await db.from('user_profiles').select('role').eq('id', currentUser.id).single();
     if (!profile || profile.role !== 'admin') { window.location.href = 'index.html'; return; }
-
     await loadRefData();
     setScheduleRange('week');
   } catch (err) {
     document.querySelector('.container').innerHTML =
-      `<div style="color:#a00;background:white;border:1px solid #f99;padding:1rem;margin-top:1rem">
-        <strong>Load error:</strong> ${err.message || JSON.stringify(err)}
-      </div>`;
+      `<div class="msg error" style="margin-top:1rem"><strong>Load error:</strong> ${err.message || JSON.stringify(err)}</div>`;
+    console.error('schedule init error:', err);
   }
 }
 
-
-// ---- REFERENCE DATA ----
 async function loadRefData() {
   const [p, lt, tc, jt] = await Promise.all([
     db.from('parts').select('id,part_name,category,unit,unit_cost').eq('active', true).order('part_name'),
@@ -163,7 +157,6 @@ async function loadRefData() {
   allLaborTypes = lt.data || [];
   allTechs      = tc.data || [];
   allJobTypes   = jt.data || [];
-
   const techSel = document.getElementById('sv-tech');
   if (techSel) {
     techSel.innerHTML = '<option value="">All Techs</option>' +
@@ -171,8 +164,6 @@ async function loadRefData() {
   }
 }
 
-
-// ---- SCHEDULE ----
 function setScheduleRange(range) {
   if (range === 'today') {
     const t = today();
@@ -180,7 +171,7 @@ function setScheduleRange(range) {
     document.getElementById('sv-to').value   = t;
   } else {
     const mon = weekStart();
-    const sun = new Date(mon);
+    const sun = new Date(mon + 'T12:00:00');
     sun.setDate(sun.getDate() + 6);
     document.getElementById('sv-from').value = mon;
     document.getElementById('sv-to').value   = sun.toISOString().split('T')[0];
@@ -192,61 +183,79 @@ async function loadSchedule() {
   const from   = document.getElementById('sv-from').value;
   const to     = document.getElementById('sv-to').value;
   const techId = document.getElementById('sv-tech').value;
-
   let query = db.from('jobs')
     .select(`id, job_date, status, scope, is_fixed_price, work_order_number, purchase_order_number,
              assigned_tech_ids,
-             accounts!jobs_account_id_fkey(account_name),
+             accounts!jobs_account_id_fkey(account_name, address),
              job_types(job_type_name),
              job_line_items(item_type,item_id,quantity)`)
     .gte('job_date', from).lte('job_date', to)
     .not('status', 'eq', 'Cancelled')
     .order('job_date');
-
   if (techId) query = query.contains('assigned_tech_ids', [techId]);
-
   const { data, error } = await query;
   const el = document.getElementById('schedule-list');
-  if (error || !data?.length) {
-    el.innerHTML = '<p>No jobs found.</p>';
+  if (error) {
+    el.innerHTML = `<div class="msg error">${error.message}</div>`;
     document.getElementById('stocking-panel').style.display = 'none';
     return;
   }
-
-  const addDayStatuses = ['Scheduled', 'In Progress', 'Awaiting Parts', 'Flagged'];
+  if (!data?.length) {
+    el.innerHTML = '<p class="meta">No jobs found for this period.</p>';
+    document.getElementById('stocking-panel').style.display = 'none';
+    return;
+  }
+  const addDayStatuses = ['Scheduled','In Progress','Awaiting Parts','Flagged'];
   el.innerHTML = `<div style="overflow-x:auto"><table>
-    <thead><tr><th>Date</th><th>Account</th><th>Type</th><th>WO</th><th>Status</th><th>Scope</th><th></th></tr></thead>
-    <tbody>${data.map(j => `<tr>
-      <td style="white-space:nowrap">${formatDate(j.job_date)}</td>
-      <td>${j.accounts?.account_name || ''}</td>
-      <td>${j.job_types?.job_type_name || ''}</td>
-      <td style="font-size:0.82rem">${j.work_order_number || ''}</td>
-      <td><span class="status-badge status-${j.status.replace(/ /g, '-')}">${j.status}</span></td>
-      <td style="max-width:200px;font-size:0.82rem">${j.scope || ''}</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-blue" onclick="openReopen('${j.id}')">Edit</button>
-        ${addDayStatuses.includes(j.status)
-          ? `<button class="btn btn-secondary" onclick="toggleAddDayForm('${j.id}')">Add a Day</button>` : ''}
-        ${!['Approved','Pending Review'].includes(j.status)
-          ? `<button class="btn btn-red" onclick="deleteJob('${j.id}')">Delete</button>` : ''}
-      </td>
-    </tr>
-    <tr id="add-day-form-${j.id}" style="display:none">
-      <td colspan="7" style="background:#f9f9f9;padding:0.7rem;border-bottom:2px solid #ccc">
-        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:flex-end">
-          <div><label style="font-size:0.82rem;font-weight:bold;display:block;margin-bottom:0.2rem">Date</label>
-            <input type="date" id="add-day-date-${j.id}" value="${tomorrow()}" style="padding:0.35rem;border:1px solid #ccc"></div>
-          <div style="flex:2"><label style="font-size:0.82rem;font-weight:bold;display:block;margin-bottom:0.2rem">Notes for this visit</label>
-            <input type="text" id="add-day-notes-${j.id}" style="width:100%;padding:0.35rem;border:1px solid #ccc"></div>
-          <button class="btn btn-primary" onclick="saveAddDay('${j.id}')">Save</button>
-          <button class="btn btn-secondary" onclick="toggleAddDayForm('${j.id}')">Cancel</button>
-        </div>
-        <div id="add-day-msg-${j.id}" style="font-size:0.82rem;margin-top:0.3rem;color:#2a7a2a"></div>
-      </td>
-    </tr>`).join('')}</tbody>
+    <thead><tr>
+      <th>Date</th><th>Account</th><th>Type</th><th>WO</th><th>Status</th><th>Scope</th><th></th>
+    </tr></thead>
+    <tbody>
+    ${data.map(j => `
+      <tr>
+        <td style="white-space:nowrap">${formatDate(j.job_date)}</td>
+        <td>
+          <strong>${j.accounts?.account_name || ''}</strong>
+          ${j.accounts?.address ? `<br><span style="font-size:0.78rem;color:#5a6075">${j.accounts.address}</span>` : ''}
+        </td>
+        <td style="font-size:0.83rem">${j.job_types?.job_type_name || ''}</td>
+        <td style="font-size:0.82rem;white-space:nowrap">${j.work_order_number || ''}</td>
+        <td><span class="status-badge status-${j.status.replace(/ /g,'-')}">${j.status}</span></td>
+        <td style="max-width:200px;font-size:0.82rem">${j.scope || ''}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-blue" onclick="openReopen('${j.id}')">Edit</button>
+          ${addDayStatuses.includes(j.status)
+            ? `<button class="btn btn-secondary" onclick="toggleAddDayForm('${j.id}')">Add a Day</button>` : ''}
+          ${!['Approved','Pending Review'].includes(j.status)
+            ? `<button class="btn btn-red" onclick="deleteJob('${j.id}')">Delete</button>` : ''}
+        </td>
+      </tr>
+      <tr id="add-day-form-${j.id}" class="add-day-row" style="display:none">
+        <td colspan="7">
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:flex-end">
+            <div>
+              <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem;color:#4a5070">Visit Date</label>
+              <input type="date" id="add-day-date-${j.id}" value="${tomorrow()}"
+                style="padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px;font-size:0.85rem">
+            </div>
+            <div style="flex:2;min-width:180px">
+              <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem;color:#4a5070">Notes for this visit</label>
+              <input type="text" id="add-day-notes-${j.id}" placeholder="Optional..."
+                style="width:100%;padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px;font-size:0.85rem">
+            </div>
+            <div style="display:flex;gap:0.3rem">
+              <button class="btn btn-primary"   onclick="saveAddDay('${j.id}')">Save</button>
+              <button class="btn btn-secondary" onclick="toggleAddDayForm('${j.id}')">Cancel</button>
+            </div>
+          </div>
+          <div id="add-day-msg-${j.id}" style="font-size:0.82rem;margin-top:0.4rem"></div>
+        </td>
+      </tr>
+    `).join('')}
+    </tbody>
   </table></div>`;
 
-  // Parts/labor stocking totals
+  // Stocking totals
   const partTotals = {}, laborTotals = {};
   data.forEach(j => {
     (j.job_line_items || []).forEach(i => {
@@ -259,28 +268,23 @@ async function loadSchedule() {
       }
     });
   });
-
-  const partEntries  = Object.entries(partTotals).sort((a, b) => a[0].localeCompare(b[0]));
-  const laborEntries = Object.entries(laborTotals).sort((a, b) => a[0].localeCompare(b[0]));
+  const partEntries  = Object.entries(partTotals).sort((a,b)  => a[0].localeCompare(b[0]));
+  const laborEntries = Object.entries(laborTotals).sort((a,b) => a[0].localeCompare(b[0]));
   const stockPanel   = document.getElementById('stocking-panel');
-
-  if (!partEntries.length && !laborEntries.length) {
-    stockPanel.style.display = 'none';
-    return;
-  }
-  stockPanel.style.display = 'block';
+  if (!partEntries.length && !laborEntries.length) { stockPanel.style.display = 'none'; return; }
+  stockPanel.style.display = '';
   document.getElementById('stocking-content').innerHTML = `
-    <p style="font-size:0.85rem;color:#555;margin-bottom:0.8rem">Based on expected parts and labor pre-loaded on jobs.</p>
+    <p style="font-size:0.83rem;color:#5a6075;margin-bottom:0.8rem">Based on expected parts and labor pre-loaded on assigned jobs.</p>
     <div style="display:flex;gap:2rem;flex-wrap:wrap">
       ${partEntries.length ? `<div style="flex:1;min-width:200px">
         <div class="section-title" style="margin-top:0">Parts Needed</div>
         <table><thead><tr><th>Part</th><th>Total Qty</th></tr></thead>
-        <tbody>${partEntries.map(([name, qty]) => `<tr><td>${name}</td><td><strong>${qty}</strong></td></tr>`).join('')}</tbody>
+        <tbody>${partEntries.map(([n,q]) => `<tr><td>${n}</td><td><strong>${q}</strong></td></tr>`).join('')}</tbody>
         </table></div>` : ''}
       ${laborEntries.length ? `<div style="flex:1;min-width:200px">
         <div class="section-title" style="margin-top:0">Labor (hrs)</div>
         <table><thead><tr><th>Type</th><th>Total Hrs</th></tr></thead>
-        <tbody>${laborEntries.map(([name, hrs]) => `<tr><td>${name}</td><td><strong>${hrs}</strong></td></tr>`).join('')}</tbody>
+        <tbody>${laborEntries.map(([n,h]) => `<tr><td>${n}</td><td><strong>${h}</strong></td></tr>`).join('')}</tbody>
         </table></div>` : ''}
     </div>`;
 }
@@ -303,28 +307,22 @@ async function saveAddDay(jobId) {
   const date  = document.getElementById(`add-day-date-${jobId}`).value;
   const notes = document.getElementById(`add-day-notes-${jobId}`).value.trim();
   const msg   = document.getElementById(`add-day-msg-${jobId}`);
-  if (!date) { msg.textContent = 'Date is required.'; return; }
-
+  if (!date) { msg.innerHTML = '<span style="color:#a02020">Date is required.</span>'; return; }
   const { count } = await db.from('job_visits').select('id', { count: 'exact', head: true }).eq('job_id', jobId);
   await db.from('job_visits').insert({
     job_id: jobId, visit_number: (count || 0) + 1,
     visit_date: date, tech_notes: notes || null
   });
-
   const { data: job } = await db.from('jobs').select('status').eq('id', jobId).single();
   if (job?.status !== 'Scheduled') {
     await db.from('jobs').update({ status: 'Scheduled', updated_at: new Date().toISOString() }).eq('id', jobId);
   }
-
-  msg.textContent = 'Visit added.';
+  msg.innerHTML = '<span style="color:#2a7a4a;font-weight:600">Visit added.</span>';
   setTimeout(() => { toggleAddDayForm(jobId); loadSchedule(); }, 800);
 }
 
-
-// ---- REOPEN / EDIT MODAL ----
 async function openReopen(jobId) {
   reopenParts = []; reopenLabor = []; reopenCharges = []; reopenVisits = [];
-
   const [{ data: job }, { data: visits }] = await Promise.all([
     db.from('jobs')
       .select(`*, accounts!jobs_account_id_fkey(account_name), job_types(job_type_name),
@@ -333,12 +331,10 @@ async function openReopen(jobId) {
     db.from('job_visits').select('*').eq('job_id', jobId).order('visit_number')
   ]);
   reopenVisits = visits || [];
-
   const comp      = job.job_completions?.[0] || {};
   const laborOpts = allLaborTypes.map(l => `<option value="${l.id}">${l.labor_type_name}</option>`).join('');
-  const statusOpts = ['Scheduled', 'Quoted', 'Awaiting Parts', 'Pending Review', 'Flagged', 'Approved', 'Cancelled']
+  const statusOpts = ['Scheduled','Quoted','Awaiting Parts','Pending Review','Flagged','Approved','Cancelled']
     .map(s => `<option value="${s}" ${s === job.status ? 'selected' : ''}>${s}</option>`).join('');
-
   (job.job_line_items || []).forEach(i => {
     if (i.item_type === 'Part') {
       const p = allParts.find(x => x.id === i.item_id);
@@ -350,83 +346,76 @@ async function openReopen(jobId) {
       reopenCharges.push({ type: i.item_type, description: i.override_reason || '', amount: i.unit_cost, lineItemId: i.id });
     }
   });
-
   document.getElementById('reopen-content').innerHTML = `
-    <h3>Edit Job: ${job.accounts?.account_name || ''}</h3>
+    <h3 style="margin:0 0 0.2rem;color:#1a2744">${job.accounts?.account_name || ''}</h3>
     <div class="meta">${formatDate(job.job_date)} | ${job.job_types?.job_type_name || ''}</div>
-
-    <div class="form-row"><label>Status</label><select id="ro-status">${statusOpts}</select></div>
+    <div class="form-row" style="margin-top:0.8rem"><label>Status</label><select id="ro-status">${statusOpts}</select></div>
     <div class="two-col">
       <div class="form-row"><label>Work Order No.</label><input type="text" id="ro-wo" value="${job.work_order_number || ''}"></div>
       <div class="form-row"><label>Purchase Order No.</label><input type="text" id="ro-po" value="${job.purchase_order_number || ''}"></div>
     </div>
     <div class="form-row"><label>Scope</label><textarea id="ro-scope">${job.scope || ''}</textarea></div>
     <div class="form-row"><label>Site Notes</label><textarea id="ro-sitenotes">${job.site_notes || ''}</textarea></div>
-
     <div class="section-title">Completion Details</div>
-    <div class="form-row"><label>Time In</label>
-      <input type="datetime-local" id="ro-timein" value="${comp.time_in ? comp.time_in.slice(0, 16) : ''}"></div>
-    <div class="form-row"><label>Time Out</label>
-      <input type="datetime-local" id="ro-timeout" value="${comp.time_out ? comp.time_out.slice(0, 16) : ''}"></div>
-    <div class="form-row"><label>Payment Type</label>
-      <select id="ro-paytype">
-        <option value="">-- Select --</option>
-        ${['Cash', 'Check', 'Card', 'Invoice'].map(p => `<option ${p === comp.payment_type ? 'selected' : ''}>${p}</option>`).join('')}
-      </select>
+    <div class="two-col">
+      <div class="form-row"><label>Time In</label><input type="datetime-local" id="ro-timein" value="${comp.time_in ? comp.time_in.slice(0,16) : ''}"></div>
+      <div class="form-row"><label>Time Out</label><input type="datetime-local" id="ro-timeout" value="${comp.time_out ? comp.time_out.slice(0,16) : ''}"></div>
     </div>
-    <div class="form-row"><label>Payment Detail</label>
-      <input type="text" id="ro-paydetail" value="${comp.payment_detail || ''}"></div>
-    <div class="form-row"><label>Tech Notes</label>
-      <textarea id="ro-technotes">${comp.tech_notes || ''}</textarea></div>
+    <div class="two-col">
+      <div class="form-row"><label>Payment Type</label>
+        <select id="ro-paytype"><option value="">-- Select --</option>
+          ${['Cash','Check','Card','Invoice'].map(p => `<option ${p === comp.payment_type ? 'selected' : ''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-row"><label>Payment Detail</label><input type="text" id="ro-paydetail" value="${comp.payment_detail || ''}"></div>
+    </div>
+    <div class="form-row"><label>Tech Notes</label><textarea id="ro-technotes">${comp.tech_notes || ''}</textarea></div>
     <div class="form-row"><label><input type="checkbox" id="ro-followup" ${comp.follow_up_flag ? 'checked' : ''}> Follow-up Flag</label></div>
-
     <div class="section-title">Visit Times</div>
     ${reopenVisits.length ? reopenVisits.map(v => `
-      <div style="background:#f9f9f9;border:1px solid #eee;padding:0.5rem;margin-bottom:0.4rem">
-        <div style="font-size:0.82rem;font-weight:bold;margin-bottom:0.3rem">Visit ${v.visit_number} (${formatDate(v.visit_date)})</div>
+      <div style="background:#f8f9fc;border:1px solid #eef0f6;border-radius:4px;padding:0.6rem;margin-bottom:0.4rem">
+        <div style="font-size:0.83rem;font-weight:600;margin-bottom:0.4rem;color:#1a2744">Visit ${v.visit_number} (${formatDate(v.visit_date)})</div>
         <div class="two-col">
-          <div class="form-row"><label>Visit ${v.visit_number}: Clock In</label>
+          <div class="form-row"><label>Clock In</label>
             <input type="datetime-local" id="vi-cin-${v.id}" value="${v.clocked_in_at ? v.clocked_in_at.slice(0,16) : ''}">
           </div>
-          <div class="form-row"><label>Visit ${v.visit_number}: Clock Out</label>
+          <div class="form-row"><label>Clock Out</label>
             <input type="datetime-local" id="vi-cout-${v.id}" value="${v.clocked_out_at ? v.clocked_out_at.slice(0,16) : ''}">
           </div>
         </div>
-      </div>`).join('') : '<p class="meta">No clock-in visits on record.</p>'}
-
+      </div>`).join('')
+    : '<p class="meta">No clock-in visits on record.</p>'}
     <div class="section-title">Parts</div>
     <div class="parts-search-wrap">
-      <input type="text" id="ro-partsearch" placeholder="Search parts..." oninput="searchReopenParts()" style="width:100%;padding:0.35rem;border:1px solid #ccc">
+      <input type="text" id="ro-partsearch" placeholder="Search parts to add..." oninput="searchReopenParts()" autocomplete="off">
       <div class="parts-results" id="ro-parts-results"></div>
     </div>
     <table id="ro-parts-table"><thead><tr><th>Part</th><th>Qty</th><th></th></tr></thead><tbody></tbody></table>
-
     <div class="section-title">Labor</div>
-    <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem;flex-wrap:wrap">
-      <select id="ro-labortype" style="flex:2;padding:0.35rem;border:1px solid #ccc">
+    <div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap">
+      <select id="ro-labortype" style="flex:2;min-width:150px;padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px">
         <option value="">-- Type --</option>${laborOpts}
       </select>
-      <input type="number" id="ro-laborhours" placeholder="Hours" style="flex:1;padding:0.35rem;border:1px solid #ccc;min-width:60px">
+      <input type="number" id="ro-laborhours" placeholder="Hours" style="flex:1;min-width:70px;padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px">
       <button class="btn btn-secondary" onclick="addReopenLabor()">Add</button>
     </div>
     <table id="ro-labor-table"><thead><tr><th>Type</th><th>Hours</th><th></th></tr></thead><tbody></tbody></table>
-
     <div class="section-title">Additional Charges</div>
-    <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem;flex-wrap:wrap;align-items:flex-end">
-      <select id="ro-chargetype" style="padding:0.35rem;border:1px solid #ccc">
+    <div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap;align-items:flex-end">
+      <select id="ro-chargetype" style="padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px">
         <option value="Service Call">Service Call</option>
         <option value="Other">Other</option>
       </select>
-      <input type="text" id="ro-chargedesc" placeholder="Description" style="flex:2;padding:0.35rem;border:1px solid #ccc">
-      <input type="number" id="ro-chargeamt" placeholder="$" step="0.01" style="width:80px;padding:0.35rem;border:1px solid #ccc">
+      <input type="text" id="ro-chargedesc" placeholder="Description" style="flex:2;padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px">
+      <input type="number" id="ro-chargeamt" placeholder="$" step="0.01" style="width:85px;padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px">
       <button class="btn btn-secondary" onclick="addReopenCharge()">Add</button>
     </div>
     <table id="ro-charges-table"><thead><tr><th>Type</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody></tbody></table>
-
-    <div id="ro-msg" style="margin-top:0.5rem"></div>
-    <button class="btn btn-primary" style="margin-top:0.8rem" onclick="saveReopen('${jobId}', '${comp.id || ''}')">Save Changes</button>
-  `;
-
+    <div id="ro-msg" style="margin-top:0.6rem"></div>
+    <div style="margin-top:1rem;display:flex;gap:0.4rem">
+      <button class="btn btn-primary"   onclick="saveReopen('${jobId}','${comp.id || ''}')">Save Changes</button>
+      <button class="btn btn-secondary" onclick="closeReopenModal()">Cancel</button>
+    </div>`;
   renderReopenParts(); renderReopenLabor(); renderReopenCharges();
   document.getElementById('reopen-modal').style.display = '';
 }
@@ -440,16 +429,11 @@ function searchReopenParts() {
   const matches = allParts.filter(p => p.part_name.toLowerCase().includes(q)).slice(0, 8);
   if (!matches.length) { res.style.display = 'none'; return; }
   res.innerHTML = matches.map(p =>
-    `<div data-id="${p.id}" data-name="${p.part_name.replace(/"/g, '&quot;')}">
-      ${p.part_name}${p.category ? ' | ' + p.category : ''}</div>`
+    `<div data-id="${p.id}" data-name="${p.part_name.replace(/"/g,'&quot;')}">${p.part_name}${p.category ? ' | '+p.category : ''}</div>`
   ).join('');
   res.style.display = 'block';
   res.querySelectorAll('div').forEach(div => {
-    div.addEventListener('mousedown', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      addReopenPart(div.dataset.id, div.dataset.name);
-    });
+    div.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); addReopenPart(div.dataset.id, div.dataset.name); });
   });
 }
 function addReopenPart(id, name) {
@@ -461,13 +445,12 @@ function addReopenPart(id, name) {
 }
 function removeReopenPart(idx) { reopenParts.splice(idx, 1); renderReopenParts(); }
 function renderReopenParts() {
-  document.querySelector('#ro-parts-table tbody').innerHTML = reopenParts.map((p, i) =>
+  document.querySelector('#ro-parts-table tbody').innerHTML = reopenParts.map((p,i) =>
     `<tr><td>${p.name}</td>
-     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:60px;padding:0.2rem;border:1px solid #ccc" onchange="reopenParts[${i}].qty=parseFloat(this.value)||1"></td>
-     <td><button onclick="removeReopenPart(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:65px;padding:0.25rem 0.35rem;border:1px solid #c8cdd8;border-radius:3px" onchange="reopenParts[${i}].qty=parseFloat(this.value)||1"></td>
+     <td><button onclick="removeReopenPart(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold;font-size:1rem;padding:0.1rem 0.3rem">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
-
 function addReopenLabor() {
   const id    = document.getElementById('ro-labortype').value;
   const hours = parseFloat(document.getElementById('ro-laborhours').value);
@@ -479,12 +462,11 @@ function addReopenLabor() {
 }
 function removeReopenLabor(idx) { reopenLabor.splice(idx, 1); renderReopenLabor(); }
 function renderReopenLabor() {
-  document.querySelector('#ro-labor-table tbody').innerHTML = reopenLabor.map((l, i) =>
+  document.querySelector('#ro-labor-table tbody').innerHTML = reopenLabor.map((l,i) =>
     `<tr><td>${l.name}</td><td>${l.hours} hr</td>
-     <td><button onclick="removeReopenLabor(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><button onclick="removeReopenLabor(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold;font-size:1rem;padding:0.1rem 0.3rem">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
-
 function addReopenCharge() {
   const type = document.getElementById('ro-chargetype').value;
   const desc = document.getElementById('ro-chargedesc').value.trim();
@@ -497,25 +479,23 @@ function addReopenCharge() {
 }
 function removeReopenCharge(idx) { reopenCharges.splice(idx, 1); renderReopenCharges(); }
 function renderReopenCharges() {
-  document.querySelector('#ro-charges-table tbody').innerHTML = reopenCharges.map((c, i) =>
+  document.querySelector('#ro-charges-table tbody').innerHTML = reopenCharges.map((c,i) =>
     `<tr><td>${c.type}</td><td>${c.description}</td><td>$${Number(c.amount).toFixed(2)}</td>
-     <td><button onclick="removeReopenCharge(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="4" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><button onclick="removeReopenCharge(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold;font-size:1rem;padding:0.1rem 0.3rem">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="4" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
 
 async function saveReopen(jobId, compId) {
   const msg = document.getElementById('ro-msg');
   msg.innerHTML = '';
-
   await db.from('jobs').update({
-    status:               document.getElementById('ro-status').value,
-    scope:                document.getElementById('ro-scope').value     || null,
-    site_notes:           document.getElementById('ro-sitenotes').value || null,
-    work_order_number:    document.getElementById('ro-wo').value        || null,
-    purchase_order_number: document.getElementById('ro-po').value      || null,
+    status:                document.getElementById('ro-status').value,
+    scope:                 document.getElementById('ro-scope').value      || null,
+    site_notes:            document.getElementById('ro-sitenotes').value  || null,
+    work_order_number:     document.getElementById('ro-wo').value         || null,
+    purchase_order_number: document.getElementById('ro-po').value         || null,
     updated_at: new Date().toISOString()
   }).eq('id', jobId);
-
   const compPayload = {
     job_id:         jobId,
     time_in:        document.getElementById('ro-timein').value    || null,
@@ -533,42 +513,27 @@ async function saveReopen(jobId, compId) {
     compPayload.submitted_by = currentUser.id;
     await db.from('job_completions').insert(compPayload);
   }
-
   await db.from('job_line_items').delete().eq('job_id', jobId);
   const lineItems = [
-    ...reopenParts.map(p => ({
-      job_id: jobId, item_type: 'Part', item_id: p.id,
-      quantity: p.qty, unit_cost: allParts.find(x => x.id === p.id)?.unit_cost || 0
-    })),
-    ...reopenLabor.map(l => ({
-      job_id: jobId, item_type: 'Labor', item_id: l.id,
-      quantity: l.hours, unit_cost: allLaborTypes.find(x => x.id === l.id)?.hourly_rate || 0
-    })),
-    ...reopenCharges.map(c => ({
-      job_id: jobId, item_type: c.type,
-      item_id: '00000000-0000-0000-0000-000000000000',
-      quantity: 1, unit_cost: c.amount, override_reason: c.description
-    }))
+    ...reopenParts.map(p => ({ job_id: jobId, item_type: 'Part',  item_id: p.id, quantity: p.qty,   unit_cost: allParts.find(x => x.id === p.id)?.unit_cost || 0 })),
+    ...reopenLabor.map(l => ({ job_id: jobId, item_type: 'Labor', item_id: l.id, quantity: l.hours, unit_cost: allLaborTypes.find(x => x.id === l.id)?.hourly_rate || 0 })),
+    ...reopenCharges.map(c => ({ job_id: jobId, item_type: c.type, item_id: '00000000-0000-0000-0000-000000000000', quantity: 1, unit_cost: c.amount, override_reason: c.description }))
   ];
   if (lineItems.length) await db.from('job_line_items').insert(lineItems);
-
   for (const v of reopenVisits) {
     await db.from('job_visits').update({
       clocked_in_at:  document.getElementById(`vi-cin-${v.id}`)?.value  || null,
       clocked_out_at: document.getElementById(`vi-cout-${v.id}`)?.value || null
     }).eq('id', v.id);
   }
-
   msg.innerHTML = '<div class="msg success">Job updated.</div>';
   setTimeout(() => { closeReopenModal(); loadSchedule(); }, 1000);
 }
 
-// Close dropdowns when clicking outside
 document.addEventListener('click', e => {
   if (!e.target.closest('.parts-search-wrap'))
     document.querySelectorAll('.parts-results').forEach(el => el.style.display = 'none');
 });
-
 
 init();
 </script>

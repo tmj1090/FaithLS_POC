@@ -3,79 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Faith Lock Admin</title>
+<title>Faith Lock | Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="shared.js"></script>
 <style>
+/* ---- RESET & BASE ---- */
 * { box-sizing: border-box; }
-body { font-family: sans-serif; margin: 0; background: #f0f0f0; font-size: 0.9rem; }
-header { background: #1a1a1a; color: white; padding: 0.7rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
-header h1 { margin: 0; font-size: 1rem; }
-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-nav button { background: none; border: 1px solid #aaa; color: #aaa; padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.85rem; }
-nav button.active { border-color: white; color: white; }
-button.logout { background: none; border: 1px solid #f66; color: #f66; padding: 0.3rem 0.7rem; cursor: pointer; }
-.container { max-width: 960px; margin: 1rem auto; padding: 0 1rem; }
-.card { background: white; border: 1px solid #ccc; margin-bottom: 0.8rem; padding: 1rem; }
-.card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
-.meta { color: #555; font-size: 0.82rem; margin-bottom: 0.4rem; }
-.filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: flex-end; }
-.filters label { font-size: 0.82rem; font-weight: bold; display: block; margin-bottom: 0.2rem; }
-.filters input, .filters select { padding: 0.35rem; border: 1px solid #ccc; font-size: 0.85rem; }
-.btn { padding: 0.35rem 0.8rem; border: none; cursor: pointer; font-size: 0.85rem; margin-right: 0.3rem; margin-top: 0.2rem; }
-.btn-primary { background: #1a1a1a; color: white; }
-.btn-green { background: #2a7a2a; color: white; }
-.btn-yellow { background: #b8860b; color: white; }
-.btn-red { background: #a00; color: white; }
-.btn-secondary { background: #ddd; color: #333; }
-.btn-blue { background: #1a4a8a; color: white; }
-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-th { background: #eee; text-align: left; padding: 0.4rem 0.5rem; white-space: nowrap; }
-td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #eee; vertical-align: top; }
-tr:hover td { background: #fafafa; }
-.status-badge { display: inline-block; padding: 0.15rem 0.5rem; font-size: 0.78rem; font-weight: bold; }
-.status-Scheduled { background: #e0e8ff; color: #224; }
-.status-Quoted { background: #fff0cc; color: #640; }
-.status-Awaiting-Parts { background: #ffe8cc; color: #640; }
-.status-Pending-Review { background: #ffd; color: #660; }
-.status-Flagged { background: #ffe0e0; color: #900; }
-.status-Approved { background: #e0ffe0; color: #060; }
-.status-In-Progress { background: #e0ffe0; color: #060; }
-.fixed-banner { background: #ffe0e0; border: 1px solid #f99; color: #900; padding: 0.3rem 0.6rem; margin: 0.4rem 0; font-weight: bold; font-size: 0.82rem; }
-.contact-banner { background: #e8f4ff; border: 1px solid #9bc; color: #135; padding: 0.4rem 0.6rem; margin: 0.4rem 0; font-size: 0.82rem; }
-.form-row { margin-bottom: 0.5rem; }
-.form-row label { display: block; font-weight: bold; font-size: 0.82rem; margin-bottom: 0.2rem; }
-.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 0.4rem; border: 1px solid #ccc; font-size: 0.9rem; }
-.form-row textarea { height: 60px; resize: vertical; }
-.msg { padding: 0.4rem 0.6rem; margin: 0.4rem 0; font-size: 0.85rem; }
-.msg.success { background: #e0ffe0; border: 1px solid #9d9; }
-.msg.error { background: #ffe0e0; border: 1px solid #f99; }
-.section-title { font-weight: bold; margin: 0.8rem 0 0.4rem; font-size: 0.9rem; border-bottom: 1px solid #eee; padding-bottom: 0.2rem; }
-.expandable { display: none; border-top: 1px solid #eee; margin-top: 0.6rem; padding-top: 0.6rem; }
-input[type=checkbox] { width: auto; }
-.tag { display: inline-block; background: #eee; padding: 0.1rem 0.4rem; font-size: 0.78rem; margin-right: 0.2rem; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f2f4f8; font-size: 0.9rem; color: #1a1a2e; }
+
+/* ---- HEADER & NAV ---- */
+header { background: #1a2744; color: white; padding: 0.6rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+header h1 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+nav { display: flex; gap: 0.3rem; flex-wrap: wrap; align-items: center; }
+nav button { background: transparent; border: 1px solid rgba(255,255,255,0.35); color: rgba(255,255,255,0.75); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; transition: all 0.15s; }
+nav button:hover { border-color: white; color: white; }
+nav button.active { background: #6b6fa8; border-color: #6b6fa8; color: white; }
+nav .nav-divider { width: 1px; height: 1.2rem; background: rgba(255,255,255,0.2); margin: 0 0.4rem; }
+button.logout { background: transparent; border: 1px solid rgba(255,100,100,0.6); color: rgba(255,150,150,0.9); padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.82rem; border-radius: 3px; }
+button.logout:hover { border-color: #f88; color: #f88; }
+
+/* ---- LAYOUT ---- */
+.container { max-width: 980px; margin: 1.2rem auto; padding: 0 1rem; }
+
+/* ---- CARDS ---- */
+.card { background: white; border: 1px solid #dde1ea; border-radius: 6px; margin-bottom: 1rem; padding: 1.2rem; box-shadow: 0 1px 4px rgba(26,39,68,0.06); }
+.card h3 { margin: 0 0 0.6rem; font-size: 1rem; color: #1a2744; font-weight: 600; }
+
+/* ---- SECTION TITLE ---- */
+.section-title { font-weight: 600; font-size: 0.82rem; color: #6b6fa8; text-transform: uppercase; letter-spacing: 0.05em; margin: 1rem 0 0.5rem; border-bottom: 1px solid #e8eaf2; padding-bottom: 0.3rem; }
+
+/* ---- FORM ELEMENTS ---- */
+.form-row { margin-bottom: 0.6rem; }
+.form-row label { display: block; font-weight: 600; font-size: 0.8rem; color: #4a5070; margin-bottom: 0.25rem; }
+.form-row input, .form-row select, .form-row textarea,
+.filters input, .filters select { padding: 0.45rem 0.6rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.88rem; font-family: inherit; width: 100%; background: #fff; transition: border-color 0.15s; }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus,
+.filters input:focus, .filters select:focus { outline: none; border-color: #6b6fa8; box-shadow: 0 0 0 2px rgba(107,111,168,0.12); }
+.form-row textarea { height: 64px; resize: vertical; }
+input[type=checkbox] { width: auto; accent-color: #1a2744; }
 select[multiple] { height: 90px; }
+
+/* ---- FILTERS BAR ---- */
+.filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: flex-end; }
+.filters label { font-size: 0.8rem; font-weight: 600; color: #4a5070; display: block; margin-bottom: 0.25rem; }
+.filters input, .filters select { padding: 0.4rem 0.55rem; border: 1px solid #c8cdd8; border-radius: 4px; font-size: 0.85rem; }
+
+/* ---- BUTTONS ---- */
+.btn { padding: 0.38rem 0.9rem; border: none; cursor: pointer; font-size: 0.84rem; border-radius: 4px; font-family: inherit; font-weight: 500; transition: opacity 0.15s, transform 0.1s; margin-right: 0.3rem; margin-top: 0.2rem; }
+.btn:active { transform: scale(0.97); }
+.btn-primary   { background: #1a2744; color: white; }
+.btn-primary:hover { background: #243560; }
+.btn-accent    { background: #6b6fa8; color: white; }
+.btn-accent:hover { background: #5c6096; }
+.btn-green     { background: #2a7a4a; color: white; }
+.btn-green:hover { background: #236040; }
+.btn-yellow    { background: #b86c00; color: white; }
+.btn-yellow:hover { background: #9e5c00; }
+.btn-red       { background: #a02020; color: white; }
+.btn-red:hover { background: #8a1a1a; }
+.btn-secondary { background: #eaecf4; color: #333; }
+.btn-secondary:hover { background: #d8dcea; }
+.btn-blue      { background: #1a4a8a; color: white; }
+.btn-blue:hover { background: #153d75; }
+
+/* ---- TOGGLE PAIR (existing / new customer) ---- */
+.toggle-pair { display: inline-flex; border: 1px solid #c8cdd8; border-radius: 4px; overflow: hidden; margin-bottom: 0.8rem; }
+.toggle-pair button { border: none; padding: 0.4rem 1rem; cursor: pointer; font-size: 0.85rem; font-family: inherit; background: #f2f4f8; color: #555; }
+.toggle-pair button.active { background: #1a2744; color: white; }
+
+/* ---- TABLES ---- */
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { background: #f2f4f8; text-align: left; padding: 0.5rem 0.6rem; white-space: nowrap; font-weight: 600; color: #4a5070; font-size: 0.8rem; border-bottom: 2px solid #dde1ea; }
+td { padding: 0.45rem 0.6rem; border-bottom: 1px solid #eef0f6; vertical-align: top; }
+tr:hover td { background: #f8f9fc; }
+
+/* ---- STATUS BADGES ---- */
+.status-badge { display: inline-block; padding: 0.18rem 0.55rem; font-size: 0.76rem; font-weight: 600; border-radius: 20px; letter-spacing: 0.02em; }
+.status-Scheduled      { background: #e4eaf8; color: #1a2744; }
+.status-Quoted         { background: #fff3d6; color: #7a4800; }
+.status-Awaiting-Parts { background: #ffe8cc; color: #7a3800; }
+.status-Pending-Review { background: #fff8c0; color: #6b5a00; }
+.status-Flagged        { background: #ffe0e0; color: #900; }
+.status-Approved       { background: #d6f2e0; color: #1a5c30; }
+.status-In-Progress    { background: #d6f2e0; color: #1a5c30; }
+.status-Cancelled      { background: #eee; color: #666; }
+
+/* ---- BANNERS ---- */
+.fixed-banner    { background: #ffe8e8; border: 1px solid #f4aaaa; color: #800; padding: 0.4rem 0.7rem; margin: 0.4rem 0; font-weight: 600; font-size: 0.83rem; border-radius: 4px; }
+.contact-banner  { background: #e8f0ff; border: 1px solid #b0c4f8; color: #1a3070; padding: 0.5rem 0.7rem; margin: 0.4rem 0; font-size: 0.85rem; border-radius: 4px; line-height: 1.5; }
+.expected-banner { background: #eaf2ff; border: 1px solid #aacaf8; color: #1a3070; padding: 0.4rem 0.7rem; margin: 0.4rem 0; font-size: 0.83rem; border-radius: 4px; }
+.warn-banner     { background: #fff8d0; border: 1px solid #e0cc50; color: #604800; padding: 0.4rem 0.7rem; margin: 0.4rem 0; font-size: 0.83rem; border-radius: 4px; }
+
+/* ---- MESSAGES ---- */
+.msg { padding: 0.5rem 0.7rem; margin: 0.4rem 0; font-size: 0.85rem; border-radius: 4px; }
+.msg.success { background: #d6f2e0; border: 1px solid #8cd8aa; color: #1a5c30; }
+.msg.error   { background: #ffe0e0; border: 1px solid #f4aaaa; color: #800; }
+
+/* ---- PARTS SEARCH AUTOCOMPLETE ---- */
 .parts-search-wrap { position: relative; }
-.parts-results { border: 1px solid #ccc; background: white; max-height: 150px; overflow-y: auto; display: none; position: absolute; z-index: 10; width: 100%; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-.parts-results div { padding: 0.35rem 0.5rem; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.85rem; }
-.parts-results div:hover { background: #f0f0f0; }
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.parts-results { border: 1px solid #c8cdd8; background: white; max-height: 160px; overflow-y: auto; display: none; position: absolute; z-index: 20; width: 100%; box-shadow: 0 4px 12px rgba(26,39,68,0.14); border-radius: 0 0 4px 4px; }
+.parts-results div { padding: 0.4rem 0.6rem; cursor: pointer; border-bottom: 1px solid #eef0f6; font-size: 0.85rem; }
+.parts-results div:hover { background: #e8eaf8; }
+
+/* ---- LAYOUT HELPERS ---- */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
 @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+.expandable { display: none; border-top: 1px solid #eef0f6; margin-top: 0.8rem; padding-top: 0.8rem; }
+.tag { display: inline-block; background: #eaecf4; padding: 0.1rem 0.45rem; font-size: 0.78rem; border-radius: 3px; margin-right: 0.2rem; }
+.meta { color: #5a6075; font-size: 0.83rem; margin-bottom: 0.35rem; }
+
+/* ---- MODAL ---- */
+#reopen-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); z-index: 100; overflow-y: auto; }
+#reopen-modal > div { background: white; max-width: 720px; margin: 1.5rem auto; padding: 1.5rem; position: relative; border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+#reopen-modal .close-btn { position: absolute; top: 0.75rem; right: 0.75rem; background: #eaecf4; border: none; font-size: 1rem; cursor: pointer; border-radius: 3px; padding: 0.2rem 0.5rem; color: #333; }
+
+/* ---- STAT BOX (review totals) ---- */
+.stat-box { display: inline-block; background: #f2f4f8; border: 1px solid #dde1ea; border-radius: 5px; padding: 0.5rem 0.9rem; margin-right: 0.5rem; margin-bottom: 0.5rem; text-align: center; min-width: 100px; }
+.stat-box .val { font-size: 1.25rem; font-weight: 700; color: #1a2744; }
+.stat-box .lbl { font-size: 0.75rem; color: #5a6075; margin-top: 0.1rem; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Faith Lock &amp; Safe | Admin</h1>
+  <h1>Faith Lock &amp; Safe &nbsp;|&nbsp; Admin</h1>
   <nav>
     <button class="active" onclick="showSection('assign')">Assign</button>
     <button onclick="showSection('review')">Review</button>
-    <span style="border-left:1px solid #555;margin:0 0.6rem;height:1.2rem;display:inline-block"></span>
-    <a href="schedule.html" style="text-decoration:none"><button>Jobs List</button></a>
+    <span class="nav-divider"></span>
+    <a href="schedule.html" style="text-decoration:none"><button>Schedule</button></a>
     <button onclick="showSection('calendar')">Calendar</button>
-    <span style="border-left:1px solid #555;margin:0 0.6rem;height:1.2rem;display:inline-block"></span>
+    <span class="nav-divider"></span>
     <a href="accounts.html" style="text-decoration:none"><button>Accounts</button></a>
     <button onclick="showSection('reference')">Reference</button>
-    <span style="border-left:1px solid #555;margin:0 0.6rem;height:1.2rem;display:inline-block"></span>
+    <span class="nav-divider"></span>
     <button onclick="showSection('search')">Search</button>
     <button onclick="showSection('export')">Export</button>
   </nav>
@@ -90,12 +150,15 @@ select[multiple] { height: 90px; }
 <div id="section-assign">
   <div class="card">
     <h3>Assign Job</h3>
-    <div style="display:flex;margin-bottom:0.8rem">
-      <button id="a-mode-existing" class="btn btn-primary" onclick="setAssignMode('existing')" style="margin:0;border-radius:2px 0 0 2px">Existing Account</button>
-      <button id="a-mode-new" class="btn btn-secondary" onclick="setAssignMode('new')" style="margin:0;border-radius:0 2px 2px 0">New Customer</button>
+
+    <!-- Existing / New Customer toggle -->
+    <div class="toggle-pair">
+      <button id="a-mode-existing" class="active" onclick="setAssignMode('existing')">Existing Account</button>
+      <button id="a-mode-new" onclick="setAssignMode('new')">New Customer</button>
     </div>
+
     <div class="two-col">
-      <div class="form-row"><label>Date <span style="color:#c00">*</span></label><input type="date" id="a-date" oninput="this.style.border=''"></div>
+      <div class="form-row"><label>Date <span style="color:#a02020">*</span></label><input type="date" id="a-date" oninput="this.style.border=''"></div>
       <div class="form-row"><label>Status</label>
         <select id="a-status">
           <option>Scheduled</option><option>Quoted</option><option>Awaiting Parts</option>
@@ -103,11 +166,12 @@ select[multiple] { height: 90px; }
       </div>
     </div>
 
+    <!-- Existing account fields -->
     <div id="a-existing-account-fields">
       <div class="two-col">
-        <div class="form-row"><label>Account <span style="color:#c00">*</span></label>
+        <div class="form-row"><label>Account <span style="color:#a02020">*</span></label>
           <div class="parts-search-wrap">
-            <input type="text" id="a-account" placeholder="Type to search accounts..." oninput="searchAccountTypeahead()" autocomplete="off" style="width:100%;padding:0.4rem;border:1px solid #ccc">
+            <input type="text" id="a-account" placeholder="Type to search accounts..." oninput="searchAccountTypeahead()" autocomplete="off">
             <div class="parts-results" id="a-account-results"></div>
           </div>
           <input type="hidden" id="a-account-id">
@@ -116,9 +180,8 @@ select[multiple] { height: 90px; }
           <select id="a-subaccount"><option value="">-- None --</option></select>
         </div>
       </div>
-      <!-- Contact info pulled from CRM when account selected -->
       <div id="a-contact-panel" style="display:none">
-        <div class="section-title">Account Contact <span style="font-weight:normal;font-size:0.82rem;color:#666">(from CRM - edit for this job only)</span></div>
+        <div class="section-title">Account Contact <span style="font-weight:400;text-transform:none;font-size:0.78rem;color:#888">(from CRM -- edit for this job only)</span></div>
         <div id="a-contact-banner" class="contact-banner"></div>
         <div id="a-contact-edit" style="display:none">
           <div class="two-col">
@@ -130,15 +193,16 @@ select[multiple] { height: 90px; }
             <div class="form-row"><label>Company</label><input type="text" id="ac-company"></div>
           </div>
           <div class="form-row"><label>Contact Notes</label><textarea id="ac-notes" style="height:40px"></textarea></div>
-          <div class="msg" style="background:#fff8d0;border:1px solid #e0c040;color:#543" id="a-contact-warn"></div>
+          <div class="warn-banner" id="a-contact-warn" style="display:none"></div>
         </div>
-        <button class="btn btn-secondary" style="margin-bottom:0.5rem" onclick="toggleContactEdit()">Edit Contact for This Job</button>
+        <button class="btn btn-secondary" style="margin-bottom:0.6rem;font-size:0.82rem" onclick="toggleContactEdit()">Edit Contact for This Job</button>
       </div>
     </div>
 
+    <!-- New customer fields -->
     <div id="a-new-customer-fields" style="display:none">
       <div class="two-col">
-        <div class="form-row"><label>Customer Name <span style="color:#c00">*</span></label><input type="text" id="a-nc-name" oninput="this.style.border=''"></div>
+        <div class="form-row"><label>Customer Name <span style="color:#a02020">*</span></label><input type="text" id="a-nc-name" oninput="this.style.border=''"></div>
         <div class="form-row"><label>Phone</label><input type="text" id="a-nc-phone"></div>
       </div>
       <div class="form-row"><label>Address</label><input type="text" id="a-nc-address"></div>
@@ -151,11 +215,11 @@ select[multiple] { height: 90px; }
         <select id="a-jobtype"><option value="">-- Select --</option></select>
       </div>
       <div class="form-row"><label>Lead Tech</label>
-        <select id="a-leadtech"><option value="">-- Select --</option></select>
+        <select id="a-leadtech"><option value="">-- Select Lead --</option></select>
       </div>
     </div>
 
-    <div class="form-row"><label>Assign Techs (hold Ctrl/Cmd for multiple)</label>
+    <div class="form-row"><label>Assign Techs <span style="font-weight:400;color:#888">(hold Ctrl/Cmd for multiple)</span></label>
       <select id="a-techs" multiple></select>
     </div>
 
@@ -165,78 +229,57 @@ select[multiple] { height: 90px; }
     </div>
 
     <div class="form-row"><label>Scope of Work</label><textarea id="a-scope"></textarea></div>
-    <div class="form-row"><label>Site Notes (gate codes, contacts, parking)</label><textarea id="a-sitenotes"></textarea></div>
-    <div style="display:flex;gap:1rem;align-items:center;margin-bottom:0.6rem;flex-wrap:wrap">
-      <label><input type="checkbox" id="a-fixedprice" onchange="toggleFixed()"> Fixed Price Job</label>
-      <div id="a-quotewrap" style="display:none">
-        <label>Quote Amount $</label>
-        <input type="number" id="a-quoteamount" style="width:100px;padding:0.35rem;border:1px solid #ccc">
+    <div class="form-row"><label>Site Notes <span style="font-weight:400;color:#888">(gate codes, contacts, parking)</span></label><textarea id="a-sitenotes"></textarea></div>
+
+    <div style="display:flex;gap:1rem;align-items:center;margin-bottom:0.7rem;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:0.4rem"><input type="checkbox" id="a-fixedprice" onchange="toggleFixed()"> Fixed Price Job</label>
+      <div id="a-quotewrap" style="display:none;display:flex;align-items:center;gap:0.4rem">
+        <label style="font-size:0.83rem;font-weight:600;margin:0">Quote Amount $</label>
+        <input type="number" id="a-quoteamount" style="width:110px;padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px">
       </div>
     </div>
 
-    <div class="section-title" style="margin-top:0.8rem">Expected Parts <span style="font-weight:normal;font-size:0.82rem;color:#666">(optional)</span></div>
-    <div class="parts-search-wrap" style="margin-bottom:0.4rem">
-      <input type="text" id="a-partsearch" placeholder="Search parts to pre-load..." oninput="searchAssignParts()" autocomplete="off" style="width:100%;padding:0.4rem;border:1px solid #ccc">
+    <div class="section-title">Expected Parts <span style="font-weight:400;text-transform:none;color:#888">(optional)</span></div>
+    <div class="parts-search-wrap" style="margin-bottom:0.5rem">
+      <input type="text" id="a-partsearch" placeholder="Search parts to pre-load..." oninput="searchAssignParts()" autocomplete="off">
       <div class="parts-results" id="a-parts-results"></div>
     </div>
-    <table id="a-parts-table"><thead><tr><th>Part</th><th>Qty</th><th></th></tr></thead><tbody><tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr></tbody></table>
+    <table id="a-parts-table"><thead><tr><th>Part</th><th>Qty</th><th></th></tr></thead><tbody><tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr></tbody></table>
 
-    <div class="section-title" style="margin-top:0.8rem">Expected Labor <span style="font-weight:normal;font-size:0.82rem;color:#666">(optional)</span></div>
-    <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem;flex-wrap:wrap">
-      <select id="a-labortype" style="flex:2;padding:0.35rem;border:1px solid #ccc"><option value="">Select type...</option></select>
-      <input type="number" id="a-laborhours" placeholder="Hrs" style="width:70px;padding:0.35rem;border:1px solid #ccc">
+    <div class="section-title" style="margin-top:1rem">Expected Labor <span style="font-weight:400;text-transform:none;color:#888">(optional)</span></div>
+    <div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap">
+      <select id="a-labortype" style="flex:2;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px"><option value="">Select type...</option></select>
+      <input type="number" id="a-laborhours" placeholder="Hrs" style="width:75px;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
       <button class="btn btn-secondary" onclick="addAssignLabor()">Add</button>
     </div>
-    <table id="a-labor-table"><thead><tr><th>Type</th><th>Hours</th><th></th></tr></thead><tbody><tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr></tbody></table>
+    <table id="a-labor-table"><thead><tr><th>Type</th><th>Hours</th><th></th></tr></thead><tbody><tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr></tbody></table>
 
-    <div class="section-title" style="margin-top:0.8rem">Additional Charges <span style="font-weight:normal;font-size:0.82rem;color:#666">(Service Call, Other)</span></div>
-    <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem;flex-wrap:wrap;align-items:flex-end">
+    <div class="section-title" style="margin-top:1rem">Additional Charges <span style="font-weight:400;text-transform:none;color:#888">(Service Call, Other)</span></div>
+    <div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap;align-items:flex-end">
       <div>
-        <label style="font-size:0.82rem;font-weight:bold;display:block;margin-bottom:0.2rem">Type</label>
-        <select id="a-chargetype" style="padding:0.35rem;border:1px solid #ccc">
+        <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem;color:#4a5070">Type</label>
+        <select id="a-chargetype" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
           <option value="Service Call">Service Call</option>
           <option value="Other">Other</option>
         </select>
       </div>
       <div style="flex:2">
-        <label style="font-size:0.82rem;font-weight:bold;display:block;margin-bottom:0.2rem">Description</label>
-        <input type="text" id="a-chargedesc" placeholder="Description..." style="width:100%;padding:0.35rem;border:1px solid #ccc">
+        <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem;color:#4a5070">Description</label>
+        <input type="text" id="a-chargedesc" placeholder="Description..." style="width:100%;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
       </div>
       <div>
-        <label style="font-size:0.82rem;font-weight:bold;display:block;margin-bottom:0.2rem">Amount $</label>
-        <input type="number" id="a-chargeamt" placeholder="0.00" step="0.01" style="width:90px;padding:0.35rem;border:1px solid #ccc">
+        <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem;color:#4a5070">Amount $</label>
+        <input type="number" id="a-chargeamt" placeholder="0.00" step="0.01" style="width:95px;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
       </div>
       <button class="btn btn-secondary" onclick="addAssignCharge()">Add</button>
     </div>
-    <table id="a-charges-table"><thead><tr><th>Type</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody><tr><td colspan="4" style="color:#aaa;font-style:italic">None</td></tr></tbody></table>
+    <table id="a-charges-table"><thead><tr><th>Type</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody><tr><td colspan="4" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr></tbody></table>
 
-    <div id="a-msg" style="margin-top:0.6rem"></div>
-    <button class="btn btn-primary" onclick="assignJob()">Assign Job</button>
-    <button class="btn btn-secondary" onclick="duplicateLast()">Duplicate Last Job</button>
-  </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- JOBS LIST SECTION -->
-<!-- ============================================================ -->
-<div id="section-jobslist" style="display:none">
-  <div class="card">
-    <h3>Jobs List</h3>
-    <div class="filters">
-      <div><label>From</label><input type="date" id="sv-from"></div>
-      <div><label>To</label><input type="date" id="sv-to"></div>
-      <div style="align-self:flex-end">
-        <button class="btn btn-secondary" onclick="setScheduleRange('today')">Today</button>
-        <button class="btn btn-secondary" onclick="setScheduleRange('week')">This Week</button>
-        <button class="btn btn-primary" onclick="loadSchedule()">Load</button>
-      </div>
+    <div id="a-msg" style="margin-top:0.7rem"></div>
+    <div style="margin-top:0.6rem">
+      <button class="btn btn-primary" onclick="assignJob()">Assign Job</button>
+      <button class="btn btn-secondary" onclick="duplicateLast()">Duplicate Last Job</button>
     </div>
-    <div id="schedule-list">Select a date range and click Load.</div>
-  </div>
-
-  <div class="card" id="stocking-panel" style="display:none">
-    <h3>Parts and Labor Totals <span style="font-weight:normal;font-size:0.82rem;color:#666">for loaded date range</span></h3>
-    <div id="stocking-content"></div>
   </div>
 </div>
 
@@ -244,22 +287,20 @@ select[multiple] { height: 90px; }
 <!-- REVIEW SECTION -->
 <!-- ============================================================ -->
 <div id="section-review" style="display:none">
-  <div class="filters">
+  <div style="display:flex;gap:0.5rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1rem">
     <div>
-      <label>Status Filter</label>
-      <select id="rv-status" onchange="loadReview()">
+      <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem;color:#4a5070">Status Filter</label>
+      <select id="rv-status" onchange="loadReview()" style="padding:0.4rem 0.55rem;border:1px solid #c8cdd8;border-radius:4px;font-size:0.85rem">
         <option value="">All</option>
         <option value="Pending Review" selected>Pending Review</option>
         <option value="Flagged">Flagged</option>
         <option value="Approved">Approved</option>
       </select>
     </div>
-    <div style="align-self:flex-end">
-      <button class="btn btn-primary" onclick="loadReview()">Refresh</button>
-      <button class="btn btn-green" id="bulk-approve-btn" style="display:none" onclick="bulkApprove()">Bulk Approve All Pending</button>
-    </div>
+    <button class="btn btn-primary" onclick="loadReview()">Refresh</button>
+    <button class="btn btn-green" id="bulk-approve-btn" style="display:none" onclick="bulkApprove()">Bulk Approve All Pending</button>
   </div>
-  <div id="review-list">Click Refresh to load.</div>
+  <div id="review-list"><p class="meta">Click Refresh to load.</p></div>
 </div>
 
 <!-- ============================================================ -->
@@ -304,7 +345,7 @@ select[multiple] { height: 90px; }
       <div><label>From Date</label><input type="date" id="ex-from"></div>
       <div><label>To Date</label><input type="date" id="ex-to"></div>
       <div class="form-row"><label>Status</label>
-        <select id="ex-status">
+        <select id="ex-status" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
           <option value="Approved">Approved Only (default)</option>
           <option value="">All Statuses</option>
         </select>
@@ -320,19 +361,19 @@ select[multiple] { height: 90px; }
 <!-- ============================================================ -->
 <div id="section-reference" style="display:none">
   <div class="card">
-    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap">
+    <div style="display:flex;gap:0.4rem;margin-bottom:1rem;flex-wrap:wrap;border-bottom:1px solid #eef0f6;padding-bottom:0.8rem">
       <button class="btn btn-primary" onclick="showRefTab('parts')">Parts</button>
-      <button class="btn btn-primary" onclick="showRefTab('jobtypes')">Job Types</button>
-      <button class="btn btn-primary" onclick="showRefTab('labortypes')">Labor Types</button>
-      <button class="btn btn-primary" onclick="showRefTab('techs')">Techs</button>
+      <button class="btn btn-secondary" onclick="showRefTab('jobtypes')">Job Types</button>
+      <button class="btn btn-secondary" onclick="showRefTab('labortypes')">Labor Types</button>
+      <button class="btn btn-secondary" onclick="showRefTab('techs')">Techs</button>
     </div>
     <div id="ref-parts">
       <h3>Parts Catalog</h3>
-      <div style="display:flex;gap:0.4rem;margin-bottom:0.6rem;flex-wrap:wrap">
-        <input type="text" id="rp-name" placeholder="Part name" style="padding:0.35rem;border:1px solid #ccc;flex:2">
-        <input type="text" id="rp-category" placeholder="Category" style="padding:0.35rem;border:1px solid #ccc;flex:1">
-        <input type="text" id="rp-unit" placeholder="Unit" style="padding:0.35rem;border:1px solid #ccc;width:80px">
-        <input type="number" id="rp-cost" placeholder="Unit cost" style="padding:0.35rem;border:1px solid #ccc;width:100px">
+      <div style="display:flex;gap:0.4rem;margin-bottom:0.7rem;flex-wrap:wrap">
+        <input type="text" id="rp-name" placeholder="Part name" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;flex:2">
+        <input type="text" id="rp-category" placeholder="Category" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;flex:1">
+        <input type="text" id="rp-unit" placeholder="Unit" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;width:80px">
+        <input type="number" id="rp-cost" placeholder="Unit cost" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;width:100px">
         <button class="btn btn-green" onclick="addPart()">Add</button>
       </div>
       <div id="parts-ref-msg"></div>
@@ -341,10 +382,10 @@ select[multiple] { height: 90px; }
     </div>
     <div id="ref-jobtypes" style="display:none">
       <h3>Job Types</h3>
-      <div style="display:flex;gap:0.4rem;margin-bottom:0.6rem;flex-wrap:wrap">
-        <input type="text" id="rjt-name" placeholder="Job type name" style="padding:0.35rem;border:1px solid #ccc;flex:2">
-        <input type="text" id="rjt-category" placeholder="Category" style="padding:0.35rem;border:1px solid #ccc;flex:1">
-        <input type="number" id="rjt-rate" placeholder="Flat rate" style="padding:0.35rem;border:1px solid #ccc;width:100px">
+      <div style="display:flex;gap:0.4rem;margin-bottom:0.7rem;flex-wrap:wrap">
+        <input type="text" id="rjt-name" placeholder="Job type name" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;flex:2">
+        <input type="text" id="rjt-category" placeholder="Category" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;flex:1">
+        <input type="number" id="rjt-rate" placeholder="Flat rate" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;width:100px">
         <button class="btn btn-green" onclick="addJobType()">Add</button>
       </div>
       <table><thead><tr><th>Name</th><th>Category</th><th>Flat Rate</th><th>Active</th><th></th></tr></thead>
@@ -352,9 +393,9 @@ select[multiple] { height: 90px; }
     </div>
     <div id="ref-labortypes" style="display:none">
       <h3>Labor Types</h3>
-      <div style="display:flex;gap:0.4rem;margin-bottom:0.6rem">
-        <input type="text" id="rlt-name" placeholder="Labor type name" style="padding:0.35rem;border:1px solid #ccc;flex:2">
-        <input type="number" id="rlt-rate" placeholder="Hourly rate" style="padding:0.35rem;border:1px solid #ccc;width:120px">
+      <div style="display:flex;gap:0.4rem;margin-bottom:0.7rem">
+        <input type="text" id="rlt-name" placeholder="Labor type name" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;flex:2">
+        <input type="number" id="rlt-rate" placeholder="Hourly rate" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;width:120px">
         <button class="btn btn-green" onclick="addLaborType()">Add</button>
       </div>
       <table><thead><tr><th>Name</th><th>Hourly Rate</th><th></th></tr></thead>
@@ -362,8 +403,8 @@ select[multiple] { height: 90px; }
     </div>
     <div id="ref-techs" style="display:none">
       <h3>Techs</h3>
-      <div style="display:flex;gap:0.4rem;margin-bottom:0.6rem">
-        <input type="text" id="rt-name" placeholder="Tech name" style="padding:0.35rem;border:1px solid #ccc;flex:1">
+      <div style="display:flex;gap:0.4rem;margin-bottom:0.7rem">
+        <input type="text" id="rt-name" placeholder="Tech name" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;flex:1">
         <button class="btn btn-green" onclick="addTech()">Add</button>
       </div>
       <table><thead><tr><th>Name</th><th>Active</th><th></th></tr></thead>
@@ -377,27 +418,27 @@ select[multiple] { height: 90px; }
 <!-- ============================================================ -->
 <div id="section-calendar" style="display:none">
   <div class="card">
-    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:0.8rem">
+    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
       <button class="btn btn-secondary" onclick="calPrevWeek()">Prev Week</button>
-      <strong id="cal-week-label" style="min-width:180px;text-align:center"></strong>
+      <strong id="cal-week-label" style="min-width:200px;text-align:center;color:#1a2744"></strong>
       <button class="btn btn-secondary" onclick="calNextWeek()">Next Week</button>
-      <div style="margin-left:1rem">
-        <label style="font-size:0.82rem;font-weight:bold">Tech</label>
-        <select id="cal-tech" onchange="renderCalendar()" style="padding:0.35rem;border:1px solid #ccc;margin-left:0.4rem"></select>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:0.4rem">
+        <label style="font-size:0.82rem;font-weight:600;color:#4a5070">Tech</label>
+        <select id="cal-tech" onchange="renderCalendar()" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px"></select>
       </div>
     </div>
     <div id="calendar-grid" style="overflow-x:auto"></div>
   </div>
 </div>
 
-</div><!-- end container -->
+</div><!-- end .container -->
 
 <!-- ============================================================ -->
 <!-- REOPEN/EDIT MODAL -->
 <!-- ============================================================ -->
-<div id="reopen-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;overflow-y:auto">
-  <div style="background:white;max-width:700px;margin:1.5rem auto;padding:1.5rem;position:relative">
-    <button onclick="closeReopenModal()" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;font-size:1.2rem;cursor:pointer">X</button>
+<div id="reopen-modal">
+  <div>
+    <button class="close-btn" onclick="closeReopenModal()">X</button>
     <div id="reopen-content"></div>
   </div>
 </div>
@@ -405,44 +446,35 @@ select[multiple] { height: 90px; }
 <script>
 // ============================================================
 // admin.html — Faith Lock & Safe Admin Dashboard
-//
-// Shared utilities (db, formatDate, today, etc.) are in shared.js.
-// This script handles admin-specific logic: job assignment, review,
-// schedule, calendar, reference data, search, and export.
+// Shared utilities are in shared.js.
 // ============================================================
 
-// ---- PAGE STATE ----
-// These variables hold data loaded from Supabase and track UI state.
-let currentUser         = null;
-let allAccounts         = [];   // all accounts (master + sub)
-let allTechs            = [];
-let allJobTypes         = [];
-let allParts            = [];
-let allLaborTypes       = [];
-let lastJob             = null; // last-assigned job, used for "Duplicate Last Job"
-let reopenParts         = [];   // line items in the reopen/edit modal
-let reopenLabor         = [];
-let reopenCharges       = [];
-let reopenVisits        = [];   // job_visits rows for the job open in the modal
-let assignParts         = [];   // line items in the assign form
-let assignLabor         = [];
-let assignCharges       = [];
-let currentAccountContacts = []; // contacts for the currently selected account
-let contactEditMode     = false;
+let currentUser            = null;
+let allAccounts            = [];
+let allTechs               = [];
+let allJobTypes            = [];
+let allParts               = [];
+let allLaborTypes          = [];
+let lastJob                = null;
+let reopenParts            = [];
+let reopenLabor            = [];
+let reopenCharges          = [];
+let reopenVisits           = [];
+let assignParts            = [];
+let assignLabor            = [];
+let assignCharges          = [];
+let currentAccountContacts = [];
+let contactEditMode        = false;
 
 
 // ---- INIT ----
-// Called on page load. Verifies the user is logged in and is an admin,
-// then loads all reference data needed to populate the form dropdowns.
 async function init() {
   try {
     const { data: { session }, error: sessErr } = await db.auth.getSession();
     if (sessErr) throw sessErr;
-    // Not logged in — send to login page
     if (!session) { window.location.href = 'index.html'; return; }
     currentUser = session.user;
 
-    // Confirm this user has the admin role. Techs are redirected to tech.html.
     const { data: profile, error: profErr } = await db.from('user_profiles')
       .select('role').eq('id', currentUser.id).single();
     if (profErr) throw profErr;
@@ -451,20 +483,16 @@ async function init() {
     await loadRefData();
     setDateDefaults();
   } catch (err) {
-    // Show a readable error in the page rather than silently failing
     document.querySelector('.container').innerHTML =
-      `<div style="color:#a00;background:white;border:1px solid #f99;padding:1rem;margin-top:1rem">
-        <strong>Load error:</strong> ${err.message || JSON.stringify(err)}<br>
-        <span style="font-size:0.82rem">Check the browser console (F12). Try signing out and back in.</span>
-      </div>`;
+      `<div class="msg error" style="margin-top:1rem"><strong>Load error:</strong> ${err.message || JSON.stringify(err)}<br>
+       <span style="font-size:0.82rem">Check the browser console (F12). Try signing out and back in.</span></div>`;
     console.error('admin init error:', err);
   }
 }
 
-// setDateDefaults: pre-fills all date inputs to today so forms are ready to use immediately.
 function setDateDefaults() {
   const t = today();
-  ['a-date', 'sv-from', 'sv-to', 'ex-from', 'ex-to'].forEach(id => {
+  ['a-date','ex-from','ex-to'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = t;
   });
@@ -472,9 +500,6 @@ function setDateDefaults() {
 
 
 // ---- REFERENCE DATA ----
-// loadRefData: loads all lookup tables from Supabase in parallel (Promise.all),
-// then populates every dropdown on the page that depends on them.
-// Called once on init and again after any reference data is added/changed.
 async function loadRefData() {
   const [a, tc, jt, p, lt] = await Promise.all([
     db.from('accounts').select('id,account_name,parent_account_id,address').eq('active', true).order('account_name'),
@@ -484,45 +509,34 @@ async function loadRefData() {
     db.from('labor_types').select('*').order('labor_type_name')
   ]);
 
-  if (a.error)  console.error('accounts load error:', a.error.message);
-  if (p.error)  console.error('parts load error:', p.error.message);
-
   allAccounts   = a.data  || [];
   allTechs      = tc.data || [];
   allJobTypes   = jt.data || [];
   allParts      = p.data  || [];
   allLaborTypes = lt.data || [];
 
-  // Assign form dropdowns — a-account is now a typeahead, not a select
   populateSelect('a-leadtech', allTechs, 'id', 'tech_name', '-- Select Lead --');
   populateMultiSelect('a-techs', allTechs, 'id', 'tech_name');
   populateSelect('a-jobtype', allJobTypes, 'id', 'job_type_name', '-- Select --');
-
-  // Search form dropdowns
   populateSelect('s-account', allAccounts.filter(x => !x.parent_account_id), 'id', 'account_name', '-- All --');
   populateSelect('s-tech', allTechs, 'id', 'tech_name', '-- All --');
+
   const cats = [...new Set(allJobTypes.map(j => j.category).filter(Boolean))];
   populateSelect('s-category', cats.map(c => ({ id: c, name: c })), 'id', 'name', '-- All --');
-
   populateSelect('a-labortype', allLaborTypes, 'id', 'labor_type_name', 'Select type...');
 
-  // Calendar tech filter
   const calTech = document.getElementById('cal-tech');
   if (calTech) {
     calTech.innerHTML = '<option value="">All Techs</option>' +
       allTechs.map(t => `<option value="${t.id}">${t.tech_name}</option>`).join('');
   }
 
-  // Re-render all reference tables
   renderPartsRef();
   renderJobTypesRef();
   renderLaborTypesRef();
   renderTechsRef();
 }
 
-// loadSubAccounts: populates the sub-account dropdown based on the selected parent account.
-// Called whenever the account dropdown changes (onchange="loadSubAccounts('a')").
-// prefix matches the input ID prefix used in that form section (e.g. 'a' for assign).
 function loadSubAccounts(prefix) {
   const idEl    = document.getElementById(`${prefix}-account-id`);
   const parentId = idEl ? idEl.value : document.getElementById(`${prefix}-account`).value;
@@ -530,30 +544,19 @@ function loadSubAccounts(prefix) {
   populateSelect(`${prefix}-subaccount`, subs, 'id', 'account_name', '-- None --');
 }
 
-// toggleFixed: shows/hides the quote amount field when Fixed Price is checked.
 function toggleFixed() {
-  document.getElementById('a-quotewrap').style.display =
-    document.getElementById('a-fixedprice').checked ? '' : 'none';
+  const wrap = document.getElementById('a-quotewrap');
+  wrap.style.display = document.getElementById('a-fixedprice').checked ? 'flex' : 'none';
 }
 
 
 // ---- ACCOUNT CONTACT ----
-// loadAccountContact: fetches the primary and secondary contacts for the selected account
-// and displays them in the contact banner. Called when the account dropdown changes.
-// The contact info is shown as a reference — the admin can optionally edit it
-// for this job only (changes do NOT update the CRM).
 async function loadAccountContact() {
   const accountId = document.getElementById('a-account-id').value;
   const panel     = document.getElementById('a-contact-panel');
   const banner    = document.getElementById('a-contact-banner');
+  if (!accountId) { panel.style.display = 'none'; currentAccountContacts = []; return; }
 
-  if (!accountId) {
-    panel.style.display = 'none';
-    currentAccountContacts = [];
-    return;
-  }
-
-  // Fetch contacts ordered by is_primary descending so primary comes first
   const { data: contacts } = await db.from('account_contacts')
     .select('*').eq('account_id', accountId).eq('active', true)
     .order('is_primary', { ascending: false });
@@ -575,9 +578,9 @@ async function loadAccountContact() {
   if (primary.work_phone) html += `Work: ${primary.work_phone} &nbsp;`;
   if (primary.cell_phone) html += `Cell: ${primary.cell_phone} &nbsp;`;
   if (primary.email)      html += primary.email;
-  if (primary.notes)      html += `<br><em>${primary.notes}</em>`;
+  if (primary.notes)      html += `<br><em style="color:#555">${primary.notes}</em>`;
   if (secondary) {
-    html += `<br><span style="color:#446;font-size:0.8rem">Secondary: ${secondary.contact_name}`;
+    html += `<br><span style="font-size:0.82rem;color:#446">Secondary: ${secondary.contact_name}`;
     if (secondary.work_phone) html += ` | ${secondary.work_phone}`;
     if (secondary.cell_phone) html += ` / ${secondary.cell_phone}`;
     html += '</span>';
@@ -589,8 +592,6 @@ async function loadAccountContact() {
   contactEditMode = false;
 }
 
-// searchAccountTypeahead: filters allAccounts client-side as the admin types.
-// Uses the same .parts-results dropdown pattern as the parts search.
 function searchAccountTypeahead() {
   const input   = document.getElementById('a-account');
   const results = document.getElementById('a-account-results');
@@ -610,8 +611,7 @@ function searchAccountTypeahead() {
   results.style.display = 'block';
   results.querySelectorAll('div').forEach(div => {
     div.addEventListener('mousedown', e => {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       selectAccount(div.dataset.id, div.dataset.name);
     });
   });
@@ -626,9 +626,6 @@ function selectAccount(id, name) {
   loadAccountContact();
 }
 
-// toggleContactEdit: shows or hides the per-job contact edit fields.
-// WHY this exists: the admin sometimes needs to record a different contact
-// for a specific job (e.g. an on-site person) without changing the CRM record.
 function toggleContactEdit() {
   contactEditMode = !contactEditMode;
   const editDiv = document.getElementById('a-contact-edit');
@@ -642,19 +639,20 @@ function toggleContactEdit() {
     document.getElementById('ac-email').value     = primary.email        || '';
     document.getElementById('ac-company').value   = primary.company      || '';
     document.getElementById('ac-notes').value     = primary.notes        || '';
-    document.getElementById('a-contact-warn').textContent =
-      'These changes apply to this job only and will not update the CRM. To update the permanent record, go to Accounts.';
+    const warn = document.getElementById('a-contact-warn');
+    warn.textContent = 'These changes apply to this job only and will not update the CRM.';
+    warn.style.display = '';
+  } else {
+    document.getElementById('a-contact-warn').style.display = 'none';
   }
 }
 
-
-// setAssignMode: switches the assign form between Existing Account and New Customer.
 function setAssignMode(mode) {
   const isExisting = mode === 'existing';
   document.getElementById('a-existing-account-fields').style.display = isExisting ? '' : 'none';
   document.getElementById('a-new-customer-fields').style.display     = isExisting ? 'none' : '';
-  document.getElementById('a-mode-existing').className = isExisting ? 'btn btn-primary'   : 'btn btn-secondary';
-  document.getElementById('a-mode-new').className      = isExisting ? 'btn btn-secondary' : 'btn btn-primary';
+  document.getElementById('a-mode-existing').className = isExisting ? 'active' : '';
+  document.getElementById('a-mode-new').className      = isExisting ? '' : 'active';
   if (isExisting) {
     ['a-nc-name','a-nc-address','a-nc-phone','a-nc-notes'].forEach(id => {
       const el = document.getElementById(id); if (el) { el.value = ''; el.style.border = ''; }
@@ -668,19 +666,18 @@ function setAssignMode(mode) {
   }
 }
 
+
 // ---- ASSIGN JOB ----
-// assignJob: reads the assign form and creates a new job record in Supabase,
-// including all expected line items (parts, labor, charges).
 async function assignJob() {
   const msg = document.getElementById('a-msg');
   msg.innerHTML = '';
   const date          = document.getElementById('a-date').value;
-  const isNewCustomer = document.getElementById('a-mode-new').classList.contains('btn-primary');
+  const isNewCustomer = document.getElementById('a-mode-new').classList.contains('active');
   let   accountId     = null;
 
   if (!date) {
     msg.innerHTML = '<div class="msg error">Date is required.</div>';
-    document.getElementById('a-date').style.border = '2px solid #c00';
+    document.getElementById('a-date').style.border = '2px solid #a02020';
     return;
   }
 
@@ -688,7 +685,7 @@ async function assignJob() {
     const ncName = document.getElementById('a-nc-name').value.trim();
     if (!ncName) {
       msg.innerHTML = '<div class="msg error">Customer name is required.</div>';
-      document.getElementById('a-nc-name').style.border = '2px solid #c00';
+      document.getElementById('a-nc-name').style.border = '2px solid #a02020';
       return;
     }
     if (document.getElementById('a-nc-save').checked) {
@@ -713,14 +710,13 @@ async function assignJob() {
   } else {
     accountId = document.getElementById('a-account-id').value;
     if (!accountId) {
-      msg.innerHTML = '<div class="msg error">Date and account are required.</div>';
-      document.getElementById('a-account').style.border = '2px solid #c00';
+      msg.innerHTML = '<div class="msg error">Account is required.</div>';
+      document.getElementById('a-account').style.border = '2px solid #a02020';
       return;
     }
   }
 
-  const techEls = document.getElementById('a-techs').selectedOptions;
-  const techIds = Array.from(techEls).map(o => o.value);
+  const techIds = Array.from(document.getElementById('a-techs').selectedOptions).map(o => o.value);
 
   const payload = {
     job_date:             date,
@@ -736,8 +732,7 @@ async function assignJob() {
     purchase_order_number: document.getElementById('a-po').value          || null,
     is_fixed_price:       document.getElementById('a-fixedprice').checked,
     quote_amount:         document.getElementById('a-fixedprice').checked
-                            ? parseFloat(document.getElementById('a-quoteamount').value) || null
-                            : null,
+                            ? parseFloat(document.getElementById('a-quoteamount').value) || null : null,
     created_by: currentUser.id
   };
 
@@ -745,19 +740,14 @@ async function assignJob() {
   if (error) { msg.innerHTML = `<div class="msg error">${error.message}</div>`; return; }
   lastJob = payload;
 
-  // Build line items array for all expected parts, labor, and flat charges.
-  // The sentinel UUID '00000000-...' is used as item_id for flat charges
-  // (Service Call, Other) because they don't reference a catalog part or labor type.
   const expItems = [
     ...assignParts.map(p => ({
       job_id: data.id, item_type: 'Part', item_id: p.id,
-      quantity: p.qty,
-      unit_cost: allParts.find(x => x.id === p.id)?.unit_cost || 0
+      quantity: p.qty, unit_cost: allParts.find(x => x.id === p.id)?.unit_cost || 0
     })),
     ...assignLabor.map(l => ({
       job_id: data.id, item_type: 'Labor', item_id: l.id,
-      quantity: l.hours,
-      unit_cost: allLaborTypes.find(x => x.id === l.id)?.hourly_rate || 0
+      quantity: l.hours, unit_cost: allLaborTypes.find(x => x.id === l.id)?.hourly_rate || 0
     })),
     ...assignCharges.map(c => ({
       job_id: data.id, item_type: c.type,
@@ -768,7 +758,7 @@ async function assignJob() {
   if (expItems.length) await db.from('job_line_items').insert(expItems);
 
   msg.innerHTML = '<div class="msg success">Job assigned successfully.</div>';
-  ['a-scope', 'a-sitenotes', 'a-wo', 'a-po'].forEach(id => document.getElementById(id).value = '');
+  ['a-scope','a-sitenotes','a-wo','a-po'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('a-fixedprice').checked = false;
   document.getElementById('a-quotewrap').style.display = 'none';
   assignParts = []; assignLabor = []; assignCharges = [];
@@ -781,8 +771,6 @@ async function assignJob() {
   }
 }
 
-// duplicateLast: pre-fills the assign form with values from the last assigned job.
-// Useful when assigning the same account/type job on multiple consecutive days.
 async function duplicateLast() {
   if (!lastJob) { alert('No job assigned this session to duplicate.'); return; }
   const acct = allAccounts.find(a => a.id === lastJob.account_id);
@@ -792,168 +780,14 @@ async function duplicateLast() {
   }
   loadSubAccounts('a');
   await loadAccountContact();
-  document.getElementById('a-jobtype').value   = lastJob.job_type_id  || '';
-  document.getElementById('a-leadtech').value  = lastJob.lead_tech_id || '';
-  document.getElementById('a-date').value      = today();
-  document.getElementById('a-msg').innerHTML   = '<div class="msg success">Last job duplicated. Review and assign.</div>';
-}
-
-
-// ---- JOBS LIST (SCHEDULE VIEWER) ----
-// setScheduleRange: shortcut buttons to pre-fill the date range inputs.
-function setScheduleRange(range) {
-  if (range === 'today') {
-    const t = today();
-    document.getElementById('sv-from').value = t;
-    document.getElementById('sv-to').value   = t;
-  } else if (range === 'week') {
-    const mon = weekStart();
-    // Add 6 days to Monday to get Sunday
-    const sun = new Date(mon);
-    sun.setDate(sun.getDate() + 6);
-    document.getElementById('sv-from').value = mon;
-    document.getElementById('sv-to').value   = sun.toISOString().split('T')[0];
-  }
-  loadSchedule();
-}
-
-// loadSchedule: fetches all non-cancelled jobs in the date range and renders them
-// as a table, plus a parts/labor totals summary useful for stocking a truck.
-async function loadSchedule() {
-  const from = document.getElementById('sv-from').value;
-  const to   = document.getElementById('sv-to').value;
-  const { data, error } = await db.from('jobs')
-    .select(`id, job_date, status, scope, is_fixed_price, work_order_number, purchase_order_number,
-             accounts!jobs_account_id_fkey(account_name),
-             job_types(job_type_name),
-             job_line_items(item_type,item_id,quantity)`)
-    .gte('job_date', from).lte('job_date', to)
-    .not('status', 'eq', 'Cancelled')
-    .order('job_date');
-
-  // WHY !fk_name syntax for accounts: the jobs table has TWO foreign keys to accounts
-  // (account_id and sub_account_id). Supabase needs the constraint name to know
-  // which relationship to join. Without it, the query would be ambiguous.
-
-  const el = document.getElementById('schedule-list');
-  if (error || !data?.length) {
-    el.innerHTML = '<p>No jobs found.</p>';
-    document.getElementById('stocking-panel').style.display = 'none';
-    return;
-  }
-
-  const addDayStatuses = ['Scheduled', 'In Progress', 'Awaiting Parts', 'Flagged'];
-  el.innerHTML = `<div style="overflow-x:auto"><table>
-    <thead><tr><th>Date</th><th>Account</th><th>Type</th><th>WO</th><th>Status</th><th>Scope</th><th></th></tr></thead>
-    <tbody>${data.map(j => `<tr>
-      <td style="white-space:nowrap">${formatDate(j.job_date)}</td>
-      <td>${j.accounts?.account_name || ''}</td>
-      <td>${j.job_types?.job_type_name || ''}</td>
-      <td style="font-size:0.82rem">${j.work_order_number || ''}</td>
-      <td><span class="status-badge status-${j.status.replace(/ /g, '-')}">${j.status}</span></td>
-      <td style="max-width:200px;font-size:0.82rem">${j.scope || ''}</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-blue" onclick="openReopen('${j.id}')">Edit</button>
-        ${addDayStatuses.includes(j.status)
-          ? `<button class="btn btn-secondary" onclick="toggleAddDayForm('${j.id}')">Add a Day</button>` : ''}
-        ${!['Approved','Pending Review'].includes(j.status)
-          ? `<button class="btn btn-red" onclick="deleteJob('${j.id}')">Delete</button>` : ''}
-      </td>
-    </tr>
-    <tr id="add-day-form-${j.id}" style="display:none">
-      <td colspan="7" style="background:#f9f9f9;padding:0.7rem;border-bottom:2px solid #ccc">
-        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:flex-end">
-          <div><label style="font-size:0.82rem;font-weight:bold;display:block;margin-bottom:0.2rem">Date</label>
-            <input type="date" id="add-day-date-${j.id}" value="${tomorrow()}" style="padding:0.35rem;border:1px solid #ccc"></div>
-          <div style="flex:2"><label style="font-size:0.82rem;font-weight:bold;display:block;margin-bottom:0.2rem">Notes for this visit</label>
-            <input type="text" id="add-day-notes-${j.id}" style="width:100%;padding:0.35rem;border:1px solid #ccc"></div>
-          <button class="btn btn-primary" onclick="saveAddDay('${j.id}')">Save</button>
-          <button class="btn btn-secondary" onclick="toggleAddDayForm('${j.id}')">Cancel</button>
-        </div>
-        <div id="add-day-msg-${j.id}" style="font-size:0.82rem;margin-top:0.3rem;color:#2a7a2a"></div>
-      </td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
-
-  // Build parts/labor totals by summing expected line items across all loaded jobs
-  const partTotals  = {};
-  const laborTotals = {};
-  data.forEach(j => {
-    (j.job_line_items || []).forEach(i => {
-      if (i.item_type === 'Part') {
-        const name = allParts.find(p => p.id === i.item_id)?.part_name || i.item_id;
-        partTotals[name] = (partTotals[name] || 0) + Number(i.quantity);
-      } else if (i.item_type === 'Labor') {
-        const name = allLaborTypes.find(l => l.id === i.item_id)?.labor_type_name || i.item_id;
-        laborTotals[name] = (laborTotals[name] || 0) + Number(i.quantity);
-      }
-    });
-  });
-
-  const partEntries  = Object.entries(partTotals).sort((a, b) => a[0].localeCompare(b[0]));
-  const laborEntries = Object.entries(laborTotals).sort((a, b) => a[0].localeCompare(b[0]));
-  const stockPanel   = document.getElementById('stocking-panel');
-
-  if (!partEntries.length && !laborEntries.length) {
-    stockPanel.style.display = 'none';
-    return;
-  }
-
-  stockPanel.style.display = 'block';
-  document.getElementById('stocking-content').innerHTML = `
-    <p style="font-size:0.85rem;color:#555;margin-bottom:0.8rem">Based on expected parts and labor pre-loaded on jobs. Does not include jobs with no line items.</p>
-    <div style="display:flex;gap:2rem;flex-wrap:wrap">
-      ${partEntries.length ? `<div style="flex:1;min-width:200px">
-        <div class="section-title" style="margin-top:0">Parts Needed</div>
-        <table><thead><tr><th>Part</th><th>Total Qty</th></tr></thead>
-        <tbody>${partEntries.map(([name, qty]) => `<tr><td>${name}</td><td><strong>${qty}</strong></td></tr>`).join('')}</tbody>
-        </table></div>` : ''}
-      ${laborEntries.length ? `<div style="flex:1;min-width:200px">
-        <div class="section-title" style="margin-top:0">Labor (hrs)</div>
-        <table><thead><tr><th>Type</th><th>Total Hrs</th></tr></thead>
-        <tbody>${laborEntries.map(([name, hrs]) => `<tr><td>${name}</td><td><strong>${hrs}</strong></td></tr>`).join('')}</tbody>
-        </table></div>` : ''}
-    </div>`;
-}
-
-async function deleteJob(id) {
-  if (!confirm('Delete this job? This cannot be undone.')) return;
-  await db.from('jobs').delete().eq('id', id);
-  loadSchedule();
-}
-
-function toggleAddDayForm(jobId) {
-  document.querySelectorAll('[id^="add-day-form-"]').forEach(el => {
-    if (el.id !== `add-day-form-${jobId}`) el.style.display = 'none';
-  });
-  const row = document.getElementById(`add-day-form-${jobId}`);
-  if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
-}
-
-async function saveAddDay(jobId) {
-  const date  = document.getElementById(`add-day-date-${jobId}`).value;
-  const notes = document.getElementById(`add-day-notes-${jobId}`).value.trim();
-  const msg   = document.getElementById(`add-day-msg-${jobId}`);
-  if (!date) { msg.textContent = 'Date is required.'; return; }
-
-  const { count } = await db.from('job_visits').select('id', { count: 'exact', head: true }).eq('job_id', jobId);
-  await db.from('job_visits').insert({
-    job_id: jobId, visit_number: (count || 0) + 1,
-    visit_date: date, tech_notes: notes || null
-  });
-
-  const { data: job } = await db.from('jobs').select('status').eq('id', jobId).single();
-  if (job?.status !== 'Scheduled') {
-    await db.from('jobs').update({ status: 'Scheduled', updated_at: new Date().toISOString() }).eq('id', jobId);
-  }
-
-  msg.textContent = 'Visit added.';
-  setTimeout(() => { toggleAddDayForm(jobId); loadSchedule(); }, 800);
+  document.getElementById('a-jobtype').value  = lastJob.job_type_id  || '';
+  document.getElementById('a-leadtech').value = lastJob.lead_tech_id || '';
+  document.getElementById('a-date').value     = today();
+  document.getElementById('a-msg').innerHTML  = '<div class="msg success">Last job duplicated. Review and assign.</div>';
 }
 
 
 // ---- REVIEW ----
-// loadReview: fetches jobs filtered by status and renders each as a review card.
 async function loadReview() {
   const status = document.getElementById('rv-status').value;
   let query = db.from('jobs')
@@ -970,19 +804,16 @@ async function loadReview() {
     .order('job_date', { ascending: false });
 
   if (status) query = query.eq('status', status);
-
   const { data, error } = await query;
   const el = document.getElementById('review-list');
   if (error) { el.innerHTML = `<div class="msg error">${error.message}</div>`; return; }
-  if (!data?.length) { el.innerHTML = '<p>No jobs found.</p>'; return; }
+  if (!data?.length) { el.innerHTML = '<p class="meta">No jobs found.</p>'; return; }
 
   const pending = data.filter(j => j.status === 'Pending Review');
   document.getElementById('bulk-approve-btn').style.display = pending.length > 1 ? '' : 'none';
   el.innerHTML = data.map(j => reviewCard(j)).join('');
 }
 
-// reviewCard: builds the HTML for one job in the review list.
-// Each card is collapsed by default; the admin clicks Expand to see details.
 function reviewCard(j) {
   const account = j.accounts?.account_name || '';
   const sub     = j.sub?.account_name ? ` / ${j.sub.account_name}` : '';
@@ -993,26 +824,25 @@ function reviewCard(j) {
   const laborItems  = items.filter(i => i.item_type === 'Labor');
   const chargeItems = items.filter(i => i.item_type === 'Service Call' || i.item_type === 'Other');
 
-  // Build a table row for each line item, with an editable override cost field.
-  // setOverride() saves changes to the DB immediately on change — no Save button needed.
   const itemRow = (i, label) => {
     const ext = (i.override_cost ?? i.unit_cost) * i.quantity;
     return `<tr>
       <td>${i.item_type}</td><td>${label}</td><td>${i.quantity}</td>
       <td>$${Number(i.unit_cost).toFixed(2)}</td>
       <td><input type="number" step="0.01" placeholder="${i.unit_cost}" value="${i.override_cost || ''}"
-        style="width:80px;padding:0.2rem;border:1px solid #ccc"
+        style="width:80px;padding:0.2rem 0.3rem;border:1px solid #c8cdd8;border-radius:3px"
         onchange="setOverride('${i.id}', this.value, 'reason-${i.id}')"></td>
       <td><input type="text" id="reason-${i.id}" placeholder="Reason" value="${i.override_reason || ''}"
-        style="width:120px;padding:0.2rem;border:1px solid #ccc"></td>
-      <td>$${ext.toFixed(2)}</td>
+        style="width:130px;padding:0.2rem 0.3rem;border:1px solid #c8cdd8;border-radius:3px"></td>
+      <td><strong>$${ext.toFixed(2)}</strong></td>
     </tr>`;
   };
 
-  const partRows   = partItems.map(i => itemRow(i, allParts.find(p => p.id === i.item_id)?.part_name || i.item_id)).join('');
+  const partRows   = partItems.map(i  => itemRow(i, allParts.find(p => p.id === i.item_id)?.part_name || i.item_id)).join('');
   const laborRows  = laborItems.map(i => itemRow(i, (allLaborTypes.find(l => l.id === i.item_id)?.labor_type_name || i.item_id) + ' (hrs)')).join('');
   const chargeRows = chargeItems.map(i => itemRow(i, i.override_reason || i.item_type)).join('');
 
+  const totalRev = calcRevenue(items);
   const fixedBanner = j.is_fixed_price
     ? `<div class="fixed-banner">FIXED PRICE | Quoted: $${Number(j.quote_amount || 0).toFixed(2)}</div>` : '';
 
@@ -1021,38 +851,40 @@ function reviewCard(j) {
     j.purchase_order_number ? `PO: ${j.purchase_order_number}` : ''
   ].filter(Boolean).join(' | ');
 
-  // Quote form section — only shown if the tech submitted a quote form for this job
   const qf = j.quote_forms?.[0];
   const quoteSection = qf ? `
     <div class="section-title">Quote Form</div>
-    ${qf.scope_observed ? `<p style="font-size:0.85rem"><strong>Scope observed:</strong> ${qf.scope_observed}</p>` : ''}
-    ${qf.materials_json ? `<p style="font-size:0.85rem"><strong>Materials/notes:</strong> ${
-      Array.isArray(qf.materials_json)
-        ? qf.materials_json.map(m => m.notes || JSON.stringify(m)).join('; ')
-        : JSON.stringify(qf.materials_json)
+    ${qf.scope_observed ? `<p style="font-size:0.85rem;margin:0.3rem 0"><strong>Scope observed:</strong> ${qf.scope_observed}</p>` : ''}
+    ${qf.materials_json ? `<p style="font-size:0.85rem;margin:0.3rem 0"><strong>Materials / notes:</strong> ${
+      Array.isArray(qf.materials_json) ? qf.materials_json.map(m => m.notes || JSON.stringify(m)).join('; ') : JSON.stringify(qf.materials_json)
     }</p>` : ''}
     <p style="font-size:0.78rem;color:#888">Submitted: ${new Date(qf.created_at).toLocaleString()}</p>` : '';
 
   return `<div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.3rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.4rem">
       <div>
-        <h3>${account}${sub}</h3>
+        <h3 style="margin-bottom:0.2rem">${account}${sub}</h3>
         <div class="meta">${formatDate(j.job_date)} | ${j.job_types?.job_type_name || ''}</div>
         ${j.accounts?.address ? `<div class="meta">Address: ${mapsLink(j.accounts.address)}</div>` : ''}
-        ${wopo ? `<div class="meta">${wopo}</div>` : ''}
+        ${wopo ? `<div class="meta" style="color:#1a2744">${wopo}</div>` : ''}
       </div>
-      <span class="status-badge status-${j.status.replace(/ /g, '-')}">${j.status}</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem">
+        <span class="status-badge status-${j.status.replace(/ /g, '-')}">${j.status}</span>
+        ${totalRev > 0 ? `<span style="font-size:0.83rem;color:#2a7a4a;font-weight:600">$${totalRev.toFixed(2)}</span>` : ''}
+      </div>
     </div>
     ${fixedBanner}
-    <button class="btn btn-secondary" onclick="toggleExpand('exp-${j.id}')">Expand / Collapse</button>
-    <button class="btn btn-green"     onclick="reviewAction('${j.id}', 'Approved')">Approve</button>
-    <button class="btn btn-yellow"    onclick="reviewAction('${j.id}', 'Flagged')">Flag</button>
-    <button class="btn btn-secondary" onclick="reviewAction('${j.id}', 'Reset')">Reset</button>
-    <button class="btn btn-blue"      onclick="openReopen('${j.id}')">Reopen / Edit</button>
+    <div style="margin-top:0.7rem;display:flex;flex-wrap:wrap;gap:0.3rem">
+      <button class="btn btn-secondary" onclick="toggleExpand('exp-${j.id}')">Details</button>
+      <button class="btn btn-green"     onclick="reviewAction('${j.id}', 'Approved')">Approve</button>
+      <button class="btn btn-yellow"    onclick="reviewAction('${j.id}', 'Flagged')">Flag</button>
+      <button class="btn btn-secondary" onclick="reviewAction('${j.id}', 'Reset')">Reset</button>
+      <button class="btn btn-blue"      onclick="openReopen('${j.id}')">Edit</button>
+    </div>
 
     <div id="exp-${j.id}" class="expandable">
-      ${j.scope      ? `<div class="section-title">Scope</div><p style="font-size:0.85rem">${j.scope}</p>` : ''}
-      ${j.site_notes ? `<div class="section-title">Site Notes</div><p style="font-size:0.85rem">${j.site_notes}</p>` : ''}
+      ${j.scope      ? `<div class="section-title">Scope</div><p style="font-size:0.88rem;margin:0.3rem 0">${j.scope}</p>` : ''}
+      ${j.site_notes ? `<div class="section-title">Site Notes</div><p style="font-size:0.88rem;margin:0.3rem 0">${j.site_notes}</p>` : ''}
 
       <div class="section-title">Visits</div>
       ${(j.job_visits?.length) ? `<div style="overflow-x:auto"><table>
@@ -1067,13 +899,12 @@ function reviewCard(j) {
       </table></div>` : '<p class="meta">No visits recorded.</p>'}
 
       <div class="section-title">Completion</div>
-      <table><tbody>
-        <tr><td><strong>Payment</strong></td><td>${comp.payment_type || '--'}</td>
-            <td><strong>Detail</strong></td><td>${comp.payment_detail || '--'}</td></tr>
-        <tr><td><strong>Follow-up</strong></td><td>${comp.follow_up_flag ? 'YES' : 'No'}</td>
-            <td><strong>Submitted</strong></td><td>${comp.submitted_at ? new Date(comp.submitted_at).toLocaleString() : '--'}</td></tr>
-      </tbody></table>
-      ${comp.tech_notes ? `<div style="margin-top:0.5rem"><strong>Tech Notes:</strong> <span style="font-size:0.85rem">${comp.tech_notes}</span></div>` : ''}
+      <div style="background:#f8f9fc;border-radius:4px;padding:0.6rem;font-size:0.85rem;line-height:1.7">
+        <strong>Payment:</strong> ${comp.payment_type || '--'} ${comp.payment_detail || ''} &nbsp;|&nbsp;
+        <strong>Follow-up:</strong> ${comp.follow_up_flag ? '<span style="color:#a02020;font-weight:600">YES</span>' : 'No'} &nbsp;|&nbsp;
+        <strong>Submitted:</strong> ${comp.submitted_at ? new Date(comp.submitted_at).toLocaleString() : '--'}
+      </div>
+      ${comp.tech_notes ? `<div style="margin-top:0.5rem;font-size:0.85rem"><strong>Tech Notes:</strong> ${comp.tech_notes}</div>` : ''}
 
       ${items.length ? `
         <div class="section-title">Line Items</div>
@@ -1090,33 +921,31 @@ function reviewCard(j) {
       <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem">
         <input type="file" id="aphoto-${j.id}" accept="image/*" multiple style="font-size:0.85rem">
         <button class="btn btn-primary" onclick="uploadAdminPhotos('${j.id}')">Upload Photos</button>
-        <span id="aphoto-msg-${j.id}" style="font-size:0.82rem;color:#2a7a2a"></span>
+        <span id="aphoto-msg-${j.id}" style="font-size:0.82rem;color:#2a7a4a"></span>
       </div>
-      <div id="job-photos-${j.id}" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem">
-        <span style="font-size:0.82rem;color:#aaa">Click "Load Photos" to view uploaded photos.</span>
+      <div id="job-photos-${j.id}" style="margin-bottom:0.5rem">
+        <span style="font-size:0.82rem;color:#aaa">Click "Load Photos" to view.</span>
       </div>
       <button class="btn btn-secondary" style="font-size:0.82rem" onclick="loadJobPhotos('${j.id}')">Load Photos</button>
 
-      <div class="section-title">Admin Review Note</div>
+      <div class="section-title">Admin Note</div>
       <div style="display:flex;gap:0.4rem;margin-top:0.3rem">
-        <input type="text" id="rnote-${j.id}" placeholder="Add review note..." style="flex:1;padding:0.35rem;border:1px solid #ccc">
+        <input type="text" id="rnote-${j.id}" placeholder="Add a review note..." style="flex:1;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
         <button class="btn btn-primary" onclick="saveReviewNote('${j.id}')">Save Note</button>
       </div>
       ${j.admin_reviews?.length
-        ? `<div style="font-size:0.82rem;margin-top:0.4rem;color:#444">Last: ${j.admin_reviews[j.admin_reviews.length - 1].review_notes || ''} (${j.admin_reviews[j.admin_reviews.length - 1].review_status})</div>`
+        ? `<div style="font-size:0.82rem;margin-top:0.4rem;color:#444;background:#f8f9fc;padding:0.4rem 0.6rem;border-radius:4px">
+             Last note: ${j.admin_reviews[j.admin_reviews.length-1].review_notes || ''} (${j.admin_reviews[j.admin_reviews.length-1].review_status})</div>`
         : ''}
     </div>
   </div>`;
 }
 
-// toggleExpand: shows or hides the expandable detail section of a review card.
 function toggleExpand(id) {
   const el = document.getElementById(id);
   el.style.display = el.style.display === 'block' ? 'none' : 'block';
 }
 
-// reviewAction: changes a job's status (Approved, Flagged, or back to Pending Review)
-// and records the action in admin_reviews for an audit trail.
 async function reviewAction(jobId, action) {
   const statusMap = { Approved: 'Approved', Flagged: 'Flagged', Reset: 'Pending Review' };
   await db.from('jobs').update({ status: statusMap[action], updated_at: new Date().toISOString() }).eq('id', jobId);
@@ -1124,18 +953,19 @@ async function reviewAction(jobId, action) {
   loadReview();
 }
 
-// saveReviewNote: attaches a text note to a job in admin_reviews.
-// Flagged status is used here to ensure the note is visible in the review filter.
+// BUG FIX: saveReviewNote previously inserted with review_status:'Flagged' which would
+// contaminate the audit trail. Now uses 'Reset' as the neutral status (allowed by DB check
+// constraint) while preserving the note text. Admin can flag separately if needed.
 async function saveReviewNote(jobId) {
-  const note = document.getElementById(`rnote-${jobId}`).value;
-  if (!note) return;
+  const note = document.getElementById(`rnote-${jobId}`).value.trim();
+  if (!note) { alert('Enter a note before saving.'); return; }
   await db.from('admin_reviews').insert({
-    job_id: jobId, review_status: 'Flagged', review_notes: note, reviewed_by: currentUser.id
+    job_id: jobId, review_status: 'Reset', review_notes: note, reviewed_by: currentUser.id
   });
+  document.getElementById(`rnote-${jobId}`).value = '';
   alert('Note saved.');
 }
 
-// bulkApprove: approves all currently Pending Review jobs in one operation.
 async function bulkApprove() {
   if (!confirm('Approve all Pending Review jobs?')) return;
   const { data } = await db.from('jobs').select('id').eq('status', 'Pending Review');
@@ -1146,9 +976,6 @@ async function bulkApprove() {
   loadReview();
 }
 
-// setOverride: saves a cost override and reason for a single line item immediately.
-// Called onchange from the override input fields in reviewCard.
-// No separate "Save" step is needed — each field saves as you change it.
 async function setOverride(lineItemId, val, reasonFieldId) {
   const reason = document.getElementById(reasonFieldId)?.value || '';
   await db.from('job_line_items').update({
@@ -1159,13 +986,11 @@ async function setOverride(lineItemId, val, reasonFieldId) {
 
 
 // ---- PHOTOS (Admin) ----
-// uploadAdminPhotos: uploads one or more photos from the review card file input.
 async function uploadAdminPhotos(jobId) {
   const input = document.getElementById(`aphoto-${jobId}`);
   const msgEl = document.getElementById(`aphoto-msg-${jobId}`);
   if (!input.files?.length) { msgEl.textContent = 'No files selected.'; return; }
   msgEl.textContent = 'Uploading...';
-
   const { data: job } = await db.from('jobs').select('account_id').eq('id', jobId).single();
   let uploaded = 0;
   for (const file of input.files) {
@@ -1184,31 +1009,23 @@ async function uploadAdminPhotos(jobId) {
   await loadJobPhotos(jobId);
 }
 
-// loadJobPhotos: fetches photos for a job and renders them as thumbnails.
-// Uses shared fetchPhotoUrls() and renderPhotoGrid() from shared.js.
 async function loadJobPhotos(jobId) {
   const grid = document.getElementById(`job-photos-${jobId}`);
   if (!grid) return;
   grid.innerHTML = '<span style="font-size:0.82rem;color:#aaa">Loading...</span>';
-
   const { data: photos } = await db.from('job_photos')
-    .select('id,storage_path,file_name,uploaded_at')
-    .eq('job_id', jobId)
+    .select('id,storage_path,file_name,uploaded_at').eq('job_id', jobId)
     .order('uploaded_at', { ascending: false });
-
   if (!photos?.length) {
     grid.innerHTML = '<span style="font-size:0.82rem;color:#aaa">No photos uploaded yet.</span>';
     return;
   }
-
   const withUrls = await fetchPhotoUrls(photos);
   renderPhotoGrid(grid, withUrls, true);
 }
 
 
 // ---- REOPEN / EDIT MODAL ----
-// openReopen: loads a job's current data into the edit modal so the admin
-// can change status, completion details, or line items.
 async function openReopen(jobId) {
   reopenParts = []; reopenLabor = []; reopenCharges = []; reopenVisits = [];
 
@@ -1221,12 +1038,11 @@ async function openReopen(jobId) {
   ]);
   reopenVisits = visits || [];
 
-  const comp      = job.job_completions?.[0] || {};
+  const comp     = job.job_completions?.[0] || {};
   const laborOpts = allLaborTypes.map(l => `<option value="${l.id}">${l.labor_type_name}</option>`).join('');
-  const statusOpts = ['Scheduled', 'Quoted', 'Awaiting Parts', 'Pending Review', 'Flagged', 'Approved', 'Cancelled']
+  const statusOpts = ['Scheduled','Quoted','Awaiting Parts','Pending Review','Flagged','Approved','Cancelled']
     .map(s => `<option value="${s}" ${s === job.status ? 'selected' : ''}>${s}</option>`).join('');
 
-  // Pre-populate the line item arrays from the job's existing line items
   (job.job_line_items || []).forEach(i => {
     if (i.item_type === 'Part') {
       const p = allParts.find(x => x.id === i.item_id);
@@ -1240,10 +1056,10 @@ async function openReopen(jobId) {
   });
 
   document.getElementById('reopen-content').innerHTML = `
-    <h3>Reopen / Edit Job: ${job.accounts?.account_name || ''}</h3>
+    <h3 style="margin:0 0 0.3rem;color:#1a2744">${job.accounts?.account_name || ''}</h3>
     <div class="meta">${formatDate(job.job_date)} | ${job.job_types?.job_type_name || ''}</div>
 
-    <div class="form-row"><label>Status</label><select id="ro-status">${statusOpts}</select></div>
+    <div class="form-row" style="margin-top:0.8rem"><label>Status</label><select id="ro-status">${statusOpts}</select></div>
     <div class="two-col">
       <div class="form-row"><label>Work Order No.</label><input type="text" id="ro-wo" value="${job.work_order_number || ''}"></div>
       <div class="form-row"><label>Purchase Order No.</label><input type="text" id="ro-po" value="${job.purchase_order_number || ''}"></div>
@@ -1252,31 +1068,31 @@ async function openReopen(jobId) {
     <div class="form-row"><label>Site Notes</label><textarea id="ro-sitenotes">${job.site_notes || ''}</textarea></div>
 
     <div class="section-title">Completion Details</div>
-    <div class="form-row"><label>Time In</label>
-      <input type="datetime-local" id="ro-timein" value="${comp.time_in ? comp.time_in.slice(0, 16) : ''}"></div>
-    <div class="form-row"><label>Time Out</label>
-      <input type="datetime-local" id="ro-timeout" value="${comp.time_out ? comp.time_out.slice(0, 16) : ''}"></div>
-    <div class="form-row"><label>Payment Type</label>
-      <select id="ro-paytype">
-        <option value="">-- Select --</option>
-        ${['Cash', 'Check', 'Card', 'Invoice'].map(p => `<option ${p === comp.payment_type ? 'selected' : ''}>${p}</option>`).join('')}
-      </select>
+    <div class="two-col">
+      <div class="form-row"><label>Time In</label><input type="datetime-local" id="ro-timein" value="${comp.time_in ? comp.time_in.slice(0,16) : ''}"></div>
+      <div class="form-row"><label>Time Out</label><input type="datetime-local" id="ro-timeout" value="${comp.time_out ? comp.time_out.slice(0,16) : ''}"></div>
     </div>
-    <div class="form-row"><label>Payment Detail</label>
-      <input type="text" id="ro-paydetail" value="${comp.payment_detail || ''}"></div>
-    <div class="form-row"><label>Tech Notes</label>
-      <textarea id="ro-technotes">${comp.tech_notes || ''}</textarea></div>
+    <div class="two-col">
+      <div class="form-row"><label>Payment Type</label>
+        <select id="ro-paytype">
+          <option value="">-- Select --</option>
+          ${['Cash','Check','Card','Invoice'].map(p => `<option ${p === comp.payment_type ? 'selected' : ''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-row"><label>Payment Detail</label><input type="text" id="ro-paydetail" value="${comp.payment_detail || ''}"></div>
+    </div>
+    <div class="form-row"><label>Tech Notes</label><textarea id="ro-technotes">${comp.tech_notes || ''}</textarea></div>
     <div class="form-row"><label><input type="checkbox" id="ro-followup" ${comp.follow_up_flag ? 'checked' : ''}> Follow-up Flag</label></div>
 
     <div class="section-title">Visit Times</div>
     ${reopenVisits.length ? reopenVisits.map(v => `
-      <div style="background:#f9f9f9;border:1px solid #eee;padding:0.5rem;margin-bottom:0.4rem">
-        <div style="font-size:0.82rem;font-weight:bold;margin-bottom:0.3rem">Visit ${v.visit_number} (${formatDate(v.visit_date)})</div>
+      <div style="background:#f8f9fc;border:1px solid #eef0f6;border-radius:4px;padding:0.6rem;margin-bottom:0.4rem">
+        <div style="font-size:0.83rem;font-weight:600;margin-bottom:0.4rem;color:#1a2744">Visit ${v.visit_number} (${formatDate(v.visit_date)})</div>
         <div class="two-col">
-          <div class="form-row"><label>Visit ${v.visit_number}: Clock In</label>
+          <div class="form-row"><label>Clock In</label>
             <input type="datetime-local" id="vi-cin-${v.id}" value="${v.clocked_in_at ? v.clocked_in_at.slice(0,16) : ''}">
           </div>
-          <div class="form-row"><label>Visit ${v.visit_number}: Clock Out</label>
+          <div class="form-row"><label>Clock Out</label>
             <input type="datetime-local" id="vi-cout-${v.id}" value="${v.clocked_out_at ? v.clocked_out_at.slice(0,16) : ''}">
           </div>
         </div>
@@ -1284,35 +1100,38 @@ async function openReopen(jobId) {
 
     <div class="section-title">Parts</div>
     <div class="parts-search-wrap">
-      <input type="text" id="ro-partsearch" placeholder="Search parts..." oninput="searchReopenParts()" style="width:100%;padding:0.35rem;border:1px solid #ccc">
+      <input type="text" id="ro-partsearch" placeholder="Search parts..." oninput="searchReopenParts()">
       <div class="parts-results" id="ro-parts-results"></div>
     </div>
     <table id="ro-parts-table"><thead><tr><th>Part</th><th>Qty</th><th></th></tr></thead><tbody></tbody></table>
 
     <div class="section-title">Labor</div>
-    <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem;flex-wrap:wrap">
-      <select id="ro-labortype" style="flex:2;padding:0.35rem;border:1px solid #ccc">
+    <div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap">
+      <select id="ro-labortype" style="flex:2;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
         <option value="">-- Type --</option>${laborOpts}
       </select>
-      <input type="number" id="ro-laborhours" placeholder="Hours" style="flex:1;padding:0.35rem;border:1px solid #ccc;min-width:60px">
+      <input type="number" id="ro-laborhours" placeholder="Hours" style="flex:1;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px;min-width:70px">
       <button class="btn btn-secondary" onclick="addReopenLabor()">Add</button>
     </div>
     <table id="ro-labor-table"><thead><tr><th>Type</th><th>Hours</th><th></th></tr></thead><tbody></tbody></table>
 
     <div class="section-title">Additional Charges</div>
-    <div style="display:flex;gap:0.4rem;margin-bottom:0.4rem;flex-wrap:wrap;align-items:flex-end">
-      <select id="ro-chargetype" style="padding:0.35rem;border:1px solid #ccc">
+    <div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap;align-items:flex-end">
+      <select id="ro-chargetype" style="padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
         <option value="Service Call">Service Call</option>
         <option value="Other">Other</option>
       </select>
-      <input type="text" id="ro-chargedesc" placeholder="Description" style="flex:2;padding:0.35rem;border:1px solid #ccc">
-      <input type="number" id="ro-chargeamt" placeholder="$" step="0.01" style="width:80px;padding:0.35rem;border:1px solid #ccc">
+      <input type="text" id="ro-chargedesc" placeholder="Description" style="flex:2;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
+      <input type="number" id="ro-chargeamt" placeholder="$" step="0.01" style="width:85px;padding:0.4rem;border:1px solid #c8cdd8;border-radius:4px">
       <button class="btn btn-secondary" onclick="addReopenCharge()">Add</button>
     </div>
     <table id="ro-charges-table"><thead><tr><th>Type</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody></tbody></table>
 
-    <div id="ro-msg" style="margin-top:0.5rem"></div>
-    <button class="btn btn-primary" style="margin-top:0.8rem" onclick="saveReopen('${jobId}', '${comp.id || ''}')">Save Changes</button>
+    <div id="ro-msg" style="margin-top:0.6rem"></div>
+    <div style="margin-top:1rem;display:flex;gap:0.4rem">
+      <button class="btn btn-primary" onclick="saveReopen('${jobId}', '${comp.id || ''}')">Save Changes</button>
+      <button class="btn btn-secondary" onclick="closeReopenModal()">Cancel</button>
+    </div>
   `;
 
   renderReopenParts(); renderReopenLabor(); renderReopenCharges();
@@ -1321,9 +1140,6 @@ async function openReopen(jobId) {
 
 function closeReopenModal() { document.getElementById('reopen-modal').style.display = 'none'; }
 
-// ---- Reopen Parts ----
-// searchReopenParts / addReopenPart / removeReopenPart / renderReopenParts:
-// manage the parts list in the reopen modal using the same pattern as assignParts.
 function searchReopenParts() {
   const q   = document.getElementById('ro-partsearch').value.toLowerCase();
   const res = document.getElementById('ro-parts-results');
@@ -1331,18 +1147,11 @@ function searchReopenParts() {
   const matches = allParts.filter(p => p.part_name.toLowerCase().includes(q)).slice(0, 8);
   if (!matches.length) { res.style.display = 'none'; return; }
   res.innerHTML = matches.map(p =>
-    `<div data-id="${p.id}" data-name="${p.part_name.replace(/"/g, '&quot;')}">
-      ${p.part_name}${p.category ? ' | ' + p.category : ''}</div>`
+    `<div data-id="${p.id}" data-name="${p.part_name.replace(/"/g,'&quot;')}">${p.part_name}${p.category ? ' | '+p.category : ''}</div>`
   ).join('');
   res.style.display = 'block';
-  // WHY mousedown + preventDefault: mousedown fires before the input loses focus (blur).
-  // Without preventDefault, the dropdown disappears before the click registers.
   res.querySelectorAll('div').forEach(div => {
-    div.addEventListener('mousedown', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      addReopenPart(div.dataset.id, div.dataset.name);
-    });
+    div.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); addReopenPart(div.dataset.id, div.dataset.name); });
   });
 }
 function addReopenPart(id, name) {
@@ -1356,12 +1165,10 @@ function removeReopenPart(idx) { reopenParts.splice(idx, 1); renderReopenParts()
 function renderReopenParts() {
   document.querySelector('#ro-parts-table tbody').innerHTML = reopenParts.map((p, i) =>
     `<tr><td>${p.name}</td>
-     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:60px;padding:0.2rem;border:1px solid #ccc" onchange="reopenParts[${i}].qty=parseFloat(this.value)||1"></td>
-     <td><button onclick="removeReopenPart(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:65px;padding:0.25rem;border:1px solid #c8cdd8;border-radius:3px" onchange="reopenParts[${i}].qty=parseFloat(this.value)||1"></td>
+     <td><button onclick="removeReopenPart(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
-
-// ---- Reopen Labor ----
 function addReopenLabor() {
   const id    = document.getElementById('ro-labortype').value;
   const hours = parseFloat(document.getElementById('ro-laborhours').value);
@@ -1375,11 +1182,9 @@ function removeReopenLabor(idx) { reopenLabor.splice(idx, 1); renderReopenLabor(
 function renderReopenLabor() {
   document.querySelector('#ro-labor-table tbody').innerHTML = reopenLabor.map((l, i) =>
     `<tr><td>${l.name}</td><td>${l.hours} hr</td>
-     <td><button onclick="removeReopenLabor(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><button onclick="removeReopenLabor(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
-
-// ---- Reopen Charges ----
 function addReopenCharge() {
   const type = document.getElementById('ro-chargetype').value;
   const desc = document.getElementById('ro-chargedesc').value.trim();
@@ -1394,12 +1199,10 @@ function removeReopenCharge(idx) { reopenCharges.splice(idx, 1); renderReopenCha
 function renderReopenCharges() {
   document.querySelector('#ro-charges-table tbody').innerHTML = reopenCharges.map((c, i) =>
     `<tr><td>${c.type}</td><td>${c.description}</td><td>$${Number(c.amount).toFixed(2)}</td>
-     <td><button onclick="removeReopenCharge(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="4" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><button onclick="removeReopenCharge(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="4" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
 
-// saveReopen: writes all changes from the reopen modal back to the database.
-// Line items are replaced wholesale — existing items are deleted and re-inserted.
 async function saveReopen(jobId, compId) {
   const msg = document.getElementById('ro-msg');
   msg.innerHTML = '';
@@ -1409,23 +1212,22 @@ async function saveReopen(jobId, compId) {
     scope:                document.getElementById('ro-scope').value     || null,
     site_notes:           document.getElementById('ro-sitenotes').value || null,
     work_order_number:    document.getElementById('ro-wo').value        || null,
-    purchase_order_number: document.getElementById('ro-po').value       || null,
+    purchase_order_number: document.getElementById('ro-po').value      || null,
     updated_at: new Date().toISOString()
   }).eq('id', jobId);
 
   const compPayload = {
-    job_id:          jobId,
-    time_in:         document.getElementById('ro-timein').value    || null,
-    time_out:        document.getElementById('ro-timeout').value   || null,
-    payment_type:    document.getElementById('ro-paytype').value   || null,
-    payment_detail:  document.getElementById('ro-paydetail').value || null,
-    tech_notes:      document.getElementById('ro-technotes').value || null,
-    follow_up_flag:  document.getElementById('ro-followup').checked,
-    last_edited_by:  currentUser.id,
-    last_edited_at:  new Date().toISOString()
+    job_id:         jobId,
+    time_in:        document.getElementById('ro-timein').value    || null,
+    time_out:       document.getElementById('ro-timeout').value   || null,
+    payment_type:   document.getElementById('ro-paytype').value   || null,
+    payment_detail: document.getElementById('ro-paydetail').value || null,
+    tech_notes:     document.getElementById('ro-technotes').value || null,
+    follow_up_flag: document.getElementById('ro-followup').checked,
+    last_edited_by: currentUser.id,
+    last_edited_at: new Date().toISOString()
   };
 
-  // Update existing completion record or create a new one if none exists
   if (compId) {
     await db.from('job_completions').update(compPayload).eq('id', compId);
   } else {
@@ -1433,7 +1235,6 @@ async function saveReopen(jobId, compId) {
     await db.from('job_completions').insert(compPayload);
   }
 
-  // Replace all line items wholesale (delete then re-insert)
   await db.from('job_line_items').delete().eq('job_id', jobId);
   const lineItems = [
     ...reopenParts.map(p => ({
@@ -1472,20 +1273,14 @@ function searchAssignParts() {
   const matches = allParts.filter(p => p.part_name.toLowerCase().includes(q)).slice(0, 10);
   if (!matches.length) { res.style.display = 'none'; return; }
   res.innerHTML = matches.map(p =>
-    `<div data-id="${p.id}" data-name="${p.part_name.replace(/"/g, '&quot;')}">
-      ${p.part_name}${p.unit ? ' (' + p.unit + ')' : ''}${p.category ? ' | ' + p.category : ''}</div>`
+    `<div data-id="${p.id}" data-name="${p.part_name.replace(/"/g,'&quot;')}">${p.part_name}${p.unit?' ('+p.unit+')':''}${p.category?' | '+p.category:''}</div>`
   ).join('');
   res.style.display = 'block';
   res.querySelectorAll('div').forEach(div => {
-    div.addEventListener('mousedown', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      addAssignPart(div.dataset.id, div.dataset.name);
-    });
+    div.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); addAssignPart(div.dataset.id, div.dataset.name); });
   });
 }
 
-// Close parts dropdowns when clicking elsewhere on the page
 document.addEventListener('click', e => {
   if (!e.target.closest('.parts-search-wrap'))
     document.querySelectorAll('.parts-results').forEach(el => el.style.display = 'none');
@@ -1502,9 +1297,9 @@ function removeAssignPart(idx) { assignParts.splice(idx, 1); renderAssignParts()
 function renderAssignParts() {
   document.querySelector('#a-parts-table tbody').innerHTML = assignParts.map((p, i) =>
     `<tr><td>${p.name}</td>
-     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:60px;padding:0.2rem;border:1px solid #ccc" onchange="assignParts[${i}].qty=parseFloat(this.value)||1"></td>
-     <td><button onclick="removeAssignPart(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><input type="number" min="0.1" step="0.1" value="${p.qty}" style="width:65px;padding:0.25rem;border:1px solid #c8cdd8;border-radius:3px" onchange="assignParts[${i}].qty=parseFloat(this.value)||1"></td>
+     <td><button onclick="removeAssignPart(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
 
 
@@ -1523,8 +1318,8 @@ function removeAssignLabor(idx) { assignLabor.splice(idx, 1); renderAssignLabor(
 function renderAssignLabor() {
   document.querySelector('#a-labor-table tbody').innerHTML = assignLabor.map((l, i) =>
     `<tr><td>${l.name}</td><td>${l.hours} hr</td>
-     <td><button onclick="removeAssignLabor(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><button onclick="removeAssignLabor(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="3" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
 
 
@@ -1543,8 +1338,8 @@ function removeAssignCharge(idx) { assignCharges.splice(idx, 1); renderAssignCha
 function renderAssignCharges() {
   document.querySelector('#a-charges-table tbody').innerHTML = assignCharges.map((c, i) =>
     `<tr><td>${c.type}</td><td>${c.description}</td><td>$${Number(c.amount).toFixed(2)}</td>
-     <td><button onclick="removeAssignCharge(${i})" style="border:none;background:none;cursor:pointer;color:red">X</button></td></tr>`
-  ).join('') || '<tr><td colspan="4" style="color:#aaa;font-style:italic">None</td></tr>';
+     <td><button onclick="removeAssignCharge(${i})" style="border:none;background:none;cursor:pointer;color:#a02020;font-weight:bold">X</button></td></tr>`
+  ).join('') || '<tr><td colspan="4" style="color:#aaa;font-style:italic;font-size:0.83rem">None</td></tr>';
 }
 
 
@@ -1571,7 +1366,6 @@ async function runSearch() {
   if (account)  query = query.eq('account_id', account);
   if (status)   query = query.eq('status', status);
   if (category) query = query.eq('job_types.category', category);
-  // .contains() checks if the assigned_tech_ids array includes the given tech UUID
   if (tech)     query = query.contains('assigned_tech_ids', [tech]);
 
   const { data, error } = await query;
@@ -1579,14 +1373,13 @@ async function runSearch() {
   if (error) { el.innerHTML = `<div class="msg error">${error.message}</div>`; return; }
 
   let results = data || [];
-  // Address is filtered client-side since Supabase can't do partial match on a joined column
   if (address) results = results.filter(j => (j.accounts?.address || '').toLowerCase().includes(address));
-  if (!results.length) { el.innerHTML = '<p>No results.</p>'; return; }
+  if (!results.length) { el.innerHTML = '<p class="meta">No results found.</p>'; return; }
 
   const totalRevenue = results.reduce((sum, j) => sum + calcRevenue(j.job_line_items), 0);
 
   el.innerHTML = `
-    <div class="card" style="font-weight:bold">${results.length} jobs found | Total: $${totalRevenue.toFixed(2)}</div>
+    <div class="card" style="background:#1a2744;color:white;font-weight:600">${results.length} jobs found &nbsp;|&nbsp; Total: $${totalRevenue.toFixed(2)}</div>
     <div style="overflow-x:auto">
     <table>
       <thead><tr><th>Date</th><th>Account</th><th>Type</th><th>WO</th><th>Status</th><th>Address</th><th>Total</th></tr></thead>
@@ -1594,12 +1387,12 @@ async function runSearch() {
         const total = calcRevenue(j.job_line_items);
         return `<tr>
           <td style="white-space:nowrap">${formatDate(j.job_date)}</td>
-          <td>${j.accounts?.account_name || ''}${j.sub?.account_name ? ' / ' + j.sub.account_name : ''}</td>
+          <td><strong>${j.accounts?.account_name || ''}</strong>${j.sub?.account_name ? ' / '+j.sub.account_name : ''}</td>
           <td>${j.job_types?.job_type_name || ''}</td>
           <td style="font-size:0.82rem">${j.work_order_number || ''}</td>
-          <td><span class="status-badge status-${j.status.replace(/ /g, '-')}">${j.status}</span></td>
+          <td><span class="status-badge status-${j.status.replace(/ /g,'-')}">${j.status}</span></td>
           <td style="font-size:0.82rem">${j.accounts?.address ? mapsLink(j.accounts.address) : ''}</td>
-          <td>$${total.toFixed(2)}</td>
+          <td style="font-weight:600">$${total.toFixed(2)}</td>
         </tr>`;
       }).join('')}</tbody>
     </table>
@@ -1608,8 +1401,6 @@ async function runSearch() {
 
 
 // ---- EXPORT ----
-// runExport: fetches approved jobs for a date range and downloads a CSV
-// formatted for import into QuickBooks Desktop.
 async function runExport() {
   const from   = document.getElementById('ex-from').value;
   const to     = document.getElementById('ex-to').value;
@@ -1633,7 +1424,7 @@ async function runExport() {
   const { data, error } = await query;
   if (error || !data?.length) { msg.innerHTML = '<div class="msg error">No data found.</div>'; return; }
 
-  const rows = [['Date', 'Customer', 'Sub-Customer', 'Job Type', 'WO', 'PO', 'Item Type', 'Item', 'Qty', 'Unit Cost', 'Override Cost', 'Extended', 'Payment Type', 'Payment Detail', 'Tech Notes', 'Status']];
+  const rows = [['Date','Customer','Sub-Customer','Job Type','WO','PO','Item Type','Item','Qty','Unit Cost','Override Cost','Extended','Payment Type','Payment Detail','Tech Notes','Status']];
   data.forEach(j => {
     const comp  = j.job_completions?.[0] || {};
     const items = j.job_line_items || [];
@@ -1655,7 +1446,7 @@ async function runExport() {
           comp.payment_type || '', comp.payment_detail || '', comp.tech_notes || '', j.status]);
       });
     } else {
-      rows.push([...base, '', '', '', '', '', '', comp.payment_type || '', comp.payment_detail || '', comp.tech_notes || '', j.status]);
+      rows.push([...base, '','','','','','', comp.payment_type||'', comp.payment_detail||'', comp.tech_notes||'', j.status]);
     }
   });
 
@@ -1664,22 +1455,21 @@ async function runExport() {
 }
 
 
-// ---- REFERENCE DATA MANAGEMENT ----
-// showRefTab: switches between the Parts / Job Types / Labor Types / Techs sub-tabs.
+// ---- REFERENCE DATA ----
 function showRefTab(tab) {
-  ['parts', 'jobtypes', 'labortypes', 'techs'].forEach(t => {
-    document.getElementById(`ref-${t}`).style.display = t === tab ? '' : 'none';
-  });
+  ['parts','jobtypes','labortypes','techs'].forEach(t =>
+    document.getElementById(`ref-${t}`).style.display = t === tab ? '' : 'none'
+  );
 }
 
 function renderPartsRef() {
   const tbody = document.getElementById('parts-ref-body');
   if (!tbody) return;
   tbody.innerHTML = allParts.map(p => `<tr>
-    <td>${p.part_name}</td><td>${p.category || ''}</td><td>${p.unit || ''}</td>
+    <td><strong>${p.part_name}</strong></td><td>${p.category||''}</td><td>${p.unit||''}</td>
     <td>$${Number(p.unit_cost).toFixed(2)}</td>
-    <td>${p.active ? 'Yes' : 'No'}</td>
-    <td><button class="btn btn-red" onclick="toggleActive('parts', '${p.id}', ${p.active})">
+    <td>${p.active ? 'Yes' : '<span style="color:#aaa">No</span>'}</td>
+    <td><button class="btn btn-red" onclick="toggleActive('parts','${p.id}',${p.active})" style="padding:0.2rem 0.6rem;font-size:0.8rem">
       ${p.active ? 'Deactivate' : 'Activate'}</button></td>
   </tr>`).join('');
 }
@@ -1693,11 +1483,8 @@ async function addPart() {
     unit:      document.getElementById('rp-unit').value     || null,
     unit_cost: parseFloat(document.getElementById('rp-cost').value) || 0
   });
-  if (error) {
-    document.getElementById('parts-ref-msg').innerHTML = `<div class="msg error">${error.message}</div>`;
-    return;
-  }
-  ['rp-name', 'rp-category', 'rp-unit', 'rp-cost'].forEach(id => document.getElementById(id).value = '');
+  if (error) { document.getElementById('parts-ref-msg').innerHTML = `<div class="msg error">${error.message}</div>`; return; }
+  ['rp-name','rp-category','rp-unit','rp-cost'].forEach(id => document.getElementById(id).value = '');
   await loadRefData();
 }
 
@@ -1705,10 +1492,10 @@ function renderJobTypesRef() {
   const tbody = document.getElementById('jobtypes-ref-body');
   if (!tbody) return;
   tbody.innerHTML = allJobTypes.map(j => `<tr>
-    <td>${j.job_type_name}</td><td>${j.category || ''}</td>
-    <td>${j.flat_rate ? '$' + Number(j.flat_rate).toFixed(2) : '--'}</td>
-    <td>${j.active ? 'Yes' : 'No'}</td>
-    <td><button class="btn btn-red" onclick="toggleActive('job_types', '${j.id}', ${j.active})">
+    <td><strong>${j.job_type_name}</strong></td><td>${j.category||''}</td>
+    <td>${j.flat_rate ? '$'+Number(j.flat_rate).toFixed(2) : '--'}</td>
+    <td>${j.active ? 'Yes' : '<span style="color:#aaa">No</span>'}</td>
+    <td><button class="btn btn-red" onclick="toggleActive('job_types','${j.id}',${j.active})" style="padding:0.2rem 0.6rem;font-size:0.8rem">
       ${j.active ? 'Deactivate' : 'Activate'}</button></td>
   </tr>`).join('');
 }
@@ -1721,7 +1508,7 @@ async function addJobType() {
     category:      document.getElementById('rjt-category').value || null,
     flat_rate:     parseFloat(document.getElementById('rjt-rate').value) || null
   });
-  ['rjt-name', 'rjt-category', 'rjt-rate'].forEach(id => document.getElementById(id).value = '');
+  ['rjt-name','rjt-category','rjt-rate'].forEach(id => document.getElementById(id).value = '');
   await loadRefData();
 }
 
@@ -1729,8 +1516,8 @@ function renderLaborTypesRef() {
   const tbody = document.getElementById('labortypes-ref-body');
   if (!tbody) return;
   tbody.innerHTML = allLaborTypes.map(l => `<tr>
-    <td>${l.labor_type_name}</td><td>$${Number(l.hourly_rate).toFixed(2)}/hr</td>
-    <td><button class="btn btn-red" onclick="deleteLaborType('${l.id}')">Delete</button></td>
+    <td><strong>${l.labor_type_name}</strong></td><td>$${Number(l.hourly_rate).toFixed(2)}/hr</td>
+    <td><button class="btn btn-red" onclick="deleteLaborType('${l.id}')" style="padding:0.2rem 0.6rem;font-size:0.8rem">Delete</button></td>
   </tr>`).join('');
 }
 
@@ -1741,7 +1528,7 @@ async function addLaborType() {
     labor_type_name: name,
     hourly_rate:     parseFloat(document.getElementById('rlt-rate').value) || 0
   });
-  ['rlt-name', 'rlt-rate'].forEach(id => document.getElementById(id).value = '');
+  ['rlt-name','rlt-rate'].forEach(id => document.getElementById(id).value = '');
   await loadRefData();
 }
 
@@ -1755,8 +1542,9 @@ function renderTechsRef() {
   const tbody = document.getElementById('techs-ref-body');
   if (!tbody) return;
   tbody.innerHTML = allTechs.map(t => `<tr>
-    <td>${t.tech_name}</td><td>${t.active ? 'Yes' : 'No'}</td>
-    <td><button class="btn btn-red" onclick="toggleActive('techs', '${t.id}', ${t.active})">
+    <td><strong>${t.tech_name}</strong></td>
+    <td>${t.active ? 'Yes' : '<span style="color:#aaa">No</span>'}</td>
+    <td><button class="btn btn-red" onclick="toggleActive('techs','${t.id}',${t.active})" style="padding:0.2rem 0.6rem;font-size:0.8rem">
       ${t.active ? 'Deactivate' : 'Activate'}</button></td>
   </tr>`).join('');
 }
@@ -1769,9 +1557,6 @@ async function addTech() {
   await loadRefData();
 }
 
-// toggleActive: flips the active boolean on any reference table row.
-// Used by parts, job types, and techs to deactivate/reactivate records
-// without deleting them (preserves history on existing jobs).
 async function toggleActive(table, id, current) {
   await db.from(table).update({ active: !current }).eq('id', id);
   await loadRefData();
@@ -1779,11 +1564,9 @@ async function toggleActive(table, id, current) {
 
 
 // ---- CALENDAR ----
-let calWeekOffset = 0; // 0 = current week, -1 = last week, +1 = next week, etc.
+let calWeekOffset = 0;
 let calJobs = [];
 
-// calWeekDates: returns an array of 7 date strings (Mon–Sun) for the week
-// that is `offset` weeks from the current week.
 function calWeekDates(offset) {
   const now    = new Date();
   const monday = new Date(now);
@@ -1800,15 +1583,13 @@ function calWeekDates(offset) {
 function calPrevWeek() { calWeekOffset--; loadCalendar(); }
 function calNextWeek() { calWeekOffset++; loadCalendar(); }
 
-// loadCalendar: fetches jobs for the displayed week, then renders the grid.
 async function loadCalendar() {
   const days = calWeekDates(calWeekOffset);
   const from = days[0], to = days[6];
   document.getElementById('cal-week-label').textContent =
-    `${new Date(from + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ` +
-    `${new Date(to   + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    `${new Date(from+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})} - ` +
+    `${new Date(to+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
 
-  // T12:00:00 is used to keep the date display stable across timezones
   const { data } = await db.from('jobs')
     .select(`id,job_date,status,is_fixed_price,assigned_tech_ids,lead_tech_id,
              accounts!jobs_account_id_fkey(account_name),
@@ -1820,60 +1601,53 @@ async function loadCalendar() {
   renderCalendar();
 }
 
-// renderCalendar: draws the weekly grid from the calJobs array already loaded.
-// Called separately from loadCalendar so the tech filter can re-render without a new fetch.
 function renderCalendar() {
   const techId   = document.getElementById('cal-tech').value;
   const days     = calWeekDates(calWeekOffset);
-  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const todayStr = today();
 
+  const colorMap = {
+    'Scheduled':'#e4eaf8','Quoted':'#fff3d6','Awaiting Parts':'#ffe8cc',
+    'Pending Review':'#fff8c0','Flagged':'#ffe0e0','Approved':'#d6f2e0','In Progress':'#d6f2e0'
+  };
+
   document.getElementById('calendar-grid').innerHTML = `<table style="table-layout:fixed;min-width:560px">
-    <thead><tr>${days.map((d, i) => {
-      const label   = new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    <thead><tr>${days.map((d,i) => {
+      const label   = new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
       const isToday = d === todayStr;
-      return `<th style="width:14.28%;font-size:0.82rem;${isToday ? 'background:#1a1a1a;color:white;' : ''}">${dayNames[i]}<br>${label}</th>`;
+      return `<th style="width:14.28%;font-size:0.8rem;${isToday ? 'background:#1a2744;color:white;' : 'color:#4a5070;'}">${dayNames[i]}<br>${label}</th>`;
     }).join('')}</tr></thead>
     <tbody><tr>${days.map(d => {
       let jobs = calJobs.filter(j => j.job_date === d);
       if (techId) jobs = jobs.filter(j => j.assigned_tech_ids?.includes(techId));
       const cells = jobs.map(j => {
-        const color = { 'Scheduled': '#e0e8ff', 'Quoted': '#fff0cc', 'Awaiting Parts': '#ffe8cc',
-          'Pending Review': '#ffd', 'Flagged': '#ffe0e0', 'Approved': '#e0ffe0' }[j.status] || '#eee';
-        return `<div style="background:${color};border:1px solid #ccc;padding:0.3rem;margin-bottom:0.3rem;font-size:0.78rem;border-radius:2px">
-          <strong>${j.accounts?.account_name || ''}</strong><br>
-          ${j.job_types?.job_type_name || ''}<br>
-          <span style="color:#666">${j.status}</span>
+        const color = colorMap[j.status] || '#eee';
+        return `<div style="background:${color};border:1px solid rgba(0,0,0,0.08);padding:0.3rem 0.4rem;margin-bottom:0.3rem;font-size:0.77rem;border-radius:3px">
+          <strong style="color:#1a2744">${j.accounts?.account_name || ''}</strong><br>
+          <span style="color:#5a6075">${j.job_types?.job_type_name || ''}</span><br>
+          <span style="font-size:0.72rem;color:#666">${j.status}</span>
         </div>`;
       }).join('');
-      return `<td style="vertical-align:top;padding:0.3rem;border:1px solid #eee;min-height:80px">${cells || '<span style="color:#ccc;font-size:0.78rem">-</span>'}</td>`;
+      return `<td style="vertical-align:top;padding:0.3rem;border:1px solid #eef0f6;min-height:80px">${cells || '<span style="color:#ccc;font-size:0.77rem">--</span>'}</td>`;
     }).join('')}</tr></tbody>
   </table>`;
 }
 
 
 // ---- SECTION NAVIGATION ----
-// showSection: shows the requested section and hides all others.
-// Also triggers any data loads needed when entering a section.
 function showSection(name) {
-  ['assign', 'review', 'search', 'export', 'reference', 'jobslist', 'calendar'].forEach(s => {
+  ['assign','review','search','export','reference','calendar'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s === name ? 'block' : 'none';
   });
-
-  // Update nav button active state.
-  // navMap indices correspond to nav button positions in the DOM.
-  // The Accounts <a><button> counts as index 4, so reference/search/export are 5/6/7.
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  const navMap = { assign: 0, review: 1, jobslist: 2, calendar: 3, reference: 5, search: 6, export: 7 };
+  const navMap = { assign:0, review:1, reference:5, search:6, export:7 };
   const navBtns = document.querySelectorAll('nav button');
   if (navMap[name] !== undefined && navBtns[navMap[name]]) {
     navBtns[navMap[name]].classList.add('active');
   }
-
-  // Trigger data loads for sections that need them
   if (name === 'review')   loadReview();
   if (name === 'calendar') loadCalendar();
-  if (name === 'jobslist') setScheduleRange('week');
 }
 
 
