@@ -74,9 +74,9 @@ input[type=checkbox] { width: auto; }
   <!-- ---- MY JOBS TAB ---- -->
   <div id="tab-jobs">
     <div class="filters">
-      <button class="filter-btn active" onclick="setFilter('today',this)">Today</button>
+      <button class="filter-btn" onclick="setFilter('today',this)">Today</button>
       <button class="filter-btn" onclick="setFilter('week',this)">This Week</button>
-      <button class="filter-btn" onclick="setFilter('open',this)">All Open</button>
+      <button class="filter-btn active" onclick="setFilter('open',this)">All Open</button>
     </div>
     <div id="jobs-list">Loading...</div>
   </div>
@@ -180,7 +180,7 @@ input[type=checkbox] { width: auto; }
 // These are the top-level variables the page uses. Everything else is local to its function.
 
 let currentUser  = null;     // Supabase auth user object (set on init)
-let currentFilter = 'today'; // Active date filter: 'today' | 'week' | 'open'
+let currentFilter = 'open';  // Active date filter: 'today' | 'week' | 'open'
 let modalJobId   = null;     // ID of the job currently open in the modal
 
 // Parts and labor lists for the completion modal ('m') and the new-job form ('nj').
@@ -254,6 +254,12 @@ async function loadJobs() {
   const list = document.getElementById('jobs-list');
   list.innerHTML = '<p style="color:#888">Loading...</p>';
   try {
+    // Resolve auth user → techs row. The jobs table stores techs.id in assigned_tech_ids,
+    // not the Supabase auth user ID. Look up this user's techs row first.
+    // If no mapping exists yet, techRowId stays null and we show all open jobs (POC fallback).
+    const { data: techRow } = await db.from('techs').select('id').eq('user_id', currentUser.id).maybeSingle();
+    const techRowId = techRow?.id || null;
+
     let query = db.from('jobs')
       .select(`id, job_date, status, scope, site_notes, is_fixed_price, quote_amount,
                work_order_number, purchase_order_number, account_id,
@@ -264,8 +270,10 @@ async function loadJobs() {
                job_completions(id,tech_notes,follow_up_flag,submitted_at),
                job_line_items(id,item_type,item_id,quantity),
                job_visits(id,visit_number,visit_date)`)
-      .not('status', 'in', '("Cancelled","Approved")')
-      .contains('assigned_tech_ids', [currentUser.id]); // Only jobs assigned to this tech
+      .not('status', 'in', '("Cancelled","Approved")');
+
+    // Filter to this tech's jobs only when a techs row mapping exists
+    if (techRowId) query = query.contains('assigned_tech_ids', [techRowId]);
 
     if (currentFilter === 'today') query = query.eq('job_date', today());
     else if (currentFilter === 'week') query = query.gte('job_date', weekStart());
