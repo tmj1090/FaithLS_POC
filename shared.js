@@ -124,10 +124,13 @@ function downloadCSV(rows, filename) {
 
 async function fetchPhotoUrls(photos) {
   return Promise.all(photos.map(async p => {
-    const { data: signed } = await db.storage.from('job-photos').createSignedUrl(p.storage_path, 7200);
+    const { data: signed, error } = await db.storage
+      .from('job-photos')
+      .createSignedUrl(p.storage_path, 7200);
     if (signed?.signedUrl) return { ...p, url: signed.signedUrl };
-    const { data: pub } = db.storage.from('job-photos').getPublicUrl(p.storage_path);
-    return { ...p, url: pub?.publicUrl || null };
+    // Log the error so it is visible in the browser console for debugging.
+    if (error) console.warn('fetchPhotoUrls: signed URL failed for', p.storage_path, error.message);
+    return { ...p, url: null };
   }));
 }
 
