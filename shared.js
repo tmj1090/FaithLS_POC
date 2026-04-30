@@ -181,34 +181,53 @@ function mapsLink(address) {
 
 
 // ---- ADMIN NAV ----
-// Call once per page: renderAdminNav('schedule', '<button ...>Refresh</button>')
+// renderAdminNav(activePage, extraHtml)
 // activePage: 'admin' | 'schedule' | 'accounts'
-// extraHtml: page-specific buttons injected after the divider (optional)
+// extraHtml: page-specific buttons shown after a divider (optional)
+//
+// On admin.html: global nav buttons call showSection() directly -- no page reload.
+// On schedule/accounts: buttons link back to admin.html or the other pages.
 function renderAdminNav(activePage, extraHtml = '') {
-  const pages = [
-    { label: 'Assign',     href: 'admin.html',    key: 'admin' },
-    { label: 'Review',     href: 'admin.html#review', key: 'admin' },
-    { label: 'Schedule',   href: 'schedule.html', key: 'schedule' },
-    { label: 'Calendar',   href: 'admin.html#calendar', key: 'admin' },
-    { label: 'Accounts',   href: 'accounts.html', key: 'accounts' },
-    { label: 'Reference',  href: 'admin.html#reference', key: 'admin' },
-    { label: 'Search',     href: 'admin.html#search', key: 'admin' },
-    { label: 'Export',     href: 'admin.html#export', key: 'admin' },
-  ];
+  const btnStyle = (active) =>
+    `style="background:${active ? '#6b6fa8' : 'transparent'};border:1px solid ${active ? '#6b6fa8' : 'rgba(255,255,255,0.35)'};color:${active ? 'white' : 'rgba(255,255,255,0.75)'};padding:0.3rem 0.75rem;cursor:pointer;font-size:0.82rem;border-radius:3px;font-family:inherit"`;
 
-  const navBtns = pages.map(p => {
-    const active = p.key === activePage && p.label === pages.find(x => x.key === activePage)?.label
-      ? '' : ''; // active class handled per-page below
-    const isActive = (activePage === 'schedule' && p.label === 'Schedule') ||
-                     (activePage === 'accounts' && p.label === 'Accounts') ||
-                     (activePage === 'admin'    && p.label === 'Assign');
-    const cls = isActive ? 'class="active"' : '';
-    if (p.href.includes('#')) {
-      // admin.html with section anchor -- navigate and let admin page handle showSection
-      return `<a href="${p.href}" style="text-decoration:none"><button ${cls} style="background:transparent;border:1px solid rgba(255,255,255,0.35);color:rgba(255,255,255,0.75);padding:0.3rem 0.75rem;cursor:pointer;font-size:0.82rem;border-radius:3px">${p.label}</button></a>`;
-    }
-    return `<a href="${p.href}" style="text-decoration:none"><button ${cls} style="background:${isActive ? '#6b6fa8' : 'transparent'};border:1px solid ${isActive ? '#6b6fa8' : 'rgba(255,255,255,0.35)'};color:${isActive ? 'white' : 'rgba(255,255,255,0.75)'};padding:0.3rem 0.75rem;cursor:pointer;font-size:0.82rem;border-radius:3px">${p.label}</button></a>`;
-  }).join('');
+  let navHtml = '';
+
+  if (activePage === 'admin') {
+    // All sections live on this page -- use showSection, no anchors needed
+    navHtml = `
+      <button onclick="showSection('assign')"    ${btnStyle(false)}>Assign</button>
+      <button onclick="showSection('review')"    ${btnStyle(false)}>Review</button>
+      <a href="schedule.html" style="text-decoration:none"><button ${btnStyle(false)}>Schedule</button></a>
+      <button onclick="showSection('calendar')"  ${btnStyle(false)}>Calendar</button>
+      <a href="accounts.html" style="text-decoration:none"><button ${btnStyle(false)}>Accounts</button></a>
+      <button onclick="showSection('reference')" ${btnStyle(false)}>Reference</button>
+      <button onclick="showSection('search')"    ${btnStyle(false)}>Search</button>
+      <button onclick="showSection('export')"    ${btnStyle(false)}>Export</button>
+    `;
+  } else if (activePage === 'schedule') {
+    navHtml = `
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Assign</button></a>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Review</button></a>
+      <button ${btnStyle(true)}>Schedule</button>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Calendar</button></a>
+      <a href="accounts.html" style="text-decoration:none"><button ${btnStyle(false)}>Accounts</button></a>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Reference</button></a>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Search</button></a>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Export</button></a>
+    `;
+  } else if (activePage === 'accounts') {
+    navHtml = `
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Assign</button></a>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Review</button></a>
+      <a href="schedule.html" style="text-decoration:none"><button ${btnStyle(false)}>Schedule</button></a>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Calendar</button></a>
+      <button ${btnStyle(true)}>Accounts</button>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Reference</button></a>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Search</button></a>
+      <a href="admin.html" style="text-decoration:none"><button ${btnStyle(false)}>Export</button></a>
+    `;
+  }
 
   const divider = extraHtml
     ? `<span style="width:1px;height:1rem;background:rgba(255,255,255,0.2);margin:0 0.4rem;display:inline-block"></span>${extraHtml}`
@@ -219,7 +238,7 @@ function renderAdminNav(activePage, extraHtml = '') {
   document.querySelector('header').innerHTML = `
     <h1 style="margin:0;font-size:0.95rem;font-weight:600;letter-spacing:0.02em">Faith Lock &amp; Safe &nbsp;|&nbsp; ${pageTitle}</h1>
     <nav style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;flex:1;margin-left:1rem">
-      ${navBtns}${divider}
+      ${navHtml}${divider}
     </nav>
     <button class="logout" onclick="logout()">Sign Out</button>
   `;
@@ -230,51 +249,57 @@ function renderAdminNav(activePage, extraHtml = '') {
 // printJob(jobId): fetches full job record and opens a formatted print window.
 // Shows actuals if job is Approved or Pending Review; otherwise shows expected items.
 async function printJob(jobId) {
-  // Fetch core job data
   const { data: job, error } = await db
     .from('jobs')
     .select(`
       id, job_date, status, scope, site_notes, is_fixed_price,
+      account_id, job_address, assigned_tech_ids,
       work_order_number, purchase_order_number,
       accounts!jobs_account_id_fkey(account_name, address),
       sub_accounts:accounts!jobs_sub_account_id_fkey(account_name),
       job_types(job_type_name),
       lead_tech:techs!jobs_lead_tech_id_fkey(tech_name),
-      job_techs(techs(tech_name)),
-      job_line_items(item_type, quantity, notes, parts(part_name), labor_types(labor_type_name)),
-      job_visits(visit_date, visit_notes,
-        job_line_items(item_type, quantity, notes, parts(part_name), labor_types(labor_type_name)))
+      job_line_items(item_type, item_id, quantity, notes, parts(part_name), labor_types(labor_type_name)),
+      job_visits(visit_number, visit_date, clocked_in_at, clocked_out_at, tech_notes)
     `)
     .eq('id', jobId)
     .single();
 
-  if (error || !job) { alert('Could not load job data.'); return; }
+  if (error || !job) { alert('Could not load job data: ' + (error?.message || 'unknown error')); return; }
 
-  // Fetch contacts for this account
+  // Resolve tech names from assigned_tech_ids array
+  let techNames = '';
+  if (job.assigned_tech_ids?.length) {
+    const { data: techRows } = await db.from('techs')
+      .select('id, tech_name').in('id', job.assigned_tech_ids);
+    techNames = (techRows || []).map(t => t.tech_name).join(', ');
+  }
+  if (!techNames) techNames = job.lead_tech?.tech_name || '';
+
+  // Fetch contacts -- column is 'notes' not 'contact_notes'
   const { data: contacts } = await db
     .from('account_contacts')
-    .select('contact_name, title, cell_phone, work_phone, contact_notes, is_primary, is_secondary')
+    .select('contact_name, title, cell_phone, work_phone, notes, is_primary, is_secondary')
     .eq('account_id', job.account_id)
-    .eq('is_active', true)
+    .eq('active', true)
     .order('is_primary', { ascending: false });
 
   const primary   = (contacts || []).find(c => c.is_primary);
-  const secondary = (contacts || []).find(c => c.is_secondary);
+  const secondary = (contacts || []).find(c => c.is_secondary && !c.is_primary);
 
   const useActuals = ['Approved', 'Pending Review'].includes(job.status);
-  const allTechs   = (job.job_techs || []).map(t => t.techs?.tech_name).filter(Boolean).join(', ') || job.lead_tech?.tech_name || '';
 
   function itemRows(items) {
     if (!items?.length) return '<tr><td colspan="4" style="color:#aaa;font-style:italic;padding:4px 7px">None</td></tr>';
     return items.map(i => {
-      const desc = i.item_type === 'part'   ? (i.parts?.part_name || '')
-                 : i.item_type === 'labor'  ? (i.labor_types?.labor_type_name || '')
-                 : i.item_type === 'service_call' ? 'Service Call Fee'
+      const desc = i.item_type === 'Part'         ? (i.parts?.part_name || '')
+                 : i.item_type === 'Labor'        ? (i.labor_types?.labor_type_name || '')
+                 : i.item_type === 'Service Call' ? 'Service Call Fee'
                  : 'Other';
-      const badge = { part: '#dbeafe|#1e40af|Part', labor: '#dcfce7|#166534|Labor',
-                      service_call: '#fef3c7|#92400e|Svc Call', other: '#f3e8ff|#6b21a8|Other' }[i.item_type] || '|#333|';
+      const badge = { Part: '#dbeafe|#1e40af|Part', Labor: '#dcfce7|#166534|Labor',
+                      'Service Call': '#fef3c7|#92400e|Svc Call', Other: '#f3e8ff|#6b21a8|Other' }[i.item_type] || '|#333|';
       const [bg, fg, label] = badge.split('|');
-      const qty = i.item_type === 'labor' ? `${i.quantity} hr${i.quantity !== 1 ? 's' : ''}` : i.quantity;
+      const qty = i.item_type === 'Labor' ? `${i.quantity} hr${i.quantity !== 1 ? 's' : ''}` : i.quantity;
       return `<tr style="background:inherit">
         <td><span style="font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:1px 4px;border-radius:2px;background:${bg};color:${fg}">${label}</span></td>
         <td>${desc}</td><td style="text-align:center">${qty}</td><td>${i.notes || ''}</td>
@@ -293,19 +318,31 @@ async function printJob(jobId) {
         <div><div style="font-size:0.6rem;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:1px">Name</div><div style="font-size:0.76rem">${c.contact_name || ''}</div></div>
         <div><div style="font-size:0.6rem;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:1px">Title</div><div style="font-size:0.76rem">${c.title || ''}</div></div>
         <div><div style="font-size:0.6rem;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:1px">Phone</div><div style="font-size:0.76rem">${phone}</div></div>
-        ${c.contact_notes ? `<div style="grid-column:1/-1;font-size:0.68rem;color:#666;font-style:italic;padding-top:2px">Notes: ${c.contact_notes}</div>` : ''}
+        ${c.notes ? `<div style="grid-column:1/-1;font-size:0.68rem;color:#666;font-style:italic;padding-top:2px">Notes: ${c.notes}</div>` : ''}
       </div>`;
   }
 
-  // Build visit blocks -- use visits table if multi-visit; fall back to job-level items
-  const visits = job.job_visits?.length
-    ? job.job_visits.map((v, i) => ({ label: `Visit ${i + 1}`, date: v.visit_date, items: useActuals ? v.job_line_items : [] }))
-    : [{ label: 'Visit 1', date: job.job_date, items: job.job_line_items }];
+  // Visits show date and clock times. Line items are job-level (not per-visit).
+  // If multi-visit, show each visit as a block; line items shown once after all visits.
+  const sortedVisits = (job.job_visits || []).sort((a, b) => a.visit_number - b.visit_number);
 
-  const visitBlocks = visits.map(v => `
-    <div style="border:1px solid #e4dfd8;border-radius:3px;margin-bottom:8px;overflow:hidden">
+  const visitBlocks = sortedVisits.length
+    ? sortedVisits.map(v => `
+        <div style="border:1px solid #e4dfd8;border-radius:3px;margin-bottom:6px;overflow:hidden">
+          <div style="background:#f4f1ec;padding:4px 10px;font-size:0.65rem;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:0.07em;display:flex;gap:16px">
+            Visit ${v.visit_number}
+            <span style="font-weight:400;color:#666;text-transform:none;letter-spacing:0">${formatDate(v.visit_date)}</span>
+            ${v.clocked_in_at ? `<span style="font-weight:400;color:#888;text-transform:none;letter-spacing:0">In: ${new Date(v.clocked_in_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</span>` : ''}
+            ${v.clocked_out_at ? `<span style="font-weight:400;color:#888;text-transform:none;letter-spacing:0">Out: ${new Date(v.clocked_out_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</span>` : ''}
+          </div>
+          ${v.tech_notes ? `<div style="padding:5px 10px;font-size:0.72rem;color:#444;font-style:italic">${v.tech_notes}</div>` : ''}
+        </div>`).join('')
+    : `<div style="font-size:0.76rem;color:#aaa;font-style:italic">No visit records.</div>`;
+
+  const lineItemBlock = `
+    <div style="border:1px solid #e4dfd8;border-radius:3px;overflow:hidden;margin-top:8px">
       <div style="background:#f4f1ec;padding:4px 10px;font-size:0.65rem;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:0.07em">
-        ${v.label} <span style="font-weight:400;color:#666;text-transform:none;letter-spacing:0">${formatDate(v.date)}</span>
+        Line Items ${useActuals ? '(Actuals)' : '(Expected)'}
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:0.72rem">
         <thead><tr style="background:#1a2744;color:white">
@@ -314,9 +351,9 @@ async function printJob(jobId) {
           <th style="padding:5px 7px;text-align:center;font-weight:500;font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase">Qty</th>
           <th style="padding:5px 7px;text-align:left;font-weight:500;font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase">Notes</th>
         </tr></thead>
-        <tbody>${itemRows(v.items)}</tbody>
+        <tbody>${itemRows(job.job_line_items)}</tbody>
       </table>
-    </div>`).join('');
+    </div>`;
 
   const html = `<!DOCTYPE html><html><head>
     <title>Job Summary - ${job.id}</title>
@@ -359,7 +396,7 @@ async function printJob(jobId) {
         <div class="field"><label>WO Number</label><span style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem">${job.work_order_number || ''}</span></div>
         <div class="field"><label>PO Number</label><span style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem">${job.purchase_order_number || ''}</span></div>
         <div class="field"><label>Lead Tech</label><span>${job.lead_tech?.tech_name || ''}</span></div>
-        <div class="field"><label>All Techs</label><span>${allTechs}</span></div>
+        <div class="field"><label>All Techs</label><span>${techNames}</span></div>
         <div class="field"><label>Account</label><span>${job.accounts?.account_name || ''}</span></div>
         <div class="field"><label>Sub-Account</label><span>${job.sub_accounts?.account_name || ''}</span></div>
       </div>
@@ -367,7 +404,7 @@ async function printJob(jobId) {
 
     <div class="section">
       <div class="section-title">Site Address</div>
-      <span>${job.accounts?.address || ''}</span>
+      <span>${job.job_address || job.accounts?.address || ''}</span>
     </div>
 
     <div class="section">
@@ -380,12 +417,13 @@ async function printJob(jobId) {
     ${job.site_notes ? `<div class="section"><div class="section-title">Site Notes</div><div class="notes-box">${job.site_notes}</div></div>` : ''}
 
     <div class="section">
-      <div class="section-title">Visits and Line Items</div>
+      <div class="section-title">Visits</div>
       ${visitBlocks}
+      ${lineItemBlock}
     </div>
 
     <div class="footer">
-      <span>Faith Lock &amp; Safe Co. -- Internal Use</span>
+      <span>Faith Lock &amp; Safe Co. | Internal Use</span>
       <span>Printed ${new Date().toLocaleDateString('en-US')}</span>
     </div>
 
